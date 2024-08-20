@@ -13,7 +13,7 @@ import jp.neuroinf.abstracts.entity.Account;
 import jp.neuroinf.abstracts.repository.AccountRepository;
 
 @Service
-public class AccountService implements UserDetailsService {
+public class UserDetailsServiceImpl implements UserDetailsService {
 
   @Autowired
   private AccountRepository accountRepository;
@@ -27,7 +27,7 @@ public class AccountService implements UserDetailsService {
     if (account == null) {
       throw new UsernameNotFoundException("User not found");
     }
-    return new AccountDetails(account);
+    return new UserDetailsImpl(account);
   }
 
   public Account findByEmail(String username) {

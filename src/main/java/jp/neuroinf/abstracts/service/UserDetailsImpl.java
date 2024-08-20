@@ -9,12 +9,16 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import jp.neuroinf.abstracts.entity.Account;
 
-public class AccountDetails implements UserDetails {
+public class UserDetailsImpl implements UserDetails {
 
   private Account account;
 
-  public AccountDetails(Account account) {
+  public UserDetailsImpl(Account account) {
     this.account = account;
+  }
+
+  public Account getAccount() {
+    return this.account;
   }
 
   @Override
@@ -24,12 +28,12 @@ public class AccountDetails implements UserDetails {
 
   @Override
   public String getPassword() {
-    return account.getPassword();
+    return this.account.getPassword();
   }
 
   @Override
   public String getUsername() {
-    return account.getMail();
+    return this.account.getMail();
   }
 
   @Override
@@ -49,6 +53,6 @@ public class AccountDetails implements UserDetails {
 
   @Override
   public boolean isEnabled() {
-    return account.getIsActive();
+    return this.account.getIsActive();
   }
 }

@@ -20,7 +20,7 @@ public class Banner {
   @Column(name = "uuid")
   private String uuid;
 
-  @Column(name = "type", length = 300)
+  @Column(name = "type")
   private String type;
 
   @ManyToOne

@@ -48,6 +48,7 @@ public class Abstract {
   @Column(name = "doi")
   private String doi;
 
+  @Lob
   @Column(name = "acknowledgements", length = 500)
   private String acknowledgements;
 

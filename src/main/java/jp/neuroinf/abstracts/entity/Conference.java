@@ -77,10 +77,12 @@ public class Conference {
   @Column(name = "link")
   private String link;
 
-  @Column(name = "description", length = 512)
+  @Lob
+  @Column(name = "description", length = 500)
   private String description;
 
-  @Column(name = "notice", length = 512)
+  @Lob
+  @Column(name = "notice", length = 500)
   private String notice;
 
   @Column(name = "has_presentation_prefs")
@@ -126,6 +128,6 @@ public class Conference {
 
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "conference", orphanRemoval = true)
   @OnDelete(action = OnDeleteAction.CASCADE)
-  private Set<ConferenceOwners> owners = new HashSet<>();
+  private Set<ConferenceOwners> conferenceOwners = new HashSet<>();
 
 }

@@ -30,7 +30,7 @@
   },
   "java.compile.nullAnalysis.mode": "automatic",
   // Extensions - Code Spell Checker
-  "cSpell.words": ["Embeddable", "neuroinf", "prefs"],
+  "cSpell.words": ["Embeddable", "neuroinf", "prefs", "Servlet"],
   // Extensions - HTML
   "html.format.wrapLineLength": 0,
   // Extentions - Prettier
