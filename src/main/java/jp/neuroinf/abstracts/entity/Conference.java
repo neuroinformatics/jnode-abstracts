@@ -2,9 +2,7 @@ package jp.neuroinf.abstracts.entity;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -22,6 +20,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jp.neuroinf.abstracts.dto.AccountDto;
 import lombok.Data;
 
 @Data
@@ -124,10 +123,21 @@ public class Conference {
 
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "conference", orphanRemoval = true)
   @OnDelete(action = OnDeleteAction.CASCADE)
-  private Set<Banner> banners = new HashSet<>();
+  private List<Banner> banners = new ArrayList<>();
 
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "conference", orphanRemoval = true)
   @OnDelete(action = OnDeleteAction.CASCADE)
-  private Set<ConferenceOwners> conferenceOwners = new HashSet<>();
+  private List<ConferenceOwners> conferenceOwners = new ArrayList<>();
+
+  public List<Account> getOwners() {
+    return getConferenceOwners().stream().map((o) -> o.getOwner()).toList();
+  }
+
+  public boolean isOwner(AccountDto account) {
+    if (account == null) {
+      return false;
+    }
+    return getOwners().stream().filter(o -> o.getUuid().equals(account.getUuid())).findFirst().orElse(null) != null;
+  }
 
 }

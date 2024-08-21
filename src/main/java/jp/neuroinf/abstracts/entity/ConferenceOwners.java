@@ -1,7 +1,6 @@
 package jp.neuroinf.abstracts.entity;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.JoinColumn;
@@ -21,7 +20,7 @@ public class ConferenceOwners {
   private Conference conference;
 
   @Id
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne
   @JoinColumn(name = "owner_uuid", referencedColumnName = "uuid", nullable = false)
   private Account owner;
 

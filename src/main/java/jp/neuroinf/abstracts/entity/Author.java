@@ -1,7 +1,7 @@
 package jp.neuroinf.abstracts.entity;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -49,6 +49,6 @@ public class Author {
 
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "author", orphanRemoval = true)
   @OnDelete(action = OnDeleteAction.CASCADE)
-  private Set<AuthorAffiliations> affiliations = new HashSet<>();
+  private List<AuthorAffiliations> affiliations = new ArrayList<>();
 
 }

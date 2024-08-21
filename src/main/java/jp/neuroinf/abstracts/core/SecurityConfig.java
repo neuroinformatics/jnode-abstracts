@@ -1,4 +1,4 @@
-package jp.neuroinf.abstracts.config;
+package jp.neuroinf.abstracts.core;
 
 import java.io.IOException;
 
@@ -10,7 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.server.ServletServerHttpResponse;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.Authentication;
@@ -25,7 +24,6 @@ import org.springframework.security.web.authentication.logout.HttpStatusReturnin
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jp.neuroinf.abstracts.service.UserDetailsServiceImpl;
 
 @Configuration
 @EnableWebSecurity
@@ -37,14 +35,6 @@ public class SecurityConfig implements AuthenticationSuccessHandler, Authenticat
   @Bean
   public PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
-  }
-
-  @Bean
-  public DaoAuthenticationProvider authenticationProvider(UserDetailsServiceImpl userDetailsService) {
-    DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-    provider.setUserDetailsService(userDetailsService);
-    provider.setPasswordEncoder(passwordEncoder());
-    return provider;
   }
 
   @Bean
@@ -68,24 +58,23 @@ public class SecurityConfig implements AuthenticationSuccessHandler, Authenticat
   @Override
   public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
       Authentication authentication) throws IOException, ServletException {
-    MyResult result = new MyResult("認証成功");
+    AuthResultBody body = new AuthResultBody("success");
     HttpOutputMessage outputMessage = new ServletServerHttpResponse(response);
     response.setStatus(HttpStatus.OK.value());
-    httpMessageConverter.write(result, MediaType.APPLICATION_JSON, outputMessage);
+    httpMessageConverter.write(body, MediaType.APPLICATION_JSON, outputMessage);
   }
 
   @Override
   public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
       AuthenticationException exception) throws IOException, ServletException {
-    MyResult result = new MyResult("認証失敗");
-    System.out.println(exception);
+    AuthResultBody body = new AuthResultBody("failure");
     HttpOutputMessage outputMessage = new ServletServerHttpResponse(response);
     response.setStatus(HttpStatus.UNAUTHORIZED.value());
-    httpMessageConverter.write(result, MediaType.APPLICATION_JSON, outputMessage);
+    httpMessageConverter.write(body, MediaType.APPLICATION_JSON, outputMessage);
   }
 
   @lombok.Value
-  public static class MyResult {
+  public static class AuthResultBody {
     private final String message;
   }
 }

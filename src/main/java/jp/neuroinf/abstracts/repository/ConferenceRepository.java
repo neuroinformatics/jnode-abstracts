@@ -7,4 +7,5 @@ import jp.neuroinf.abstracts.entity.Conference;
 
 @Repository
 public interface ConferenceRepository extends JpaRepository<Conference, String> {
+  Conference findByUuid(String uuid);
 }

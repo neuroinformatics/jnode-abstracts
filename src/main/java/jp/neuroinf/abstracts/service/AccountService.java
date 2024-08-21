@@ -13,7 +13,7 @@ import jp.neuroinf.abstracts.entity.Account;
 import jp.neuroinf.abstracts.repository.AccountRepository;
 
 @Service
-public class UserDetailsServiceImpl implements UserDetailsService {
+public class AccountService implements UserDetailsService {
 
   @Autowired
   private AccountRepository accountRepository;
@@ -27,7 +27,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     if (account == null) {
       throw new UsernameNotFoundException("User not found");
     }
-    return new UserDetailsImpl(account);
+    return new AccountDetails(account);
   }
 
   public Account findByEmail(String username) {
@@ -35,12 +35,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
   }
 
   @Transactional
-  public void create(AccountDto userDto) {
+  public void create(AccountDto dto) {
     Account account = new Account();
-    account.setMail(userDto.getMail());
-    account.setPassword(passwordEncoder.encode(userDto.getPassword()));
-    account.setFirstName(userDto.getFirstName());
-    account.setLastName(userDto.getLastName());
+    account.setMail(dto.getMail());
+    account.setPassword(passwordEncoder.encode(dto.getPassword()));
+    account.setFirstName(dto.getFirstName());
+    account.setLastName(dto.getLastName());
     account.setIsActive(true);
     accountRepository.save(account);
   }

@@ -7,18 +7,19 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import jp.neuroinf.abstracts.dto.AccountDto;
 import jp.neuroinf.abstracts.entity.Account;
 
-public class UserDetailsImpl implements UserDetails {
+public class AccountDetails implements UserDetails {
 
   private Account account;
 
-  public UserDetailsImpl(Account account) {
+  public AccountDetails(Account account) {
     this.account = account;
   }
 
-  public Account getAccount() {
-    return this.account;
+  public AccountDto getAccount() {
+    return AccountDto.of(this.account);
   }
 
   @Override

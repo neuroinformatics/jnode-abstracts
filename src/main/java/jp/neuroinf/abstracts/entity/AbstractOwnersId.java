@@ -12,6 +12,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Embeddable
 public class AbstractOwnersId implements Serializable {
+
   private Abstract abstract_;
+
   private Account owner;
+
 }

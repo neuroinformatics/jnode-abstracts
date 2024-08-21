@@ -1,8 +1,8 @@
 package jp.neuroinf.abstracts.entity;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -57,6 +57,6 @@ public class Account {
 
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "account", orphanRemoval = true)
   @OnDelete(action = OnDeleteAction.CASCADE)
-  private Set<AccountFavorites> favorites = new HashSet<>();
+  private List<AccountFavorites> favorites = new ArrayList<>();
 
 }
