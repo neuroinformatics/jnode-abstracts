@@ -35,13 +35,16 @@
     "favouriteabstracts",
     "Floorplans",
     "fontawesome",
+    "forgotpassword",
     "fortawesome",
     "INCF",
+    "JSESSIONID",
     "myabstracts",
     "neuroinf",
     "prefs",
     "reduxjs",
-    "Servlet"
+    "Servlet",
+    "signup"
   ],
   // Extensions - HTML
   "html.format.wrapLineLength": 0,

@@ -1,16 +1,35 @@
+@function to-rgb($value) {
+  @return red($value), green($value), blue($value);
+}
+
+$custom-primary: #557bb9;
+$custom-primary-rgb: to-rgb($custom-primary);
+$custom-primary-active: darken($custom-primary, 10%);
+$custom-primary-hover: darken($custom-primary, 10%);
+$custom-primary-border: darken($custom-primary, 12%);
+$custom-primary-hover-border: darken($custom-primary, 15%);
+$custom-primary-active-hover: darken($custom-primary, 17%);
+$custom-primary-active-border: darken($custom-primary, 25%);
+$custom-body-color: #282828;
+$custom-body-color-rgb: to-rgb($custom-body-color);
+$custom-secondary-color: #646464;
+$custom-secondary-color-rgb: to-rgb($custom-secondary-color);
+$custom-tertiary-bg: #f5f7fa;
+$custom-tertiary-bg-rgb: to-rgb($custom-tertiary-bg);
+
 :root {
-  --bs-primary: #557bb9;
-  --bs-primary-rgb: 85, 123, 185;
-  --bs-body-color: #282828;
-  --bs-body-color-rgb: 40, 40, 40;
-  --bs-secondary-color: #646464;
-  --bs-secondary-color-rgb: 100, 100, 100;
-  --bs-tertiary-bg: #f5f7fa;
-  --bs-tertiary-bg-rgb: 245, 247, 250;
-  --bs-link-color: #557bb9;
-  --bs-link-color-rgb: 85, 123, 185;
-  --bs-link-hover-color: #40639b;
-  --bs-link-hover-color-rgb: 64, 99, 155;
+  --bs-primary: #{$custom-primary};
+  --bs-primary-rgb: #{$custom-primary-rgb};
+  --bs-body-color: #{$custom-body-color};
+  --bs-body-color-rgb: #{$custom-body-color-rgb};
+  --bs-secondary-color: #{$custom-secondary-color};
+  --bs-secondary-color-rgb: #{$custom-secondary-color-rgb};
+  --bs-tertiary-bg: #{$custom-tertiary-bg};
+  --bs-tertiary-bg-rgb: #{$custom-tertiary-bg-rgb};
+  --bs-link-color: #{$custom-primary};
+  --bs-link-color-rgb: #{$custom-primary-rgb};
+  --bs-link-hover-color: #{$custom-primary-hover};
+  --bs-link-hover-color-rgb: #{to-rgb($custom-primary-hover)};
 }
 
 .navbar {
@@ -30,6 +49,17 @@
 .dropdown-menu {
   --bs-dropdown-link-active-color: var(--bs-body-color);
   --bs-dropdown-link-active-bg: var(--bs-tertiary-bg);
+}
+
+.btn-primary {
+  --bs-btn-bg: var(--bs-primary);
+  --bs-btn-border-color: var(--bs-primary);
+  --bs-btn-hover-bg: #{$custom-primary-hover};
+  --bs-btn-hover-border-color: #{$custom-primary-hover-border};
+  --bs-btn-active-bg: #{$custom-primary-active};
+  --bs-btn-active-border-color: #{$custom-primary-active-border};
+  --bs-btn-disabled-bg: rgba(var(--bs-primary-rgb), 0.8);
+  --bs-btn-disabled-border-color: #{$custom-primary-border};
 }
 
 html {
@@ -76,18 +106,21 @@ a:hover {
         .navbar-nav {
           .nav-item {
 
-            &:hover {
-              background-color: var(--bs-link-hover-color);
-            }
-
             .nav-link {
               padding: 1rem;
               line-height: 2rem;
 
-              &.active {
-                background-color: var(--bs-link-hover-color);
+              &:hover {
+                background-color: #{$custom-primary-hover};
               }
 
+              &.active {
+                background-color: #{$custom-primary-active};
+
+                &:hover {
+                  background-color: #{$custom-primary-active-hover};
+                }
+              }
             }
           }
         }

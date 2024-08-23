@@ -19,22 +19,22 @@ import jp.neuroinf.abstracts.service.ConferenceService;
 
 @RestController
 @RequestMapping("/api/conferences")
-public class RestApiConferenceController {
+public class RestApiConferencesController {
 
     private final ConferenceService conferenceService;
 
     @Autowired
-    public RestApiConferenceController(ConferenceService conferenceService) {
+    public RestApiConferencesController(ConferenceService conferenceService) {
         this.conferenceService = conferenceService;
     }
 
-    @GetMapping("/")
+    @GetMapping("")
     public List<ConferenceSimpleDto> listConference(@AuthenticationPrincipal AccountDetails user) {
         AccountDto account = user != null ? user.getAccount() : null;
         return this.conferenceService.getConferenceList(account);
     }
 
-    @GetMapping("/{uuid}/")
+    @GetMapping("/{uuid}")
     public ConferenceDto retrieveConference(@AuthenticationPrincipal AccountDetails user, @PathVariable String uuid)
             throws Exception {
         AccountDto account = user != null ? user.getAccount() : null;
