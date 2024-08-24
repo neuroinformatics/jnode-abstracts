@@ -19,7 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,7 +27,8 @@ import jakarta.servlet.http.HttpServletResponse;
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfig implements AuthenticationSuccessHandler, AuthenticationFailureHandler {
+public class SecurityConfig
+    implements AuthenticationSuccessHandler, AuthenticationFailureHandler, LogoutSuccessHandler {
 
   @Autowired
   MappingJackson2HttpMessageConverter httpMessageConverter;
@@ -51,7 +52,7 @@ public class SecurityConfig implements AuthenticationSuccessHandler, Authenticat
             .failureHandler(this))
         .logout((logout) -> logout
             .logoutUrl("/api/logout")
-            .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler()));
+            .logoutSuccessHandler(this));
     return http.build();
   }
 
@@ -70,6 +71,15 @@ public class SecurityConfig implements AuthenticationSuccessHandler, Authenticat
     AuthResultBody body = new AuthResultBody("failure");
     HttpOutputMessage outputMessage = new ServletServerHttpResponse(response);
     response.setStatus(HttpStatus.UNAUTHORIZED.value());
+    httpMessageConverter.write(body, MediaType.APPLICATION_JSON, outputMessage);
+  }
+
+  @Override
+  public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
+      throws IOException {
+    AuthResultBody body = new AuthResultBody("success");
+    HttpOutputMessage outputMessage = new ServletServerHttpResponse(response);
+    response.setStatus(HttpStatus.OK.value());
     httpMessageConverter.write(body, MediaType.APPLICATION_JSON, outputMessage);
   }
 

@@ -27,7 +27,7 @@ public class RestApiUsersController {
     public AccountDto getCurrentUser(@AuthenticationPrincipal AccountDetails user) {
         AccountDto account = user != null ? user.getAccount() : null;
         if (account == null) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "not logged in");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "not logged in");
         }
         return account;
     }
