@@ -5,10 +5,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Container, Nav, Navbar, NavDropdown } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import { useAppSelector } from '../app/hooks';
+import { selectConferenceInfo } from '../features/conference/conferenceSlice';
 import { selectUserInfo } from '../features/user/userSlice';
 
 const HeaderPanel: React.FC = () => {
   const userInfo = useAppSelector(selectUserInfo);
+  const conferenceInfo = useAppSelector(selectConferenceInfo);
 
   return (
     <Navbar expand="md" className="header navbar-dark bg-primary border border-primary rounded">
@@ -87,43 +89,53 @@ const HeaderPanel: React.FC = () => {
           </Nav>
         </Navbar.Collapse>
       </Container>
-      <Container fluid>
-        <Navbar.Collapse className="basic-navbar-nav">
-          <Nav className="me-auto">
-            <Nav.Item>
-              <LinkContainer to="/conference/AINI2018">
-                <Nav.Link>Short Name</Nav.Link>
-              </LinkContainer>
-            </Nav.Item>
-            <Nav.Item>
-              <LinkContainer to="/conference/AINI2018/schedule">
-                <Nav.Link>Schedule</Nav.Link>
-              </LinkContainer>
-            </Nav.Item>
-            <Nav.Item>
-              <LinkContainer to="/conference/AINI2018/abstracts">
-                <Nav.Link>Abstracts</Nav.Link>
-              </LinkContainer>
-            </Nav.Item>
-            <Nav.Item>
-              <LinkContainer to="/conference/AINI2018/locations">
-                <Nav.Link>Locations</Nav.Link>
-              </LinkContainer>
-            </Nav.Item>
-            <Nav.Item>
-              <LinkContainer to="/conference/AINI2018/floodplains">
-                <Nav.Link>Floorplans</Nav.Link>
-              </LinkContainer>
-            </Nav.Item>
-            <Nav.Item>
-              <Nav.Link href="https://www.neuroinf.jp/aini2018/">
-                <FontAwesomeIcon icon={faUpRightFromSquare} className="pe-2" />
-                Conference home
-              </Nav.Link>
-            </Nav.Item>
-          </Nav>
-        </Navbar.Collapse>
-      </Container>
+      {conferenceInfo != null && (
+        <Container fluid>
+          <Navbar.Collapse className="basic-navbar-nav">
+            <Nav className="me-auto">
+              <Nav.Item>
+                <LinkContainer to={`/conferences/${conferenceInfo.shortName}`}>
+                  <Nav.Link>{conferenceInfo.shortName}</Nav.Link>
+                </LinkContainer>
+              </Nav.Item>
+              {conferenceInfo.schedule != null && (
+                <Nav.Item>
+                  <LinkContainer to={`/conferences/${conferenceInfo.shortName}/schedule`}>
+                    <Nav.Link>Schedule</Nav.Link>
+                  </LinkContainer>
+                </Nav.Item>
+              )}
+              <Nav.Item>
+                <LinkContainer to={`/conferences/${conferenceInfo.shortName}/abstracts`}>
+                  <Nav.Link>Abstracts</Nav.Link>
+                </LinkContainer>
+              </Nav.Item>
+              {conferenceInfo.geo != null && (
+                <>
+                  <Nav.Item>
+                    <LinkContainer to={`/conferences/${conferenceInfo.shortName}/locations`}>
+                      <Nav.Link>Locations</Nav.Link>
+                    </LinkContainer>
+                  </Nav.Item>
+                  <Nav.Item>
+                    <LinkContainer to={`/conferences/${conferenceInfo.shortName}/floodplains`}>
+                      <Nav.Link>Floorplans</Nav.Link>
+                    </LinkContainer>
+                  </Nav.Item>
+                </>
+              )}
+              {conferenceInfo.link != null && (
+                <Nav.Item>
+                  <Nav.Link href={conferenceInfo.link} target="_blank">
+                    <FontAwesomeIcon icon={faUpRightFromSquare} className="pe-2" />
+                    Conference home
+                  </Nav.Link>
+                </Nav.Item>
+              )}
+            </Nav>
+          </Navbar.Collapse>
+        </Container>
+      )}
     </Navbar>
   );
 };

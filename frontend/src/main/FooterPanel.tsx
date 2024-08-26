@@ -15,7 +15,11 @@ const FooterPanel: React.FC = () => {
         <Link to="/contact">Contact</Link>
       </div>
       <div className="p-2 ms-auto">
-        The J-Node Abstract System &mdash; © 2017-{year} <a href="https://www.neuroinf.jp/">INCF Japan Node</a>
+        <span className="text-nowrap">The J-Node Abstract System</span>
+        {' - '}
+        <span className="text-nowrap">
+          © 2017-{year} <a href="https://www.neuroinf.jp/">INCF Japan Node</a>
+        </span>
       </div>
     </Stack>
   );

@@ -6,6 +6,11 @@ export const AsyncApiStatus = {
 } as const;
 export type AsyncApiStatuses = (typeof AsyncApiStatus)[keyof typeof AsyncApiStatus];
 
+export interface ActionState {
+  error: string | null;
+  status: AsyncApiStatuses;
+}
+
 export interface ApiExceptionResponse {
   timestamp: string; // ISO8601
   code: number;

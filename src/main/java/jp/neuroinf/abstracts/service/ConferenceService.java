@@ -7,9 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
-import jp.neuroinf.abstracts.dto.AccountDto;
 import jp.neuroinf.abstracts.dto.ConferenceDto;
 import jp.neuroinf.abstracts.dto.ConferenceSimpleDto;
+import jp.neuroinf.abstracts.entity.Account;
 import jp.neuroinf.abstracts.entity.Conference;
 import jp.neuroinf.abstracts.repository.ConferenceRepository;
 
@@ -23,15 +23,21 @@ public class ConferenceService {
   }
 
   @Transactional
-  public List<ConferenceSimpleDto> getConferenceList(AccountDto account) {
-    List<ConferenceSimpleDto> dtoList = this.conferenceRepository.findAll()
-        .stream().map(c -> ConferenceSimpleDto.of(c, account)).collect(Collectors.toList());
+  public List<ConferenceSimpleDto> getConferenceList(Account account, String shortName) {
+    List<Conference> conferences;
+    if (shortName != null) {
+      conferences = this.conferenceRepository.getConferencesByShortName(shortName);
+    } else {
+      conferences = this.conferenceRepository.getConferences();
+    }
+    List<ConferenceSimpleDto> dtoList = conferences.stream().map(c -> ConferenceSimpleDto.of(c, account))
+        .collect(Collectors.toList());
     return dtoList;
   }
 
   @Transactional
-  public ConferenceDto getConference(AccountDto account, String uuid) {
-    Conference entity = this.conferenceRepository.findByUuid(uuid);
+  public ConferenceDto getConference(Account account, String uuid) {
+    Conference entity = this.conferenceRepository.findFirstByUuid(uuid);
     return entity != null ? ConferenceDto.of(entity, account) : null;
   }
 

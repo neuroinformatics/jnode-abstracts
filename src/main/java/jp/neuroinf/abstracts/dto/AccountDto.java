@@ -3,7 +3,6 @@ package jp.neuroinf.abstracts.dto;
 import java.time.LocalDateTime;
 
 import jp.neuroinf.abstracts.entity.Account;
-import jp.neuroinf.abstracts.entity.ConferenceOwners;
 import lombok.Data;
 
 @Data
@@ -32,10 +31,6 @@ public class AccountDto {
     dto.setCtime(entity.getCtime());
     dto.setMtime(entity.getMtime());
     return dto;
-  }
-
-  public static AccountDto of(ConferenceOwners owner) {
-    return of(owner.getOwner());
   }
 
 }

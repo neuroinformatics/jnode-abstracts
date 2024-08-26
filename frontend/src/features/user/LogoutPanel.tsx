@@ -1,15 +1,19 @@
 import React from 'react';
 
-import { Button, Form, FormGroup, Row } from 'react-bootstrap';
+import { Button, Form, FormGroup } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
-import HeaderTitle from '../../common/HeaderTitle';
-import { logout, selectUserInfo } from './userSlice';
+import AlertPanel from '../../common/AlertPanel';
+import GeneralPanel from '../../common/GeneralPanel';
+import LoadingOverlay from '../../common/LoadingOverlay';
+import { AsyncApiStatus } from '../../entities/api';
+import { logout, selectLogoutState, selectUserInfo } from './userSlice';
 
 const LogoutPanel: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const userInfo = useAppSelector(selectUserInfo);
+  const logoutState = useAppSelector(selectLogoutState);
 
   const onClickLogout = React.useCallback<React.MouseEventHandler<HTMLButtonElement>>(() => {
     void dispatch(logout());
@@ -21,16 +25,19 @@ const LogoutPanel: React.FC = () => {
     }
   }, [navigate, userInfo]);
 
-  const title = 'Sign Out';
+  const title = 'Sign out';
 
   return (
-    <Row className="login justify-content-center">
-      <HeaderTitle title={title} />
-
-      <fieldset className="col-md-7">
-        <legend className="title mb-4 border-bottom">{title}</legend>
+    <GeneralPanel title={title} size={7}>
+      {logoutState.status === AsyncApiStatus.loading && <LoadingOverlay message="Signing out.." />}
+      <fieldset>
         <Form>
           <FormGroup className="mb-3">
+            {logoutState.error != null && (
+              <AlertPanel variant="danger" title="Error" dismissible={true}>
+                {logoutState.error}
+              </AlertPanel>
+            )}
             <div className="d-grid">
               <Button variant="primary" size="lg" onClick={onClickLogout}>
                 Sign out
@@ -39,7 +46,7 @@ const LogoutPanel: React.FC = () => {
           </FormGroup>
         </Form>
       </fieldset>
-    </Row>
+    </GeneralPanel>
   );
 };
 

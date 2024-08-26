@@ -1,8 +1,10 @@
 import { Action, configureStore, ThunkAction } from '@reduxjs/toolkit';
+import conferenceReducer from '../features/conference/conferenceSlice';
 import userReducer from '../features/user/userSlice';
 
 export const store = configureStore({
   reducer: {
+    conference: conferenceReducer,
     user: userReducer,
   },
 });

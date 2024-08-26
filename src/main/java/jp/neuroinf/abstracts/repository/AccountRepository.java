@@ -7,5 +7,7 @@ import jp.neuroinf.abstracts.entity.Account;
 
 @Repository
 public interface AccountRepository extends JpaRepository<Account, String> {
-  Account findByMail(String email);
+
+  Account findFistByMail(String email);
+
 }

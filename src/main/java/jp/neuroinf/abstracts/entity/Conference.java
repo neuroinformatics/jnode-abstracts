@@ -20,7 +20,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jp.neuroinf.abstracts.dto.AccountDto;
 import lombok.Data;
 
 @Data
@@ -133,7 +132,7 @@ public class Conference {
     return getConferenceOwners().stream().map((o) -> o.getOwner()).toList();
   }
 
-  public boolean isOwner(AccountDto account) {
+  public boolean isOwner(Account account) {
     if (account == null) {
       return false;
     }

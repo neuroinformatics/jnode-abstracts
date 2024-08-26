@@ -1,16 +1,16 @@
 import React from 'react';
 
-import { Card, CardBody, CardHeader } from 'react-bootstrap';
-import HeaderTitle from './HeaderTitle';
+import AlertPanel from './AlertPanel';
+import GeneralPanel from './GeneralPanel';
 
 const PageNotFound: React.FC = () => {
   const title = 'Page Not Found';
   return (
-    <Card>
-      <HeaderTitle title={title} />
-      <CardHeader>{title}</CardHeader>
-      <CardBody>The resource requested could not be found.</CardBody>
-    </Card>
+    <GeneralPanel title={title}>
+      <AlertPanel variant="danger">
+        <span className="lead">The resource requested could not be found.</span>
+      </AlertPanel>
+    </GeneralPanel>
   );
 };
 

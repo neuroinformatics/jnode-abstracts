@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import jp.neuroinf.abstracts.entity.Account;
 import jp.neuroinf.abstracts.entity.Conference;
 import lombok.Data;
 
@@ -39,9 +40,9 @@ public class ConferenceDto {
   private List<AbstractGroupDto> abstractGroups;
   private List<BannerDto> banners;
   private Boolean isOwner;
-  private List<AccountDto> owners;
+  private List<AccountSimpleDto> owners;
 
-  public static ConferenceDto of(Conference entity, AccountDto account) {
+  public static ConferenceDto of(Conference entity, Account account) {
     ConferenceDto dto = new ConferenceDto();
     dto.setUuid(entity.getUuid());
     dto.setIsOpen(entity.getIsOpen());
@@ -78,7 +79,7 @@ public class ConferenceDto {
         .collect(Collectors.toList()));
     dto.setIsOwner(entity.isOwner(account));
     if (dto.isOwner) {
-      dto.setOwners(entity.getConferenceOwners().stream().map(AccountDto::of).collect(Collectors.toList()));
+      dto.setOwners(entity.getConferenceOwners().stream().map(AccountSimpleDto::of).collect(Collectors.toList()));
     }
 
     return dto;

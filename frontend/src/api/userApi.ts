@@ -1,6 +1,6 @@
 import ky from 'ky';
 import { ApiAuthResponse } from '../entities/api';
-import { UserEntity } from '../entities/users';
+import { UserEntity } from '../entities/user';
 
 export const ApiUsersLogin = async (
   username: string,

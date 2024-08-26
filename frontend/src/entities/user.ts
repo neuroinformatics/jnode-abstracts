@@ -1,6 +1,9 @@
-export interface UserEntity {
+export interface UserSimpleEntity {
   uuid: string;
   mail: string;
+}
+
+export interface UserEntity extends UserSimpleEntity {
   password: string;
   firstName: string;
   lastName: string;

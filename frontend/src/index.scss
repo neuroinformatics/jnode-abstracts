@@ -2,6 +2,10 @@
   @return red($value), green($value), blue($value);
 }
 
+$custom-font-sans-serif: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+$custom-font-serif: "EB Garamond", Georgia, "Times New Roman", Times, serif;
+$custom-font-monospace: Menlo, Monaco, Consolas, "Courier New", monospace;
+
 $custom-primary: #557bb9;
 $custom-primary-rgb: to-rgb($custom-primary);
 $custom-primary-active: darken($custom-primary, 10%);
@@ -20,6 +24,8 @@ $custom-tertiary-bg-rgb: to-rgb($custom-tertiary-bg);
 :root {
   --bs-primary: #{$custom-primary};
   --bs-primary-rgb: #{$custom-primary-rgb};
+  --bs-font-sans-serif: #{$custom-font-sans-serif};
+  --bs-font-monospace: #{$custom-font-monospace};
   --bs-body-color: #{$custom-body-color};
   --bs-body-color-rgb: #{$custom-body-color-rgb};
   --bs-secondary-color: #{$custom-secondary-color};
@@ -136,10 +142,61 @@ a:hover {
 
   // main/MainPanel
   .main-content {
-    padding: 15px 0;
+    padding: 1rem 0;
 
     @media (min-width: 768px) {
-      padding: 15px 30px;
+      padding: 1.5rem 3rem;
+    }
+
+    // common/LoadingOverlay
+    .loading-overlay {
+      background: var(--bs-body-color);
+      color: var(--bs-body-bg);
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 100%;
+      z-index: 5000;
+      text-align: center;
+      opacity: 0.8;
+
+      .inner {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+
+        .spinner-border {
+          height: 4rem;
+          width: 4rem;
+          font-size: 2rem;
+        }
+
+        .message {
+          margin-top: 1rem;
+          font-size: 2rem;
+        }
+
+      }
+    }
+
+    // common/GeneralPanel
+    .page-header {
+      padding-bottom: 0.8rem;
+      border-bottom: 1px solid var(--bs-border-color);
+    }
+
+    // conference/ConferenceRouterPanel
+    .conferences {
+
+      // conference/ConferenceListPanel,
+      // conference/ConferenceDetailPanel
+      .conference {
+        .logo img {
+          max-height: 128px;
+        }
+      }
     }
   }
 

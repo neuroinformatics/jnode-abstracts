@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import jp.neuroinf.abstracts.entity.Account;
 import jp.neuroinf.abstracts.entity.Conference;
 import lombok.Data;
 
@@ -30,7 +31,7 @@ public class ConferenceSimpleDto {
   private List<BannerDto> banners;
   private Boolean isOwner;
 
-  public static ConferenceSimpleDto of(Conference entity, AccountDto account) {
+  public static ConferenceSimpleDto of(Conference entity, Account account) {
     ConferenceSimpleDto dto = new ConferenceSimpleDto();
     dto.setUuid(entity.getUuid());
     dto.setIsOpen(entity.getIsOpen());

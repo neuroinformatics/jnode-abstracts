@@ -1,59 +1,68 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { ApiUsersCurrent, ApiUsersLogin, ApiUsersLogout } from '../../api/userApi';
-import { getApiErrorStatusCode } from '../../api/utilities';
+import { getApiErrorMessage, getApiErrorStatusCode } from '../../api/utilities';
 import { RootState } from '../../app/store';
-import { AsyncApiStatus, AsyncApiStatuses } from '../../entities/api';
-import { UserEntity } from '../../entities/users';
+import { ActionState, ApiAuthResponse, AsyncApiStatus } from '../../entities/api';
+import { UserEntity } from '../../entities/user';
 
 interface UserState {
   userInfo: UserEntity | null;
-  error: string | null;
-  apiStatus: {
-    login: AsyncApiStatuses;
-  };
+  restoreState: ActionState;
+  loginState: ActionState;
+  logoutState: ActionState;
 }
 
 const initialState: Readonly<UserState> = {
   userInfo: null,
-  error: null,
-  apiStatus: {
-    login: AsyncApiStatus.initial,
-  },
+  restoreState: { error: null, status: AsyncApiStatus.initial },
+  loginState: { error: null, status: AsyncApiStatus.initial },
+  logoutState: { error: null, status: AsyncApiStatus.initial },
 };
 
-export const restore = createAsyncThunk<{ user: UserEntity }>('user/initialize', async (_, thunkApi) => {
-  const user = await ApiUsersCurrent(thunkApi.signal);
-  return { user };
-});
-
-export const login = createAsyncThunk<
-  { user: UserEntity },
-  { username: string; password: string },
-  { rejectValue: string }
->('user/login', async (params, thunkApi) => {
-  const { username, password } = params;
-  try {
-    await ApiUsersLogin(username, password, thunkApi.signal);
-    const user = await ApiUsersCurrent(thunkApi.signal);
-    return { user };
-  } catch (e: unknown) {
-    if (getApiErrorStatusCode(e) === 401) {
-      return thunkApi.rejectWithValue('Invalid credential');
+export const restore = createAsyncThunk<UserEntity, void, { rejectValue: string }>(
+  'user/current',
+  async (_, thunkApi) => {
+    try {
+      const user = await ApiUsersCurrent(thunkApi.signal);
+      return user;
+    } catch (e: unknown) {
+      const message = await getApiErrorMessage(e);
+      return thunkApi.rejectWithValue(message);
     }
-    return thunkApi.rejectWithValue('Unexpected error');
-  }
-});
+  },
+);
 
-export const logout = createAsyncThunk<void, void, { rejectValue: string }>('user/logout', async (_, thunkApi) => {
-  try {
-    await ApiUsersLogout(thunkApi.signal);
-  } catch (e: unknown) {
-    if (getApiErrorStatusCode(e) === 401) {
-      return thunkApi.rejectWithValue('Invalid credential');
+export const login = createAsyncThunk<UserEntity, { username: string; password: string }, { rejectValue: string }>(
+  'user/login',
+  async (params, thunkApi) => {
+    const { username, password } = params;
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      await ApiUsersLogin(username, password, thunkApi.signal);
+      const user = await ApiUsersCurrent(thunkApi.signal);
+      return user;
+    } catch (e: unknown) {
+      if (getApiErrorStatusCode(e) === 401) {
+        return thunkApi.rejectWithValue('Invalid credential');
+      }
+      const message = await getApiErrorMessage(e);
+      return thunkApi.rejectWithValue(message);
     }
-    return thunkApi.rejectWithValue('Unexpected error');
-  }
-});
+  },
+);
+
+export const logout = createAsyncThunk<ApiAuthResponse, void, { rejectValue: string }>(
+  'user/logout',
+  async (_, thunkApi) => {
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      return await ApiUsersLogout(thunkApi.signal);
+    } catch (e: unknown) {
+      const message = await getApiErrorMessage(e);
+      return thunkApi.rejectWithValue(message);
+    }
+  },
+);
 
 export const userSlice = createSlice({
   name: 'user',
@@ -62,45 +71,53 @@ export const userSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(restore.pending, (state) => {
-        state.apiStatus.login = AsyncApiStatus.loading;
+        state.restoreState.status = AsyncApiStatus.loading;
       })
       .addCase(restore.fulfilled, (state, action) => {
-        const { user } = action.payload;
-        state.apiStatus.login = AsyncApiStatus.idle;
+        const user = action.payload;
+        state.restoreState.status = AsyncApiStatus.idle;
+        state.restoreState.error = null;
         state.userInfo = user;
-        state.error = null;
       })
-      .addCase(restore.rejected, (state) => {
-        state.apiStatus.login = AsyncApiStatus.failed;
+      .addCase(restore.rejected, (state, action) => {
+        const error = action.payload ?? '';
+        state.restoreState.status = AsyncApiStatus.failed;
+        state.restoreState.error = error;
       })
       .addCase(login.pending, (state) => {
-        state.apiStatus.login = AsyncApiStatus.loading;
+        state.loginState.status = AsyncApiStatus.loading;
       })
       .addCase(login.fulfilled, (state, action) => {
-        const { user } = action.payload;
-        state.apiStatus.login = AsyncApiStatus.idle;
+        const user = action.payload;
+        state.loginState.status = AsyncApiStatus.idle;
+        state.loginState.error = null;
         state.userInfo = user;
-        state.error = null;
       })
       .addCase(login.rejected, (state, action) => {
-        state.apiStatus.login = AsyncApiStatus.failed;
-        state.error = action.payload ?? '';
+        const error = action.payload ?? '';
+        state.loginState.status = AsyncApiStatus.failed;
+        state.loginState.error = error;
       })
       .addCase(logout.pending, (state) => {
-        state.apiStatus.login = AsyncApiStatus.loading;
+        state.logoutState.status = AsyncApiStatus.loading;
+        state.logoutState.error = null;
       })
       .addCase(logout.fulfilled, (state) => {
-        state.apiStatus.login = AsyncApiStatus.idle;
+        state.logoutState.status = AsyncApiStatus.idle;
+        state.logoutState.error = null;
         state.userInfo = null;
-        state.error = null;
       })
       .addCase(logout.rejected, (state, action) => {
-        state.apiStatus.login = AsyncApiStatus.failed;
-        state.error = action.payload ?? '';
+        const error = action.payload ?? '';
+        state.logoutState.status = AsyncApiStatus.failed;
+        state.logoutState.error = error;
       });
   },
 });
 
 export const selectUserInfo = (state: RootState) => state.user.userInfo;
+export const selectRestoreState = (state: RootState) => state.user.restoreState;
+export const selectLoginState = (state: RootState) => state.user.loginState;
+export const selectLogoutState = (state: RootState) => state.user.logoutState;
 
 export default userSlice.reducer;
