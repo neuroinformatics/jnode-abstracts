@@ -1,14 +1,13 @@
-export const AsyncApiStatus = {
-  initial: 0,
-  idle: 1,
-  loading: 2,
-  failed: 3,
+export const ApiAsyncStatus = {
+  idle: 0,
+  loading: 1,
+  failed: 2,
 } as const;
-export type AsyncApiStatuses = (typeof AsyncApiStatus)[keyof typeof AsyncApiStatus];
+export type ApiAsyncStatuses = (typeof ApiAsyncStatus)[keyof typeof ApiAsyncStatus];
 
-export interface ActionState {
+export interface ApiActionState {
   error: string | null;
-  status: AsyncApiStatuses;
+  status: ApiAsyncStatuses;
 }
 
 export interface ApiExceptionResponse {

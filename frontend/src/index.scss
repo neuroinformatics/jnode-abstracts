@@ -78,10 +78,14 @@ body {
 
 a {
   text-decoration: none;
-}
 
-a:hover {
-  text-decoration: underline;
+  &:hover {
+    text-decoration: underline;
+
+    &.btn {
+      text-decoration: none;
+    }
+  }
 }
 
 // App
@@ -193,8 +197,14 @@ a:hover {
       // conference/ConferenceListPanel,
       // conference/ConferenceDetailPanel
       .conference {
-        .logo img {
+        padding: .5rem;
+
+        img.logo {
           max-height: 128px;
+        }
+
+        img.thumbnail {
+          max-height: 64px;
         }
       }
     }

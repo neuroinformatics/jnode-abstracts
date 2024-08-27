@@ -8,7 +8,7 @@ import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import AlertPanel from '../../common/AlertPanel';
 import GeneralPanel from '../../common/GeneralPanel';
 import LoadingOverlay from '../../common/LoadingOverlay';
-import { AsyncApiStatus } from '../../entities/api';
+import { ApiAsyncStatus } from '../../entities/api';
 import { login, selectLoginState, selectUserInfo } from './userSlice';
 
 const LoginPanel: React.FC = () => {
@@ -30,7 +30,7 @@ const LoginPanel: React.FC = () => {
 
   React.useEffect(() => {
     if (userInfo != null) {
-      navigate('/');
+      navigate(-1);
     }
   }, [navigate, userInfo]);
 
@@ -38,7 +38,7 @@ const LoginPanel: React.FC = () => {
 
   return (
     <GeneralPanel title={title} size={7}>
-      {loginState.status === AsyncApiStatus.loading && <LoadingOverlay message="Signing in.." />}
+      {loginState.status === ApiAsyncStatus.loading && <LoadingOverlay message="Signing in.." />}
       <fieldset>
         <Form onSubmit={onSubmitLogin}>
           <InputGroup className="mb-4">

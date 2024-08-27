@@ -1,25 +1,14 @@
 import React from 'react';
 
 import { Navigate, Route, Routes } from 'react-router-dom';
-import { useAppDispatch, useAppSelector } from '../app/hooks';
 import PageNotFound from '../common/PageNotFound';
 import ConferenceRouterPanel from '../features/conference/ConferenceRouterPanel';
 import LoginPanel from '../features/user/LoginPanel';
 import LogoutPanel from '../features/user/LogoutPanel';
-import { restore, selectUserInfo } from '../features/user/userSlice';
 import AboutPanel from './AboutPanel';
 import ContactPanel from './ContactPanel';
 
 const MainPanel: React.FC = () => {
-  const dispatch = useAppDispatch();
-  const userInfo = useAppSelector(selectUserInfo);
-
-  React.useEffect(() => {
-    if (userInfo == null) {
-      dispatch(restore());
-    }
-  }, [dispatch, userInfo]);
-
   return (
     <main className="main-content">
       <Routes>

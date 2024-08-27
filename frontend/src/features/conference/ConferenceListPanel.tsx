@@ -1,60 +1,158 @@
 import React from 'react';
 
-import { Image } from 'react-bootstrap';
+import Markdown from 'react-markdown';
 import { Link } from 'react-router-dom';
-import { useAppDispatch, useAppSelector } from '../../app/hooks';
+import { useAppSelector } from '../../app/hooks';
 import HeaderTitle from '../../common/HeaderTitle';
 import JumbotronPanel from '../../common/JumbotronPanel';
 import LoadingOverlay from '../../common/LoadingOverlay';
-import { AsyncApiStatus } from '../../entities/api';
+import { ApiAsyncStatus } from '../../entities/api';
 import { ConferenceSimpleEntity } from '../../entities/conference';
-import { getConferenceList, selectConferencesInfo, selectGetListState } from './conferenceSlice';
+import { selectConferencesInfo, selectGetListState } from './conferenceSlice';
+import { formatDuration, getLogoUrl, getThumbnailUrl } from './conferenceUtilities';
 
 interface ConferenceListItemProps {
   conference: ConferenceSimpleEntity;
 }
 
-const ConferenceListItem: React.FC<ConferenceListItemProps> = (props) => {
+const ConferenceListActiveItem: React.FC<ConferenceListItemProps> = (props) => {
   const { conference } = props;
 
-  const logo = conference.logo ?? '';
+  const logo = getLogoUrl(conference);
+  const url = `/conferences/${conference.shortName}`;
 
   return (
     <JumbotronPanel>
       <div className="conference">
-        <p className="logo text-center">
-          <Image src={logo} alt={conference.name} fluid rounded />
-        </p>
+        {logo != null && (
+          <p className="text-center">
+            <img className="logo img-fluid rounded" src={logo} alt={conference.name} />
+          </p>
+        )}
         <h3 className="mb-3">
-          <Link to={`/conferences/${conference.shortName}`}>{conference.name}</Link>
+          <Link to={`${url}`}>{conference.name}</Link>
         </h3>
-        <p className="mb-3">{conference.description}</p>
-        <a className="btn btn-success btn-lg" href="#" role="button">
-          本日登録
-        </a>
+        <Markdown className="mb-3">{conference.description}</Markdown>
+        <p className="mb-3 fs-5">{formatDuration(conference)}</p>
+        {conference.isOwner && (
+          <div className="mb-2">
+            <Link to={`/dashboard/conference/${conference.uuid}`} className="btn btn-danger">
+              Conference Settings
+            </Link>{' '}
+            <Link to={`/dashboard/conference/${conference.uuid}/abstracts`} className="btn btn-danger">
+              Manage abstracts
+            </Link>
+          </div>
+        )}
       </div>
     </JumbotronPanel>
   );
 };
 
+const ConferenceListInActiveItem: React.FC<ConferenceListItemProps> = (props) => {
+  const { conference } = props;
+
+  const thumbnail = getThumbnailUrl(conference);
+  const url = `/conferences/${conference.shortName}`;
+
+  return (
+    <div className="conference">
+      <div className="media d-flex">
+        {thumbnail != null && (
+          <Link className="media-object mb-2" to={url}>
+            <img className="thumbnail img-fluid rounded" src={thumbnail} alt={conference.name} />
+          </Link>
+        )}
+        <div className="media-body">
+          <h4 className="media-heading mb-2">
+            <Link to={`${url}/abstracts`}>{conference.name}</Link>
+          </h4>
+          <p className="mb-2">{formatDuration(conference)}</p>
+        </div>
+      </div>
+      {conference.isOwner && (
+        <div className="mb-2">
+          <Link to={`/dashboard/conference/${conference.uuid}`} className="btn btn-danger">
+            Conference Settings
+          </Link>{' '}
+          <Link to={`/dashboard/conference/${conference.uuid}/abstracts`} className="btn btn-danger">
+            Manage abstracts
+          </Link>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const ConferenceListOtherItem: React.FC<ConferenceListItemProps> = (props) => {
+  const { conference } = props;
+
+  const thumbnail = getThumbnailUrl(conference);
+  const url = `/conferences/${conference.shortName}`;
+
+  return (
+    <div className="conference">
+      <div className="media unpublished d-flex">
+        {thumbnail != null && (
+          <Link className="media-object mb-2" to={url}>
+            <img className="thumbnail img-fluid rounded" src={thumbnail} alt={conference.name} />
+          </Link>
+        )}
+        <div className="media-body">
+          <h4 className="media-heading mb-2">
+            <Link to={url}>{conference.name}</Link>
+          </h4>
+          <p className="mb-2">{formatDuration(conference)}</p>
+        </div>
+      </div>
+      {conference.isOwner && (
+        <div className="mb-2">
+          <Link to={`/dashboard/conference/${conference.uuid}`} className="btn btn-danger">
+            Conference Settings
+          </Link>
+        </div>
+      )}
+    </div>
+  );
+};
+
 const ConferenceListPanel: React.FC = () => {
-  const dispatch = useAppDispatch();
   const conferencesInfo = useAppSelector(selectConferencesInfo);
   const getListState = useAppSelector(selectGetListState);
 
-  React.useEffect(() => {
-    dispatch(getConferenceList());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   const title = 'Conferences';
+  const isAdmin = false;
+
+  const actives = conferencesInfo.allIds.filter((uuid) => conferencesInfo.byId[uuid].isActive);
+  const inActives = conferencesInfo.allIds.filter(
+    (uuid) => !conferencesInfo.byId[uuid].isActive && conferencesInfo.byId[uuid].isPublished,
+  );
+  const others = conferencesInfo.allIds.filter(
+    (uuid) =>
+      !conferencesInfo.byId[uuid].isActive &&
+      !conferencesInfo.byId[uuid].isPublished &&
+      (conferencesInfo.byId[uuid].isOwner || isAdmin),
+  );
 
   return (
     <>
       <HeaderTitle title={title} />
-      {getListState.status === AsyncApiStatus.loading && <LoadingOverlay message="Loading.." />}
-      {conferencesInfo != null &&
-        conferencesInfo.map((conference) => <ConferenceListItem key={conference.uuid} conference={conference} />)}
+      {getListState.status === ApiAsyncStatus.loading && <LoadingOverlay message="Loading.." />}
+      {actives.map((uuid) => (
+        <ConferenceListActiveItem key={uuid} conference={conferencesInfo.byId[uuid]} />
+      ))}
+      {inActives.map((uuid) => (
+        <ConferenceListInActiveItem key={uuid} conference={conferencesInfo.byId[uuid]} />
+      ))}
+      {others.length > 0 && (
+        <>
+          <hr />
+          <h3 className="mb-3">Unpublished conferences</h3>
+          {others.map((uuid) => (
+            <ConferenceListOtherItem key={uuid} conference={conferencesInfo.byId[uuid]} />
+          ))}
+        </>
+      )}
     </>
   );
 };

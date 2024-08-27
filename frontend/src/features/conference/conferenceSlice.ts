@@ -2,21 +2,24 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { ApiConferenceList, ApiConferenceRetrieve } from '../../api/conferenceApi ';
 import { getApiErrorMessage } from '../../api/utilities';
 import { RootState } from '../../app/store';
-import { ActionState, AsyncApiStatus } from '../../entities/api';
+import { NormalizedState } from '../../common/normalizedState';
+import { ApiActionState, ApiAsyncStatus } from '../../entities/api';
 import { ConferenceEntity, ConferenceSimpleEntity } from '../../entities/conference';
+
+type ConferenceStateConferences = NormalizedState<ConferenceSimpleEntity, string>;
 
 interface ConferenceState {
   conferenceInfo: ConferenceEntity | null;
-  conferencesInfo: ConferenceSimpleEntity[] | null;
-  getListState: ActionState;
-  getDetailState: ActionState;
+  conferencesInfo: ConferenceStateConferences;
+  getListState: ApiActionState;
+  getDetailState: ApiActionState;
 }
 
 const initialState: Readonly<ConferenceState> = {
   conferenceInfo: null,
-  conferencesInfo: null,
-  getListState: { error: null, status: AsyncApiStatus.initial },
-  getDetailState: { error: null, status: AsyncApiStatus.initial },
+  conferencesInfo: { byId: {}, allIds: [] },
+  getListState: { error: null, status: ApiAsyncStatus.idle },
+  getDetailState: { error: null, status: ApiAsyncStatus.idle },
 };
 
 export const getConferenceList = createAsyncThunk<ConferenceSimpleEntity[], void, { rejectValue: string }>(
@@ -32,16 +35,12 @@ export const getConferenceList = createAsyncThunk<ConferenceSimpleEntity[], void
   },
 );
 
-export const getConferenceDetail = createAsyncThunk<ConferenceEntity, { shortName: string }, { rejectValue: string }>(
+export const getConferenceDetail = createAsyncThunk<ConferenceEntity, string, { rejectValue: string }>(
   'conference/get',
   async (params, thunkApi) => {
-    const { shortName } = params;
+    const uuid = params;
     try {
-      const conferences = await ApiConferenceList(shortName, thunkApi.signal);
-      if (conferences == null || conferences.length != 1) {
-        throw new Error('No such conference found.');
-      }
-      const conference = await ApiConferenceRetrieve(conferences[0].uuid, thunkApi.signal);
+      const conference = await ApiConferenceRetrieve(uuid, thunkApi.signal);
       return conference;
     } catch (e: unknown) {
       const message = await getApiErrorMessage(e);
@@ -56,38 +55,42 @@ export const conferenceSlice = createSlice({
   reducers: {
     unsetConferenceDetail: (state) => {
       state.conferenceInfo = null;
-      state.getDetailState.status = AsyncApiStatus.initial;
+      state.getDetailState.status = ApiAsyncStatus.idle;
       state.getDetailState.error = null;
     },
   },
   extraReducers: (builder) => {
     builder
       .addCase(getConferenceList.pending, (state) => {
-        state.getListState.status = AsyncApiStatus.loading;
+        state.getListState.status = ApiAsyncStatus.loading;
       })
       .addCase(getConferenceList.fulfilled, (state, action) => {
         const conferences = action.payload;
-        state.getListState.status = AsyncApiStatus.idle;
+        state.getListState.status = ApiAsyncStatus.idle;
         state.getListState.error = null;
-        state.conferencesInfo = conferences;
+        state.conferencesInfo = { allIds: [], byId: {} };
+        conferences.forEach((conference) => {
+          state.conferencesInfo.allIds.push(conference.uuid);
+          state.conferencesInfo.byId[conference.uuid] = conference;
+        });
       })
       .addCase(getConferenceList.rejected, (state, action) => {
         const error = action.payload ?? '';
-        state.getListState.status = AsyncApiStatus.failed;
+        state.getListState.status = ApiAsyncStatus.failed;
         state.getListState.error = error;
       })
       .addCase(getConferenceDetail.pending, (state) => {
-        state.getDetailState.status = AsyncApiStatus.loading;
+        state.getDetailState.status = ApiAsyncStatus.loading;
       })
       .addCase(getConferenceDetail.fulfilled, (state, action) => {
         const conference = action.payload;
-        state.getDetailState.status = AsyncApiStatus.idle;
+        state.getDetailState.status = ApiAsyncStatus.idle;
         state.getDetailState.error = null;
         state.conferenceInfo = conference;
       })
       .addCase(getConferenceDetail.rejected, (state, action) => {
         const error = action.payload ?? '';
-        state.getDetailState.status = AsyncApiStatus.failed;
+        state.getDetailState.status = ApiAsyncStatus.failed;
         state.getDetailState.error = error;
       });
   },

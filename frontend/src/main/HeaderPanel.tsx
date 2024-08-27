@@ -4,6 +4,7 @@ import { faHouse, faUpRightFromSquare } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Container, Nav, Navbar, NavDropdown } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
+import { useLocation } from 'react-router-dom';
 import { useAppSelector } from '../app/hooks';
 import { selectConferenceInfo } from '../features/conference/conferenceSlice';
 import { selectUserInfo } from '../features/user/userSlice';
@@ -11,9 +12,10 @@ import { selectUserInfo } from '../features/user/userSlice';
 const HeaderPanel: React.FC = () => {
   const userInfo = useAppSelector(selectUserInfo);
   const conferenceInfo = useAppSelector(selectConferenceInfo);
+  const { pathname } = useLocation();
 
   return (
-    <Navbar expand="md" className="header navbar-dark bg-primary border border-primary rounded">
+    <Navbar key={pathname} expand="md" className="header navbar-dark bg-primary border border-primary rounded">
       <Container fluid>
         <LinkContainer to="/">
           <Navbar.Brand className="p-3">
@@ -24,7 +26,7 @@ const HeaderPanel: React.FC = () => {
         <Navbar.Toggle className="me-3" aria-controls="basic-navbar-nav" />
         <Navbar.Collapse className="basic-navbar-nav">
           <Nav className="me-auto">
-            {userInfo != null ? (
+            {userInfo != null && (
               <>
                 <Nav.Item>
                   <LinkContainer to="/myabstracts">
@@ -37,7 +39,7 @@ const HeaderPanel: React.FC = () => {
                   </LinkContainer>
                 </Nav.Item>
               </>
-            ) : null}
+            )}
             <Nav.Item>
               <LinkContainer to="/active">
                 <Nav.Link>Active?</Nav.Link>
@@ -105,11 +107,13 @@ const HeaderPanel: React.FC = () => {
                   </LinkContainer>
                 </Nav.Item>
               )}
-              <Nav.Item>
-                <LinkContainer to={`/conferences/${conferenceInfo.shortName}/abstracts`}>
-                  <Nav.Link>Abstracts</Nav.Link>
-                </LinkContainer>
-              </Nav.Item>
+              {conferenceInfo.isPublished && (
+                <Nav.Item>
+                  <LinkContainer to={`/conferences/${conferenceInfo.shortName}/abstracts`}>
+                    <Nav.Link>Abstracts</Nav.Link>
+                  </LinkContainer>
+                </Nav.Item>
+              )}
               {conferenceInfo.geo != null && (
                 <>
                   <Nav.Item>

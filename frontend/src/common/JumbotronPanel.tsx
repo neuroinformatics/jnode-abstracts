@@ -9,7 +9,7 @@ const JumbotronPanel: React.FC<Props> = (props) => {
 
   return (
     <div className="jumbotron bg-body-tertiary p-3 px-sm-4 px-md-5 mb-4 rounded">
-      <div className="px-2 px-sm-3 px-md-4">{children}</div>
+      <div className="px-sm-1 px-md-2">{children}</div>
     </div>
   );
 };

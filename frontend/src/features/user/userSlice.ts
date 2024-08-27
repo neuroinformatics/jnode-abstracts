@@ -2,21 +2,21 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { ApiUsersCurrent, ApiUsersLogin, ApiUsersLogout } from '../../api/userApi';
 import { getApiErrorMessage, getApiErrorStatusCode } from '../../api/utilities';
 import { RootState } from '../../app/store';
-import { ActionState, ApiAuthResponse, AsyncApiStatus } from '../../entities/api';
+import { ApiActionState, ApiAsyncStatus, ApiAuthResponse } from '../../entities/api';
 import { UserEntity } from '../../entities/user';
 
 interface UserState {
   userInfo: UserEntity | null;
-  restoreState: ActionState;
-  loginState: ActionState;
-  logoutState: ActionState;
+  restoreState: ApiActionState;
+  loginState: ApiActionState;
+  logoutState: ApiActionState;
 }
 
 const initialState: Readonly<UserState> = {
   userInfo: null,
-  restoreState: { error: null, status: AsyncApiStatus.initial },
-  loginState: { error: null, status: AsyncApiStatus.initial },
-  logoutState: { error: null, status: AsyncApiStatus.initial },
+  restoreState: { error: null, status: ApiAsyncStatus.idle },
+  loginState: { error: null, status: ApiAsyncStatus.idle },
+  logoutState: { error: null, status: ApiAsyncStatus.idle },
 };
 
 export const restore = createAsyncThunk<UserEntity, void, { rejectValue: string }>(
@@ -71,45 +71,45 @@ export const userSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(restore.pending, (state) => {
-        state.restoreState.status = AsyncApiStatus.loading;
+        state.restoreState.status = ApiAsyncStatus.loading;
       })
       .addCase(restore.fulfilled, (state, action) => {
         const user = action.payload;
-        state.restoreState.status = AsyncApiStatus.idle;
+        state.restoreState.status = ApiAsyncStatus.idle;
         state.restoreState.error = null;
         state.userInfo = user;
       })
       .addCase(restore.rejected, (state, action) => {
         const error = action.payload ?? '';
-        state.restoreState.status = AsyncApiStatus.failed;
+        state.restoreState.status = ApiAsyncStatus.failed;
         state.restoreState.error = error;
       })
       .addCase(login.pending, (state) => {
-        state.loginState.status = AsyncApiStatus.loading;
+        state.loginState.status = ApiAsyncStatus.loading;
       })
       .addCase(login.fulfilled, (state, action) => {
         const user = action.payload;
-        state.loginState.status = AsyncApiStatus.idle;
+        state.loginState.status = ApiAsyncStatus.idle;
         state.loginState.error = null;
         state.userInfo = user;
       })
       .addCase(login.rejected, (state, action) => {
         const error = action.payload ?? '';
-        state.loginState.status = AsyncApiStatus.failed;
+        state.loginState.status = ApiAsyncStatus.failed;
         state.loginState.error = error;
       })
       .addCase(logout.pending, (state) => {
-        state.logoutState.status = AsyncApiStatus.loading;
+        state.logoutState.status = ApiAsyncStatus.loading;
         state.logoutState.error = null;
       })
       .addCase(logout.fulfilled, (state) => {
-        state.logoutState.status = AsyncApiStatus.idle;
+        state.logoutState.status = ApiAsyncStatus.idle;
         state.logoutState.error = null;
         state.userInfo = null;
       })
       .addCase(logout.rejected, (state, action) => {
         const error = action.payload ?? '';
-        state.logoutState.status = AsyncApiStatus.failed;
+        state.logoutState.status = ApiAsyncStatus.failed;
         state.logoutState.error = error;
       });
   },
