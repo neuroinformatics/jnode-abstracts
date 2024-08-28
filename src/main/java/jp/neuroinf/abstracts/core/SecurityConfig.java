@@ -30,8 +30,12 @@ import jakarta.servlet.http.HttpServletResponse;
 public class SecurityConfig
     implements AuthenticationSuccessHandler, AuthenticationFailureHandler, LogoutSuccessHandler {
 
+  private final MappingJackson2HttpMessageConverter httpMessageConverter;
+
   @Autowired
-  MappingJackson2HttpMessageConverter httpMessageConverter;
+  public SecurityConfig(MappingJackson2HttpMessageConverter httpMessageConverter) {
+    this.httpMessageConverter = httpMessageConverter;
+  }
 
   @Bean
   public PasswordEncoder passwordEncoder() {

@@ -10,18 +10,18 @@ public class AccountDto {
 
   private String uuid;
   private String mail;
-  private String password;
   private String firstName;
   private String lastName;
   private Boolean isActive;
   private LocalDateTime ctime;
   private LocalDateTime mtime;
+  private Boolean isAdmin;
 
   public String getFullName() {
     return firstName + ' ' + lastName;
   }
 
-  public static AccountDto of(Account entity) {
+  public static AccountDto of(Account entity, boolean isAdmin) {
     AccountDto dto = new AccountDto();
     dto.setUuid(entity.getUuid());
     dto.setMail(entity.getMail());
@@ -30,6 +30,7 @@ public class AccountDto {
     dto.setIsActive(entity.getIsActive());
     dto.setCtime(entity.getCtime());
     dto.setMtime(entity.getMtime());
+    dto.setIsAdmin(isAdmin);
     return dto;
   }
 

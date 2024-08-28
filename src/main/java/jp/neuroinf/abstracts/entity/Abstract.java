@@ -2,9 +2,8 @@ package jp.neuroinf.abstracts.entity;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -26,6 +25,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
 @Entity
@@ -100,6 +100,7 @@ public class Abstract {
 
   @OneToOne(cascade = CascadeType.ALL, mappedBy = "abstract_", orphanRemoval = true)
   @OnDelete(action = OnDeleteAction.CASCADE)
+  @EqualsAndHashCode.Exclude
   private AbstractAbstractGroup abstractAbstractGroup;
 
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "abstract_", orphanRemoval = true)
@@ -108,6 +109,16 @@ public class Abstract {
 
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "abstract_", orphanRemoval = true)
   @OnDelete(action = OnDeleteAction.CASCADE)
-  private Set<AbstractOwners> owners = new HashSet<>();
+  private List<AbstractOwners> abstractOwners = new ArrayList<>();
 
+  public List<Account> getOwners() {
+    return getAbstractOwners().stream().map((o) -> o.getOwner()).collect(Collectors.toList());
+  }
+
+  public boolean isOwner(Account account) {
+    if (account == null) {
+      return false;
+    }
+    return getOwners().stream().filter(o -> o.getUuid().equals(account.getUuid())).findFirst().orElse(null) != null;
+  }
 }

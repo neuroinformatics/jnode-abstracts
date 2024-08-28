@@ -10,4 +10,5 @@ export interface UserEntity extends UserSimpleEntity {
   isActive: boolean;
   ctime: string; // ISO8601
   mtime: string; // ISO8601
+  isAdmin: boolean;
 }

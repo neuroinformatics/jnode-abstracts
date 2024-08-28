@@ -24,7 +24,7 @@ export const formatDuration = (conference: ConferenceSimpleEntity): string => {
 };
 
 const getBannerUrl = (uuid: string): string => {
-  return `${import.meta.env.VITE_SITE_URL}api/banners/${uuid}/image`;
+  return `/api/banners/${uuid}/image`;
 };
 
 export const getLogoUrl = (conference: ConferenceSimpleEntity): string | null => {

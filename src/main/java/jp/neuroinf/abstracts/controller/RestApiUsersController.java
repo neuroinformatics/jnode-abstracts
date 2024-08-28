@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import jp.neuroinf.abstracts.dto.AccountDto;
-import jp.neuroinf.abstracts.entity.Account;
 import jp.neuroinf.abstracts.service.AccountDetails;
 import jp.neuroinf.abstracts.service.AccountService;
 
@@ -26,11 +25,10 @@ public class RestApiUsersController {
 
     @GetMapping("/current")
     public AccountDto getCurrentUser(@AuthenticationPrincipal AccountDetails user) {
-        Account account = user != null ? user.getAccount() : null;
-        if (account == null) {
+        if (user == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "not logged in");
         }
-        return AccountDto.of(account);
+        return accountService.getCurrentUser(user);
     }
 
 }

@@ -14,6 +14,18 @@ const HeaderPanel: React.FC = () => {
   const conferenceInfo = useAppSelector(selectConferenceInfo);
   const { pathname } = useLocation();
 
+  const ACTIVES: { [key: string]: string } = {
+    '/signup': 'Sing up',
+    '/forgotpassword': 'Forgot Password',
+    '/mail': 'Change Email',
+    '/password': 'Change Password',
+    '/dashboard/conference': 'Create Conference',
+    '/dashboard/accounts': 'Accounts',
+    '/about': 'About',
+    '/contact': 'Contact',
+  };
+  const active = pathname in ACTIVES ? ACTIVES[pathname] : null;
+
   return (
     <Navbar key={pathname} expand="md" className="header navbar-dark bg-primary border border-primary rounded">
       <Container fluid>
@@ -35,16 +47,18 @@ const HeaderPanel: React.FC = () => {
                 </Nav.Item>
                 <Nav.Item>
                   <LinkContainer to="/favouriteabstracts">
-                    <Nav.Link>My Favorites</Nav.Link>
+                    <Nav.Link>My Favourites</Nav.Link>
                   </LinkContainer>
                 </Nav.Item>
               </>
             )}
-            <Nav.Item>
-              <LinkContainer to="/active">
-                <Nav.Link>Active?</Nav.Link>
-              </LinkContainer>
-            </Nav.Item>
+            {active != null && (
+              <Nav.Item>
+                <LinkContainer to={pathname}>
+                  <Nav.Link>{active}</Nav.Link>
+                </LinkContainer>
+              </Nav.Item>
+            )}
           </Nav>
           <Nav className="d-flex">
             {userInfo != null ? (
@@ -60,22 +74,30 @@ const HeaderPanel: React.FC = () => {
                 <LinkContainer to="/mail">
                   <NavDropdown.Item>Change Email</NavDropdown.Item>
                 </LinkContainer>
-                <NavDropdown.Divider />
-                <NavDropdown.Header>Site Admin</NavDropdown.Header>
-                <LinkContainer to="/dashboard/conference">
-                  <NavDropdown.Item>Create Conference</NavDropdown.Item>
-                </LinkContainer>
-                <LinkContainer to="/dashboard/accounts">
-                  <NavDropdown.Item>Accounts</NavDropdown.Item>
-                </LinkContainer>
-                <NavDropdown.Divider />
-                <NavDropdown.Header>Conference Admin</NavDropdown.Header>
-                <LinkContainer to="/dashboard/conference/74cd39d6-5277-4b1a-a679-819032f7d2c4/abstracts">
-                  <NavDropdown.Item>Conference Abstracts</NavDropdown.Item>
-                </LinkContainer>
-                <LinkContainer to="/dashboard/conference/74cd39d6-5277-4b1a-a679-819032f7d2c4">
-                  <NavDropdown.Item>Conference Settings</NavDropdown.Item>
-                </LinkContainer>
+                {userInfo.isAdmin && (
+                  <>
+                    <NavDropdown.Divider />
+                    <NavDropdown.Header>Site Admin</NavDropdown.Header>
+                    <LinkContainer to="/dashboard/conference">
+                      <NavDropdown.Item>Create Conference</NavDropdown.Item>
+                    </LinkContainer>
+                    <LinkContainer to="/dashboard/accounts">
+                      <NavDropdown.Item>Accounts</NavDropdown.Item>
+                    </LinkContainer>
+                  </>
+                )}
+                {conferenceInfo != null && (conferenceInfo.isOwner || userInfo.isAdmin) && (
+                  <>
+                    <NavDropdown.Divider />
+                    <NavDropdown.Header>Conference Admin</NavDropdown.Header>
+                    <LinkContainer to={`/dashboard/conference/${conferenceInfo.uuid}/abstracts`}>
+                      <NavDropdown.Item>Conference Abstracts</NavDropdown.Item>
+                    </LinkContainer>
+                    <LinkContainer to={`/dashboard/conference/${conferenceInfo.uuid}`}>
+                      <NavDropdown.Item>Conference Settings</NavDropdown.Item>
+                    </LinkContainer>
+                  </>
+                )}
                 <NavDropdown.Divider />
                 <LinkContainer to="/logout">
                   <NavDropdown.Item>Logout</NavDropdown.Item>
@@ -129,12 +151,12 @@ const HeaderPanel: React.FC = () => {
                 </>
               )}
               {conferenceInfo.link != null && (
-                <Nav.Item>
-                  <Nav.Link href={conferenceInfo.link} target="_blank">
+                <div className="nav-item">
+                  <a className="nav-link" href={conferenceInfo.link} target="_blank">
                     <FontAwesomeIcon icon={faUpRightFromSquare} className="pe-2" />
                     Conference home
-                  </Nav.Link>
-                </Nav.Item>
+                  </a>
+                </div>
               )}
             </Nav>
           </Navbar.Collapse>

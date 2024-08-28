@@ -8,15 +8,17 @@ import JumbotronPanel from '../../common/JumbotronPanel';
 import LoadingOverlay from '../../common/LoadingOverlay';
 import { ApiAsyncStatus } from '../../entities/api';
 import { ConferenceSimpleEntity } from '../../entities/conference';
+import { selectUserInfo } from '../user/userSlice';
 import { selectConferencesInfo, selectGetListState } from './conferenceSlice';
 import { formatDuration, getLogoUrl, getThumbnailUrl } from './conferenceUtilities';
 
 interface ConferenceListItemProps {
   conference: ConferenceSimpleEntity;
+  isAdmin: boolean;
 }
 
 const ConferenceListActiveItem: React.FC<ConferenceListItemProps> = (props) => {
-  const { conference } = props;
+  const { conference, isAdmin } = props;
 
   const logo = getLogoUrl(conference);
   const url = `/conferences/${conference.shortName}`;
@@ -34,7 +36,7 @@ const ConferenceListActiveItem: React.FC<ConferenceListItemProps> = (props) => {
         </h3>
         <Markdown className="mb-3">{conference.description}</Markdown>
         <p className="mb-3 fs-5">{formatDuration(conference)}</p>
-        {conference.isOwner && (
+        {(isAdmin || conference.isOwner) && (
           <div className="mb-2">
             <Link to={`/dashboard/conference/${conference.uuid}`} className="btn btn-danger">
               Conference Settings
@@ -50,7 +52,7 @@ const ConferenceListActiveItem: React.FC<ConferenceListItemProps> = (props) => {
 };
 
 const ConferenceListInActiveItem: React.FC<ConferenceListItemProps> = (props) => {
-  const { conference } = props;
+  const { conference, isAdmin } = props;
 
   const thumbnail = getThumbnailUrl(conference);
   const url = `/conferences/${conference.shortName}`;
@@ -70,7 +72,7 @@ const ConferenceListInActiveItem: React.FC<ConferenceListItemProps> = (props) =>
           <p className="mb-2">{formatDuration(conference)}</p>
         </div>
       </div>
-      {conference.isOwner && (
+      {(isAdmin || conference.isOwner) && (
         <div className="mb-2">
           <Link to={`/dashboard/conference/${conference.uuid}`} className="btn btn-danger">
             Conference Settings
@@ -85,7 +87,7 @@ const ConferenceListInActiveItem: React.FC<ConferenceListItemProps> = (props) =>
 };
 
 const ConferenceListOtherItem: React.FC<ConferenceListItemProps> = (props) => {
-  const { conference } = props;
+  const { conference, isAdmin } = props;
 
   const thumbnail = getThumbnailUrl(conference);
   const url = `/conferences/${conference.shortName}`;
@@ -105,7 +107,7 @@ const ConferenceListOtherItem: React.FC<ConferenceListItemProps> = (props) => {
           <p className="mb-2">{formatDuration(conference)}</p>
         </div>
       </div>
-      {conference.isOwner && (
+      {(isAdmin || conference.isOwner) && (
         <div className="mb-2">
           <Link to={`/dashboard/conference/${conference.uuid}`} className="btn btn-danger">
             Conference Settings
@@ -119,10 +121,11 @@ const ConferenceListOtherItem: React.FC<ConferenceListItemProps> = (props) => {
 const ConferenceListPanel: React.FC = () => {
   const conferencesInfo = useAppSelector(selectConferencesInfo);
   const getListState = useAppSelector(selectGetListState);
+  const userInfo = useAppSelector(selectUserInfo);
 
   const title = 'Conferences';
-  const isAdmin = false;
 
+  const isAdmin = userInfo?.isAdmin ?? false;
   const actives = conferencesInfo.allIds.filter((uuid) => conferencesInfo.byId[uuid].isActive);
   const inActives = conferencesInfo.allIds.filter(
     (uuid) => !conferencesInfo.byId[uuid].isActive && conferencesInfo.byId[uuid].isPublished,
@@ -139,17 +142,17 @@ const ConferenceListPanel: React.FC = () => {
       <HeaderTitle title={title} />
       {getListState.status === ApiAsyncStatus.loading && <LoadingOverlay message="Loading.." />}
       {actives.map((uuid) => (
-        <ConferenceListActiveItem key={uuid} conference={conferencesInfo.byId[uuid]} />
+        <ConferenceListActiveItem key={uuid} conference={conferencesInfo.byId[uuid]} isAdmin={isAdmin} />
       ))}
       {inActives.map((uuid) => (
-        <ConferenceListInActiveItem key={uuid} conference={conferencesInfo.byId[uuid]} />
+        <ConferenceListInActiveItem key={uuid} conference={conferencesInfo.byId[uuid]} isAdmin={isAdmin} />
       ))}
       {others.length > 0 && (
         <>
           <hr />
           <h3 className="mb-3">Unpublished conferences</h3>
           {others.map((uuid) => (
-            <ConferenceListOtherItem key={uuid} conference={conferencesInfo.byId[uuid]} />
+            <ConferenceListOtherItem key={uuid} conference={conferencesInfo.byId[uuid]} isAdmin={isAdmin} />
           ))}
         </>
       )}

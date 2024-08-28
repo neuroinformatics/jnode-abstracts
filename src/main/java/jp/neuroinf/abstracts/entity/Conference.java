@@ -3,6 +3,7 @@ package jp.neuroinf.abstracts.entity;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -128,8 +129,12 @@ public class Conference {
   @OnDelete(action = OnDeleteAction.CASCADE)
   private List<ConferenceOwners> conferenceOwners = new ArrayList<>();
 
+  @OneToMany(cascade = CascadeType.ALL, mappedBy = "conference", orphanRemoval = true)
+  @OnDelete(action = OnDeleteAction.CASCADE)
+  private List<Abstract> abstracts = new ArrayList<>();
+
   public List<Account> getOwners() {
-    return getConferenceOwners().stream().map((o) -> o.getOwner()).toList();
+    return getConferenceOwners().stream().map((o) -> o.getOwner()).collect(Collectors.toList());
   }
 
   public boolean isOwner(Account account) {

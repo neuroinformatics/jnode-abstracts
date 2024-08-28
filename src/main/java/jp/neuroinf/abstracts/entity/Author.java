@@ -49,6 +49,6 @@ public class Author {
 
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "author", orphanRemoval = true)
   @OnDelete(action = OnDeleteAction.CASCADE)
-  private List<AuthorAffiliations> affiliations = new ArrayList<>();
+  private List<AuthorAffiliations> authorAffiliations = new ArrayList<>();
 
 }
