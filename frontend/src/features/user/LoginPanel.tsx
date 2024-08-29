@@ -2,7 +2,6 @@ import React from 'react';
 
 import { faEnvelope, faKey } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Button, Form, FormGroup, InputGroup } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import AlertPanel from '../../common/AlertPanel';
@@ -40,36 +39,43 @@ const LoginPanel: React.FC = () => {
     <GeneralPanel title={title} size={7}>
       {loginState.status === ApiAsyncStatus.loading && <LoadingOverlay message="Signing in.." />}
       <fieldset>
-        <Form onSubmit={onSubmitLogin}>
-          <InputGroup className="mb-4">
-            <InputGroup.Text>
+        <form onSubmit={onSubmitLogin}>
+          <div className="input-group mb-4">
+            <span className="input-group-text">
               <FontAwesomeIcon icon={faEnvelope} />
-            </InputGroup.Text>
-            <Form.Control type="email" placeholder="Email" required onChange={(e) => setUsername(e.target.value)} />
-          </InputGroup>
-          <InputGroup className="mb-4">
-            <InputGroup.Text>
+            </span>
+            <input
+              className="form-control"
+              type="email"
+              placeholder="Email"
+              required
+              onChange={(e) => setUsername(e.target.value)}
+            />
+          </div>
+          <div className="input-group mb-4">
+            <span className="input-group-text">
               <FontAwesomeIcon icon={faKey} />
-            </InputGroup.Text>
-            <Form.Control
+            </span>
+            <input
+              className="form-control"
               type="password"
               placeholder="Password"
               required
               onChange={(e) => setPassword(e.target.value)}
             />
-          </InputGroup>
+          </div>
           {loginState.error != null && <AlertPanel variant="danger">{loginState.error}</AlertPanel>}
           <div className="mb-3">
             <Link to="/forgotpassword">Forgot password?</Link> or <Link to="/signup">Create a new account</Link>
           </div>
-          <FormGroup className="mb-3">
+          <div className="mb-3">
             <div className="d-grid">
-              <Button type="submit" variant="primary" size="lg">
+              <button className="btn btn-primary btn-lg" type="submit">
                 Sign in
-              </Button>
+              </button>
             </div>
-          </FormGroup>
-        </Form>
+          </div>
+        </form>
       </fieldset>
     </GeneralPanel>
   );

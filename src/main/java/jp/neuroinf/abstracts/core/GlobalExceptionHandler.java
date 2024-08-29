@@ -26,7 +26,7 @@ public class GlobalExceptionHandler {
         if (exception instanceof ResponseStatusException) {
             message = ((ResponseStatusException) exception).getReason();
         }
-        exception.printStackTrace();
+        // exception.printStackTrace();
         GlobalExceptionResponseBody body = new GlobalExceptionResponseBody();
         body.setTimestamp(ZonedDateTime.now());
         body.setCode(statusCode.value());

@@ -13,7 +13,6 @@ public class StateLogDto {
   private String note;
   private String state;
   private LocalDateTime timestamp;
-  // private Abstract abstract_;
 
   public static StateLogDto of(StateLog entity) {
     StateLogDto dto = new StateLogDto();

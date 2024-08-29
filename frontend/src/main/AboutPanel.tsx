@@ -1,6 +1,5 @@
 import React from 'react';
 
-import { Col, Row } from 'react-bootstrap';
 import GeneralPage from '../common/GeneralPanel';
 
 import JNodeLogo from '../assets/J-Node-logo.png';
@@ -9,8 +8,8 @@ const AboutPanel: React.FC = () => {
   const title = 'About';
   return (
     <GeneralPage title={title}>
-      <Row className="mb-4">
-        <Col md="8" className="d-flex align-items-center">
+      <div className="row mb-4">
+        <div className="col-md-8 d-flex align-items-center">
           <p>
             This Abstract System is hosted by the{' '}
             <a href="https://www.neuroinf.jp/" target="_blank">
@@ -18,11 +17,11 @@ const AboutPanel: React.FC = () => {
             </a>
             .
           </p>
-        </Col>
-        <Col md="4">
+        </div>
+        <div className="col-md-4">
           <img className="img-fluid" src={JNodeLogo}></img>
-        </Col>
-      </Row>
+        </div>
+      </div>
     </GeneralPage>
   );
 };

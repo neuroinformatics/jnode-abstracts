@@ -1,25 +1,31 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { ApiConferenceList, ApiConferenceRetrieve } from '../../api/conferenceApi ';
+import { ApiConferenceAbstractList, ApiConferenceList, ApiConferenceRetrieve } from '../../api/conferenceApi ';
 import { getApiErrorMessage } from '../../api/utilities';
 import { RootState } from '../../app/store';
 import { NormalizedState } from '../../common/normalizedState';
+import { AbstractSimpleEntity } from '../../entities/abstract';
 import { ApiActionState, ApiAsyncStatus } from '../../entities/api';
 import { ConferenceEntity, ConferenceSimpleEntity } from '../../entities/conference';
 
-type ConferenceStateConferences = NormalizedState<ConferenceSimpleEntity, string>;
+export type ConferenceStateConferences = NormalizedState<ConferenceSimpleEntity, string>;
+export type ConferenceStateAbstracts = NormalizedState<AbstractSimpleEntity, string>;
 
 interface ConferenceState {
   conferenceInfo: ConferenceEntity | null;
   conferencesInfo: ConferenceStateConferences;
+  abstractsInfo: ConferenceStateAbstracts;
   getListState: ApiActionState;
   getDetailState: ApiActionState;
+  getAbstractsState: ApiActionState;
 }
 
 const initialState: Readonly<ConferenceState> = {
   conferenceInfo: null,
   conferencesInfo: { byId: {}, allIds: [] },
+  abstractsInfo: { byId: {}, allIds: [] },
   getListState: { error: null, status: ApiAsyncStatus.idle },
   getDetailState: { error: null, status: ApiAsyncStatus.idle },
+  getAbstractsState: { error: null, status: ApiAsyncStatus.idle },
 };
 
 export const getConferenceList = createAsyncThunk<ConferenceSimpleEntity[], void, { rejectValue: string }>(
@@ -36,12 +42,26 @@ export const getConferenceList = createAsyncThunk<ConferenceSimpleEntity[], void
 );
 
 export const getConferenceDetail = createAsyncThunk<ConferenceEntity, string, { rejectValue: string }>(
-  'conference/get',
+  'conference/retrieve',
   async (params, thunkApi) => {
     const uuid = params;
     try {
       const conference = await ApiConferenceRetrieve(uuid, thunkApi.signal);
       return conference;
+    } catch (e: unknown) {
+      const message = await getApiErrorMessage(e);
+      return thunkApi.rejectWithValue(message);
+    }
+  },
+);
+
+export const getConferenceAbstracts = createAsyncThunk<AbstractSimpleEntity[], string, { rejectValue: string }>(
+  'conference/abstracts',
+  async (params, thunkApi) => {
+    const uuid = params;
+    try {
+      const abstracts = await ApiConferenceAbstractList(uuid, thunkApi.signal);
+      return abstracts;
     } catch (e: unknown) {
       const message = await getApiErrorMessage(e);
       return thunkApi.rejectWithValue(message);
@@ -92,6 +112,24 @@ export const conferenceSlice = createSlice({
         const error = action.payload ?? '';
         state.getDetailState.status = ApiAsyncStatus.failed;
         state.getDetailState.error = error;
+      })
+      .addCase(getConferenceAbstracts.pending, (state) => {
+        state.getAbstractsState.status = ApiAsyncStatus.loading;
+      })
+      .addCase(getConferenceAbstracts.fulfilled, (state, action) => {
+        const abstracts = action.payload;
+        state.getAbstractsState.status = ApiAsyncStatus.idle;
+        state.getAbstractsState.error = null;
+        state.abstractsInfo = { allIds: [], byId: {} };
+        abstracts.forEach((abstract) => {
+          state.abstractsInfo.allIds.push(abstract.uuid);
+          state.abstractsInfo.byId[abstract.uuid] = abstract;
+        });
+      })
+      .addCase(getConferenceAbstracts.rejected, (state, action) => {
+        const error = action.payload ?? '';
+        state.getAbstractsState.status = ApiAsyncStatus.failed;
+        state.getAbstractsState.error = error;
       });
   },
 });
@@ -100,7 +138,9 @@ export const { unsetConferenceDetail } = conferenceSlice.actions;
 
 export const selectConferenceInfo = (state: RootState) => state.conference.conferenceInfo;
 export const selectConferencesInfo = (state: RootState) => state.conference.conferencesInfo;
+export const selectAbstractsInfo = (state: RootState) => state.conference.abstractsInfo;
 export const selectGetListState = (state: RootState) => state.conference.getListState;
 export const selectGetDetailState = (state: RootState) => state.conference.getDetailState;
+export const selectGetAbstractsState = (state: RootState) => state.conference.getAbstractsState;
 
 export default conferenceSlice.reducer;

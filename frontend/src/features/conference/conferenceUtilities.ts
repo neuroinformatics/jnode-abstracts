@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
-import { ConferenceSimpleEntity } from '../../entities/conference';
+import { AbstractSimpleEntity, AuthorEntity, FigureEntity } from '../../entities/abstract';
+import { AbstractGroupEntity, ConferenceEntity, ConferenceSimpleEntity } from '../../entities/conference';
 
 export const formatDuration = (conference: ConferenceSimpleEntity): string => {
   const { startDate, endDate } = conference;
@@ -35,4 +36,32 @@ export const getLogoUrl = (conference: ConferenceSimpleEntity): string | null =>
 export const getThumbnailUrl = (conference: ConferenceSimpleEntity): string | null => {
   const banner = conference.banners.filter((banner) => banner.type === 'thumbnail');
   return banner.length === 1 ? getBannerUrl(banner[0].uuid) : conference.thumbnail;
+};
+
+export const getAbstractGroup = (conference: ConferenceEntity, uuid: string | null): AbstractGroupEntity | null => {
+  return conference.abstractGroups.find((abstractGroup) => abstractGroup.uuid === uuid) ?? null;
+};
+
+export const getAbstractId = (conference: ConferenceEntity, abstract: AbstractSimpleEntity): string | null => {
+  const gId = (abstract.sortId & 0xffff0000) >> 16;
+  const aId = abstract.sortId & 0x0000ffff;
+  const abstractGroup = getAbstractGroup(conference, abstract.abstractGroupUuid);
+  const shortName = abstractGroup?.prefix === gId ? abstractGroup.shortName : null;
+  return shortName != null ? `${shortName} ${aId}` : null;
+};
+
+export const formatAuthorCitation = (author: AuthorEntity): string => {
+  const makeInitials = (name: string | null): string => {
+    return (
+      name
+        ?.split(' ')
+        .map((x) => x[0])
+        .join('') ?? ''
+    );
+  };
+  return `${author.lastName} ${makeInitials(author.firstName)}${makeInitials(author.middleName)}`;
+};
+
+export const getFigureUrl = (figure: FigureEntity): string | null => {
+  return `/api/figures/${figure.uuid}/image`;
 };

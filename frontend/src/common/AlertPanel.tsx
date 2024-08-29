@@ -1,22 +1,48 @@
 import React from 'react';
-import { Alert, AlertHeading } from 'react-bootstrap';
 
 export type AlertPanelVariant = 'danger' | 'danger' | 'light' | 'dark' | 'danger' | 'info' | 'warning' | 'danger';
 
 interface Props {
   variant: AlertPanelVariant;
   title?: string;
+  show?: boolean;
   dismissible?: boolean;
+  onClose?: () => void;
   children: React.ReactNode;
 }
 
 const AlertPanel: React.FC<Props> = (props) => {
-  const { variant, title, dismissible = false, children } = props;
+  const { variant, title, show = true, dismissible = false, onClose, children } = props;
+
+  const [isShow, setIsShow] = React.useState<boolean>(show);
+
+  const names = ['alert', `alert-${variant}`, 'fade'];
+  if (dismissible) {
+    names.push('alert-dismissible');
+  }
+  if (isShow) {
+    names.push('show');
+  }
+  const onClickClose: React.MouseEventHandler<HTMLButtonElement> = () => {
+    setIsShow(false);
+    if (onClose) {
+      onClose();
+    }
+  };
   return (
-    <Alert variant={variant} dismissible={dismissible}>
-      {title != null && <AlertHeading>{title}</AlertHeading>}
+    <div className={names.join(' ')} role="alert">
+      {title != null && <div className="alert-heading h4">{title}</div>}
       {children}
-    </Alert>
+      {dismissible && (
+        <button
+          type="button"
+          className="btn-close"
+          data-bs-dismiss="alert"
+          aria-label="Close"
+          onClick={onClickClose}
+        ></button>
+      )}
+    </div>
   );
 };
 

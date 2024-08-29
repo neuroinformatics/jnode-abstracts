@@ -1,30 +1,35 @@
 import React from 'react';
 
-import { Col, Container, Row } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
 import HeaderTitle from './HeaderTitle';
 
 interface Props {
   title: string;
+  titleLinkTo?: string;
   size?: number;
   children: React.ReactNode;
 }
 
 const GeneralPanel: React.FC<Props> = (props) => {
-  const { title, size = 12, children } = props;
+  const { title, titleLinkTo, size = 12, children } = props;
   return (
-    <Container>
-      <Row className="justify-content-center">
-        <Col md={size} className="page-header my-3">
+    <div className="mx-3">
+      <div className="row justify-content-center">
+        <div className={`page-header col-md-${size} my-3`}>
           <HeaderTitle title={title} />
-          <h1>{title}</h1>
-        </Col>
-      </Row>
-      <Row className="justify-content-center">
-        <Col md={size} className="page-body my-3 ">
-          {children}
-        </Col>
-      </Row>
-    </Container>
+          {titleLinkTo != null ? (
+            <Link to={titleLinkTo}>
+              <h1>{title}</h1>
+            </Link>
+          ) : (
+            <h1>{title}</h1>
+          )}
+        </div>
+      </div>
+      <div className="row justify-content-center">
+        <div className={`page-body col-md-${size} my-3`}>{children}</div>
+      </div>
+    </div>
   );
 };
 

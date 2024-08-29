@@ -54,7 +54,6 @@ public class ConferenceService {
     }
     return conference.getAbstracts().stream().map(AbstractSimpleDto::of)
         .filter((d) -> isAdmin || isConferenceOwner || d.getState().equals("Accepted"))
-        .sorted((d1, d2) -> d1.getSortId() - d2.getSortId())
         .collect(Collectors.toList());
   }
 

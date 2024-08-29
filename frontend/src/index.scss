@@ -2,6 +2,27 @@
   @return red($value), green($value), blue($value);
 }
 
+@mixin enum-with-comma($selector: '') {
+  ul#{$selector} {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: inline-block;
+
+    li {
+      display: inline-block;
+
+      &:not(:last-child) {
+        margin-right: .3rem;
+
+        &:after {
+          content: ", ";
+        }
+      }
+    }
+  }
+}
+
 $custom-font-sans-serif: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
 $custom-font-serif: "EB Garamond", Georgia, "Times New Roman", Times, serif;
 $custom-font-monospace: Menlo, Monaco, Consolas, "Courier New", monospace;
@@ -88,6 +109,11 @@ a {
   }
 }
 
+// common/KeywordHighlight
+.highlight {
+  background-color: rgba(var(--bs-warning-rgb), 50%);
+}
+
 // App
 #root .app {
   max-width: 960px;
@@ -149,7 +175,7 @@ a {
     padding: 1rem 0;
 
     @media (min-width: 768px) {
-      padding: 1.5rem 3rem;
+      padding: 1.5rem 2rem;
     }
 
     // common/LoadingOverlay
@@ -207,6 +233,34 @@ a {
           max-height: 64px;
         }
       }
+
+      // conference/AbstractListPanel
+      .abstract-list {
+
+        .list-group-item {
+          &:hover {
+            cursor: pointer;
+            background-color: var(--bs-primary) !important;
+            color: White;
+          }
+
+          .abstract {
+            padding: 0 .5rem;
+
+            .sortId {
+              float: right;
+              margin: .5rem 0 .5rem 1rem;
+            }
+
+            h5 {
+              font-size: 1.2rem;
+            }
+
+            @include enum-with-comma('.authors');
+          }
+        }
+      }
+
     }
   }
 

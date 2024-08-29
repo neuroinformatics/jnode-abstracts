@@ -10,7 +10,7 @@ export interface TopicEntity {
   topic: string;
 }
 
-export interface AbstractGroupsEntity {
+export interface AbstractGroupEntity {
   uuid: string;
   name: string;
   prefix: number;
@@ -46,7 +46,7 @@ export interface ConferenceEntity extends ConferenceSimpleEntity {
   geo: string | null;
   schedule: string | null;
   topics: TopicEntity[];
-  abstractGroups: AbstractGroupsEntity[];
+  abstractGroups: AbstractGroupEntity[];
   info: string | null;
   owners: UserSimpleEntity[] | null;
   ctime: string; // ISO8601

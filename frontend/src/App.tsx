@@ -1,6 +1,5 @@
 import React from 'react';
 
-import { Container } from 'react-bootstrap';
 import { useAppDispatch, useAppSelector } from './app/hooks';
 import { getConferenceList } from './features/conference/conferenceSlice';
 import { restore, selectUserInfo } from './features/user/userSlice';
@@ -23,11 +22,11 @@ const App: React.FC = () => {
   }, [dispatch, userInfo]);
 
   return (
-    <Container className="app">
+    <div className="app container">
       <HeaderPanel />
       <MainPanel />
       <FooterPanel />
-    </Container>
+    </div>
   );
 };
 

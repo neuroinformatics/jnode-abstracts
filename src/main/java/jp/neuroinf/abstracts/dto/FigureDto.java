@@ -9,7 +9,6 @@ public class FigureDto {
   private String uuid;
   private String caption;
   private Integer position;
-  // private Abstract abstract_;
 
   public static FigureDto of(Figure entity) {
     FigureDto dto = new FigureDto();

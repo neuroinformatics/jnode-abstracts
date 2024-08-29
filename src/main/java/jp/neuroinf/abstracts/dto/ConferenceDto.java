@@ -70,10 +70,8 @@ public class ConferenceDto {
     dto.setCtime(entity.getCtime());
     dto.setMtime(entity.getMtime());
     dto.setTopics(entity.getTopics().stream().map(TopicDto::of)
-        .sorted((d1, d2) -> d1.getPosition() - d2.getPosition())
         .collect(Collectors.toList()));
     dto.setAbstractGroups(entity.getAbstractGroups().stream().map(AbstractGroupDto::of)
-        .sorted((d1, d2) -> d1.getPrefix() - d2.getPrefix())
         .collect(Collectors.toList()));
     dto.setBanners(entity.getBanners().stream().map(BannerDto::of)
         .collect(Collectors.toList()));

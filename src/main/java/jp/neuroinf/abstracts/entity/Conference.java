@@ -20,6 +20,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import lombok.Data;
 
@@ -115,10 +116,12 @@ public class Conference {
 
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "conference", orphanRemoval = true)
   @OnDelete(action = OnDeleteAction.CASCADE)
+  @OrderBy("position ASC")
   private List<Topic> topics = new ArrayList<>();
 
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "conference", orphanRemoval = true)
   @OnDelete(action = OnDeleteAction.CASCADE)
+  @OrderBy("prefix ASC")
   private List<AbstractGroup> abstractGroups = new ArrayList<>();
 
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "conference", orphanRemoval = true)
@@ -131,6 +134,7 @@ public class Conference {
 
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "conference", orphanRemoval = true)
   @OnDelete(action = OnDeleteAction.CASCADE)
+  @OrderBy("sortId ASC")
   private List<Abstract> abstracts = new ArrayList<>();
 
   public List<Account> getOwners() {

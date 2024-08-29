@@ -23,6 +23,7 @@ import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -84,18 +85,22 @@ public class Abstract {
 
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "abstract_", orphanRemoval = true)
   @OnDelete(action = OnDeleteAction.CASCADE)
+  @OrderBy("position ASC")
   private List<Author> authors = new ArrayList<>();
 
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "abstract_", orphanRemoval = true)
   @OnDelete(action = OnDeleteAction.CASCADE)
+  @OrderBy("position ASC")
   private List<Affiliation> affiliations = new ArrayList<>();
 
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "abstract_", orphanRemoval = true)
   @OnDelete(action = OnDeleteAction.CASCADE)
+  @OrderBy("position ASC")
   private List<Figure> figures = new ArrayList<>();
 
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "abstract_", orphanRemoval = true)
   @OnDelete(action = OnDeleteAction.CASCADE)
+  @OrderBy("position ASC")
   private List<Reference> references = new ArrayList<>();
 
   @OneToOne(cascade = CascadeType.ALL, mappedBy = "abstract_", orphanRemoval = true)
@@ -105,6 +110,7 @@ public class Abstract {
 
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "abstract_", orphanRemoval = true)
   @OnDelete(action = OnDeleteAction.CASCADE)
+  @OrderBy("timestamp DESC")
   private List<StateLog> stateLogs = new ArrayList<>();
 
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "abstract_", orphanRemoval = true)
