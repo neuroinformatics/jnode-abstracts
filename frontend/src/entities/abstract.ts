@@ -56,25 +56,25 @@ export interface AbstractSimpleEntity {
   uuid: string;
   title: string;
   text: string;
-  sortId: number;
-  state: StateLogState;
-  conferenceUuid: string;
-  authors: AuthorEntity[];
-  affiliations: AffiliationEntity[];
-  abstractGroupUuid: string | null;
-}
-
-export interface AbstractEntity extends AbstractSimpleEntity {
   doi: string | null;
   acknowledgements: string | null;
   conflictOfInterest: string | null;
   isTalk: boolean;
   reasonForTalk: string | null;
+  sortId: number;
+  state: StateLogState;
   topic: string;
-  ctime: string; // ISO8601
-  mtime: string; // ISO8601
+  conferenceUuid: string;
+  authors: AuthorEntity[];
+  affiliations: AffiliationEntity[];
   figures: FigureEntity[];
   references: ReferenceEntity[];
+  abstractGroupUuid: string | null;
+}
+
+export interface AbstractEntity extends AbstractSimpleEntity {
+  ctime: string; // ISO8601
+  mtime: string; // ISO8601
   stateLogs: StateLogEntity[];
   owners: UserSimpleEntity[];
 }

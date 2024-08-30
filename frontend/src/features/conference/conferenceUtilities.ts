@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { AbstractSimpleEntity, AuthorEntity, FigureEntity } from '../../entities/abstract';
+import { AbstractSimpleEntity, AffiliationEntity, AuthorEntity, FigureEntity } from '../../entities/abstract';
 import { AbstractGroupEntity, ConferenceEntity, ConferenceSimpleEntity } from '../../entities/conference';
 
 export const formatDuration = (conference: ConferenceSimpleEntity): string => {
@@ -62,6 +62,40 @@ export const formatAuthorCitation = (author: AuthorEntity): string => {
   return `${author.lastName} ${makeInitials(author.firstName)}${makeInitials(author.middleName)}`;
 };
 
-export const getFigureUrl = (figure: FigureEntity): string | null => {
+export const formatAbstractAuthorsCitation = (abstract: AbstractSimpleEntity): string => {
+  return abstract.authors.map((author) => formatAuthorCitation(author)).join(', ');
+};
+
+export const formatAuthorName = (author: AuthorEntity): string => {
+  return `${author.firstName} ${author.middleName ? `${author.middleName} ` : ''}${author.lastName}`;
+};
+
+export const formatAuthorAffiliations = (author: AuthorEntity, affiliations: AffiliationEntity[]): string => {
+  const positions = author.affiliationUuids
+    .map((uuid) => (affiliations.find((a) => a.uuid === uuid)?.position ?? -1) + 1)
+    .filter((p) => p > 0)
+    .sort();
+  return positions.join(', ');
+};
+
+export const formatAffiliation = (affiliation: AffiliationEntity): string => {
+  return [affiliation.department, affiliation.section, affiliation.address, affiliation.country]
+    .filter((a) => a != null)
+    .join(', ');
+};
+
+export const getFigureUrl = (figure: FigureEntity): string => {
   return `/api/figures/${figure.uuid}/image`;
+};
+
+export const formatAbstractCopyright = (conference: ConferenceEntity, abstract: AbstractSimpleEntity): string => {
+  const year = dayjs(conference.startDate).year();
+  return `© (${year}) ${formatAbstractAuthorsCitation(abstract)}`;
+};
+
+export const formatAbstractCitation = (conference: ConferenceEntity, abstract: AbstractSimpleEntity): string => {
+  const year = dayjs(conference.startDate).year();
+  return `${formatAbstractAuthorsCitation(abstract)} (${year}) ${abstract.title}. ${conference.name}.${
+    abstract.doi != null ? ` doi:${abstract.doi}` : ''
+  }`;
 };

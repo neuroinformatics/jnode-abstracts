@@ -27,7 +27,11 @@ const HeaderPanel: React.FC = () => {
   const active = pathname in ACTIVES ? ACTIVES[pathname] : null;
 
   return (
-    <Navbar key={pathname} expand="md" className="header navbar-dark bg-primary border border-primary rounded">
+    <Navbar
+      key={pathname}
+      expand="md"
+      className="header navbar-dark bg-primary border border-primary rounded d-print-none"
+    >
       <Container fluid>
         <LinkContainer to="/">
           <Navbar.Brand className="p-3">

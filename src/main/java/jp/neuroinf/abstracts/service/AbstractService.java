@@ -24,18 +24,23 @@ public class AbstractService {
   }
 
   @Transactional
-  public AbstractDto getAbstract(Account account, String uuid) {
-    Abstract entity = this.abstractRepository.findFirstByUuid(uuid);
-    if (entity == null) {
-      return null;
-    }
-    Conference conference = entity.getConference();
+  public boolean isReadable(Account account, Abstract abstract_) {
+    Conference conference = abstract_.getConference();
     boolean isAdmin = account != null ? this.properties.getAdmins().contains(account.getMail()) : false;
     boolean isConferenceOwner = conference.isOwner(account);
-    boolean isOwner = entity.isOwner(account);
+    boolean isOwner = abstract_.isOwner(account);
     boolean isReadable = isAdmin || isConferenceOwner || isOwner
-        || conference.getIsPublished() && entity.getState().equals("Accepted");
-    return isReadable ? AbstractDto.of(entity) : null;
+        || conference.getIsPublished() && abstract_.getState().equals("Accepted");
+    return isReadable;
+  }
+
+  @Transactional
+  public AbstractDto getAbstract(Account account, String uuid) {
+    Abstract abstract_ = this.abstractRepository.findFirstByUuid(uuid);
+    if (abstract_ == null || !isReadable(account, abstract_)) {
+      return null;
+    }
+    return AbstractDto.of(abstract_);
   }
 
 }

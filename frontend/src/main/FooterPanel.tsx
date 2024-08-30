@@ -6,7 +6,7 @@ const FooterPanel: React.FC = () => {
   const year = new Date().getFullYear();
 
   return (
-    <div className="footer hstack py-3 px-2 text-secondary bg-body-tertiary rounded">
+    <div className="footer hstack py-3 px-2 text-secondary bg-body-tertiary rounded d-print-none">
       <div className="p-2">
         <Link to="/about">About</Link>
       </div>
