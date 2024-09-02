@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -49,7 +50,7 @@ public class FigureService {
     try (InputStream inputStream = new FileInputStream(filePath);
         OutputStream outputStream = response.getOutputStream();) {
       byte[] fileByteArray = inputStream.readAllBytes();
-      response.setContentType("application/octet-stream");
+      response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
       response.setContentLength(fileByteArray.length);
       outputStream.write(fileByteArray);
       outputStream.flush();

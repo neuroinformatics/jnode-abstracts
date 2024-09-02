@@ -19,6 +19,10 @@
           content: ", ";
         }
       }
+
+      sup {
+        margin-left: 1px;
+      }
     }
   }
 }
@@ -261,6 +265,33 @@ a {
         }
       }
 
+      // conference/AbstractPanel
+      .abstract {
+        @include enum-with-comma('.authors');
+
+        .affiliations {
+          margin: 0;
+          padding: 0;
+          padding-left: 3rem;
+
+          .affiliation {
+            vertical-align: super;
+            font-size: 0.75rem;
+
+            span {
+              vertical-align: middle;
+              font-size: 0.92rem;
+            }
+          }
+        }
+
+        .text {
+          font-family: #{$custom-font-serif};
+          font-size: 1.2rem;
+          min-height: 10rem;
+          text-align: justify;
+        }
+      }
     }
   }
 

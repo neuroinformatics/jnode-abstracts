@@ -116,13 +116,15 @@ const AbstractListPanel: React.FC<Props> = (props) => {
                                 <div className="sortId">{abstractId}</div>
                                 <div className="box">
                                   <h5 className="my-1">
-                                    <KeywordHighlight text={abstract.title} keyword={keyword} />
+                                    <KeywordHighlight keyword={keyword}>{abstract.title}</KeywordHighlight>
                                   </h5>
                                   <div className="list-group-item-text">
                                     <ul className="authors">
                                       {abstract.authors.map((author) => (
                                         <li key={author.uuid}>
-                                          <KeywordHighlight text={formatAuthorCitation(author)} keyword={keyword} />
+                                          <KeywordHighlight keyword={keyword}>
+                                            {formatAuthorCitation(author)}
+                                          </KeywordHighlight>
                                         </li>
                                       ))}
                                     </ul>

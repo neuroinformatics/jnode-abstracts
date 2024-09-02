@@ -1,3 +1,4 @@
+import { MathJax } from 'better-react-mathjax';
 import React from 'react';
 import { AbstractSimpleEntity } from '../../entities/abstract';
 import { ConferenceEntity } from '../../entities/conference';
@@ -19,11 +20,13 @@ const AbstractPanel: React.FC<Props> = (props) => {
   const { conference, abstract } = props;
   return (
     <div className="abstract my-3">
-      <h3 className="title mb-3">{abstract.title}</h3>
+      <h3 className="title mb-3">
+        <MathJax>{abstract.title}</MathJax>
+      </h3>
       <ul className="authors mb-3">
         {abstract.authors.map((author) => {
           return (
-            <li key={author.uuid} className="author">
+            <li key={author.uuid} className="author fs-5">
               {formatAuthorName(author)}
               <sup>{formatAuthorAffiliations(author, abstract.affiliations)}</sup>
             </li>
@@ -32,8 +35,8 @@ const AbstractPanel: React.FC<Props> = (props) => {
       </ul>
       <ol className="affiliations mb-3">
         {abstract.affiliations.map((affiliation) => (
-          <li key={affiliation.uuid} className="text-secondary">
-            <span className=" fst-italic">{formatAffiliation(affiliation)}</span>
+          <li key={affiliation.uuid} className="affiliation text-secondary">
+            <span className="fst-italic">{formatAffiliation(affiliation)}</span>
           </li>
         ))}
       </ol>
@@ -42,7 +45,9 @@ const AbstractPanel: React.FC<Props> = (props) => {
           doi: <a href={`https://doi.org/${abstract.doi}`}>{abstract.doi}</a>
         </div>
       )}
-      <div className="text mb-3">{abstract.text}</div>
+      <div className="text mb-3">
+        <MathJax>{abstract.text}</MathJax>
+      </div>
       {abstract.figures.length > 0 && (
         <div className="figures row justify-content-center mb-3">
           {abstract.figures.map((figure, idx) => (
