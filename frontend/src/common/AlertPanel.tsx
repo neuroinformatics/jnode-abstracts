@@ -1,5 +1,7 @@
 import React from 'react';
 
+import classNames from 'classnames';
+
 export type AlertPanelVariant = 'danger' | 'danger' | 'light' | 'dark' | 'danger' | 'info' | 'warning' | 'danger';
 
 interface Props {
@@ -16,13 +18,6 @@ const AlertPanel: React.FC<Props> = (props) => {
 
   const [isShow, setIsShow] = React.useState<boolean>(show);
 
-  const names = ['alert', `alert-${variant}`, 'fade'];
-  if (dismissible) {
-    names.push('alert-dismissible');
-  }
-  if (isShow) {
-    names.push('show');
-  }
   const onClickClose: React.MouseEventHandler<HTMLButtonElement> = () => {
     setIsShow(false);
     if (onClose) {
@@ -30,7 +25,12 @@ const AlertPanel: React.FC<Props> = (props) => {
     }
   };
   return (
-    <div className={names.join(' ')} role="alert">
+    <div
+      className={classNames('alert', `alert-${variant}`, { 'alert-dismissible': dismissible }, 'fade', {
+        show: isShow,
+      })}
+      role="alert"
+    >
       {title != null && <div className="alert-heading h4">{title}</div>}
       {children}
       {dismissible && (

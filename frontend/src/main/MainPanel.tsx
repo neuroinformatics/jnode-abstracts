@@ -2,6 +2,7 @@ import React from 'react';
 
 import { Navigate, Route, Routes } from 'react-router-dom';
 import PageNotFound from '../common/PageNotFound';
+import ConferenceListPanel from '../features/conference/ConferenceListPanel';
 import ConferenceRouterPanel from '../features/conference/ConferenceRouterPanel';
 import LoginPanel from '../features/user/LoginPanel';
 import LogoutPanel from '../features/user/LogoutPanel';
@@ -17,7 +18,8 @@ const MainPanel: React.FC = () => {
         <Route path="logout" element={<LogoutPanel />} />
         <Route path="about" element={<AboutPanel />} />
         <Route path="contact" element={<ContactPanel />} />
-        <Route path="conferences/*" element={<ConferenceRouterPanel />} />
+        <Route path="conferences" element={<ConferenceListPanel />} />
+        <Route path="conference/:shortName/*" element={<ConferenceRouterPanel />} />
         <Route path="*" element={<PageNotFound />} />
       </Routes>
     </main>

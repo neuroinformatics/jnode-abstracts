@@ -122,20 +122,20 @@ const HeaderPanel: React.FC = () => {
           <Navbar.Collapse className="basic-navbar-nav">
             <Nav className="me-auto">
               <Nav.Item>
-                <LinkContainer to={`/conferences/${conferenceInfo.shortName}`}>
+                <LinkContainer to={`/conference/${conferenceInfo.shortName}`}>
                   <Nav.Link>{conferenceInfo.shortName}</Nav.Link>
                 </LinkContainer>
               </Nav.Item>
               {conferenceInfo.schedule != null && (
                 <Nav.Item>
-                  <LinkContainer to={`/conferences/${conferenceInfo.shortName}/schedule`}>
+                  <LinkContainer to={`/conference/${conferenceInfo.shortName}/schedule`}>
                     <Nav.Link>Schedule</Nav.Link>
                   </LinkContainer>
                 </Nav.Item>
               )}
               {conferenceInfo.isPublished && (
                 <Nav.Item>
-                  <LinkContainer to={`/conferences/${conferenceInfo.shortName}/abstracts`}>
+                  <LinkContainer to={`/conference/${conferenceInfo.shortName}/abstracts`}>
                     <Nav.Link>Abstracts</Nav.Link>
                   </LinkContainer>
                 </Nav.Item>
@@ -143,12 +143,12 @@ const HeaderPanel: React.FC = () => {
               {conferenceInfo.geo != null && (
                 <>
                   <Nav.Item>
-                    <LinkContainer to={`/conferences/${conferenceInfo.shortName}/locations`}>
+                    <LinkContainer to={`/conference/${conferenceInfo.shortName}/locations`}>
                       <Nav.Link>Locations</Nav.Link>
                     </LinkContainer>
                   </Nav.Item>
                   <Nav.Item>
-                    <LinkContainer to={`/conferences/${conferenceInfo.shortName}/floodplains`}>
+                    <LinkContainer to={`/conference/${conferenceInfo.shortName}/floodplains`}>
                       <Nav.Link>Floorplans</Nav.Link>
                     </LinkContainer>
                   </Nav.Item>

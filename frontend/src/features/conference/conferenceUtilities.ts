@@ -50,6 +50,10 @@ export const getAbstractId = (conference: ConferenceEntity, abstract: AbstractSi
   return shortName != null ? `${shortName} ${aId}` : null;
 };
 
+export const getAbstractUrl = (conference: ConferenceEntity, abstract: AbstractSimpleEntity): string => {
+  return abstract != null ? `/conference/${conference.shortName}/abstracts#/uuid/${abstract.uuid}` : '';
+};
+
 export const formatAuthorCitation = (author: AuthorEntity): string => {
   const makeInitials = (name: string | null): string => {
     return (
@@ -96,6 +100,6 @@ export const formatAbstractCopyright = (conference: ConferenceEntity, abstract: 
 export const formatAbstractCitation = (conference: ConferenceEntity, abstract: AbstractSimpleEntity): string => {
   const year = dayjs(conference.startDate).year();
   return `${formatAbstractAuthorsCitation(abstract)} (${year}) ${abstract.title}. ${conference.name}.${
-    abstract.doi != null ? ` doi:${abstract.doi}` : ''
+    abstract.doi != null ? ` https://doi.org/${abstract.doi}` : ''
   }`;
 };

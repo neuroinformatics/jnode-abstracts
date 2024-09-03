@@ -1,5 +1,7 @@
-import { MathJax } from 'better-react-mathjax';
 import React from 'react';
+
+import { MathJax } from 'better-react-mathjax';
+import { Button, Modal } from 'react-bootstrap';
 import { AbstractSimpleEntity } from '../../entities/abstract';
 import { ConferenceEntity } from '../../entities/conference';
 import {
@@ -16,8 +18,22 @@ interface Props {
   abstract: AbstractSimpleEntity;
 }
 
+interface FigureModalState {
+  show: boolean;
+  idx: number;
+}
+
 const AbstractPanel: React.FC<Props> = (props) => {
   const { conference, abstract } = props;
+
+  const [figureModalState, setFigureModalState] = React.useState<FigureModalState>({ show: false, idx: 0 });
+  const onShowFigureModal = (idx: number) => {
+    setFigureModalState({ show: true, idx: idx });
+  };
+  const onHideFigureModal = () => {
+    setFigureModalState({ show: false, idx: 0 });
+  };
+
   return (
     <div className="abstract my-3">
       <h3 className="title mb-3">
@@ -53,11 +69,35 @@ const AbstractPanel: React.FC<Props> = (props) => {
           {abstract.figures.map((figure, idx) => (
             <div key={figure.uuid} className="figure col-sm-7">
               <div className="mb-2">
-                <img className="img-fluid" src={getFigureUrl(figure)} alt={figure.caption} />
+                <img
+                  className="img-fluid"
+                  src={getFigureUrl(figure)}
+                  alt={figure.caption}
+                  onClick={() => {
+                    onShowFigureModal(idx);
+                  }}
+                />
               </div>
               <div className="caption">{`Figure ${idx + 1}: ${figure.caption}`}</div>
             </div>
           ))}
+          <Modal show={figureModalState.show} onHide={onHideFigureModal} size="lg">
+            <Modal.Header closeButton>
+              <Modal.Title>Figure {figureModalState.idx + 1}</Modal.Title>
+            </Modal.Header>
+            <Modal.Body className="text-center">
+              <img
+                className="img-fluid"
+                src={getFigureUrl(abstract.figures[figureModalState.idx])}
+                alt={abstract.figures[figureModalState.idx].caption}
+              />
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={onHideFigureModal}>
+                Close
+              </Button>
+            </Modal.Footer>
+          </Modal>
         </div>
       )}
       {abstract.acknowledgements != null && (

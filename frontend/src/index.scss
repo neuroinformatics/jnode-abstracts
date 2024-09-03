@@ -93,6 +93,12 @@ $custom-tertiary-bg-rgb: to-rgb($custom-tertiary-bg);
   --bs-btn-disabled-border-color: #{$custom-primary-border};
 }
 
+.pagination {
+  --bs-pagination-active-color: var(--bs-body-color);
+  --bs-pagination-active-bg: var(--bs-body-bg);
+  --bs-pagination-active-border-color: var(--bs-border-color);
+}
+
 html {
   font-size: 14px;
 }
@@ -221,24 +227,32 @@ a {
       border-bottom: 1px solid var(--bs-border-color);
     }
 
-    // conference/ConferenceRouterPanel
-    .conferences {
+    // conference/ConferenceListPanel,
+    // conference/ConferencePanel
+    .conference {
+      padding: .5rem;
 
-      // conference/ConferenceListPanel,
-      // conference/ConferenceDetailPanel
-      .conference {
-        padding: .5rem;
+      img.logo {
+        max-height: 128px;
+      }
 
-        img.logo {
-          max-height: 128px;
-        }
+      img.thumbnail {
+        max-height: 64px;
+      }
+    }
 
-        img.thumbnail {
-          max-height: 64px;
+    // conference/AbstractListPanel
+    .abstracts {
+      .page-navigation {
+        .pagination {
+          justify-content: space-between;
+
+          .page-link {
+            border-radius: 0;
+          }
         }
       }
 
-      // conference/AbstractListPanel
       .abstract-list {
 
         .list-group-item {
@@ -290,6 +304,10 @@ a {
           font-size: 1.2rem;
           min-height: 10rem;
           text-align: justify;
+        }
+
+        .figures .figure img:hover {
+          cursor: pointer
         }
       }
     }

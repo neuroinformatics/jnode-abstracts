@@ -21,7 +21,7 @@ const ConferenceListActiveItem: React.FC<ConferenceListItemProps> = (props) => {
   const { conference, isAdmin } = props;
 
   const logo = getLogoUrl(conference);
-  const url = `/conferences/${conference.shortName}`;
+  const url = `/conference/${conference.shortName}`;
 
   return (
     <JumbotronPanel>
@@ -55,7 +55,7 @@ const ConferenceListInActiveItem: React.FC<ConferenceListItemProps> = (props) =>
   const { conference, isAdmin } = props;
 
   const thumbnail = getThumbnailUrl(conference);
-  const url = `/conferences/${conference.shortName}`;
+  const url = `/conference/${conference.shortName}`;
 
   return (
     <div className="conference">
@@ -90,7 +90,7 @@ const ConferenceListOtherItem: React.FC<ConferenceListItemProps> = (props) => {
   const { conference, isAdmin } = props;
 
   const thumbnail = getThumbnailUrl(conference);
-  const url = `/conferences/${conference.shortName}`;
+  const url = `/conference/${conference.shortName}`;
 
   return (
     <div className="conference">
@@ -138,7 +138,7 @@ const ConferenceListPanel: React.FC = () => {
   );
 
   return (
-    <>
+    <div className="conferences">
       <HeaderTitle title={title} />
       {getListState.status === ApiAsyncStatus.loading && <LoadingOverlay message="Loading.." />}
       {actives.map((uuid) => (
@@ -156,7 +156,7 @@ const ConferenceListPanel: React.FC = () => {
           ))}
         </>
       )}
-    </>
+    </div>
   );
 };
 
