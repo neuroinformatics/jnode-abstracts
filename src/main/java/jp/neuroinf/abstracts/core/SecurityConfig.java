@@ -25,7 +25,6 @@ import org.springframework.security.web.authentication.logout.LogoutSuccessHandl
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.Value;
 
 @Configuration
 @EnableWebSecurity
@@ -69,7 +68,7 @@ public class SecurityConfig
   @Override
   public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
       Authentication authentication) throws IOException, ServletException {
-    AuthResultBody body = new AuthResultBody("success");
+    RestSuccessResponseBody body = new RestSuccessResponseBody("success");
     HttpOutputMessage outputMessage = new ServletServerHttpResponse(response);
     response.setStatus(HttpStatus.OK.value());
     httpMessageConverter.write(body, MediaType.APPLICATION_JSON, outputMessage);
@@ -92,14 +91,10 @@ public class SecurityConfig
   @Override
   public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
       throws IOException {
-    AuthResultBody body = new AuthResultBody("success");
+    RestSuccessResponseBody body = new RestSuccessResponseBody("success");
     HttpOutputMessage outputMessage = new ServletServerHttpResponse(response);
     response.setStatus(HttpStatus.OK.value());
     httpMessageConverter.write(body, MediaType.APPLICATION_JSON, outputMessage);
   }
 
-  @Value
-  public static class AuthResultBody {
-    private final String message;
-  }
 }

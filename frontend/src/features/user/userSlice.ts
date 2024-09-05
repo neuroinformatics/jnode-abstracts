@@ -1,8 +1,8 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { ApiUsersCurrent, ApiUsersLogin, ApiUsersLogout } from '../../api/userApi';
+import { ApiUsersCurrent, ApiUsersLogin, ApiUsersLogout, ApiUsersPassword } from '../../api/userApi';
 import { getApiErrorMessage, getApiErrorStatusCode } from '../../api/utilities';
 import { RootState } from '../../app/store';
-import { ApiActionState, ApiAsyncStatus, ApiAuthResponse } from '../../entities/api';
+import { ApiActionState, ApiAsyncStatus, ApiAuthResponse, isApiPreparing } from '../../entities/api';
 import { UserEntity } from '../../entities/user';
 
 interface UserState {
@@ -10,6 +10,7 @@ interface UserState {
   restoreState: ApiActionState;
   loginState: ApiActionState;
   logoutState: ApiActionState;
+  changePasswordState: ApiActionState;
 }
 
 const initialState: Readonly<UserState> = {
@@ -17,6 +18,7 @@ const initialState: Readonly<UserState> = {
   restoreState: { error: null, status: ApiAsyncStatus.initializing },
   loginState: { error: null, status: ApiAsyncStatus.initializing },
   logoutState: { error: null, status: ApiAsyncStatus.initializing },
+  changePasswordState: { error: null, status: ApiAsyncStatus.initializing },
 };
 
 export const restore = createAsyncThunk<UserEntity, void, { rejectValue: string }>(
@@ -64,10 +66,30 @@ export const logout = createAsyncThunk<ApiAuthResponse, void, { rejectValue: str
   },
 );
 
+export const changePassword = createAsyncThunk<
+  ApiAuthResponse,
+  { uuid: string; oldPassword: string; newPassword: string },
+  { rejectValue: string }
+>('user/changePassword', async (params, thunkApi) => {
+  const { uuid, oldPassword, newPassword } = params;
+  try {
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    return await ApiUsersPassword(uuid, oldPassword, newPassword, thunkApi.signal);
+  } catch (e: unknown) {
+    const message = await getApiErrorMessage(e);
+    return thunkApi.rejectWithValue(message);
+  }
+});
+
 export const userSlice = createSlice({
   name: 'user',
   initialState,
-  reducers: {},
+  reducers: {
+    unsetChangePassword: (state) => {
+      state.changePasswordState.status = ApiAsyncStatus.initializing;
+      state.changePasswordState.error = null;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(restore.pending, (state) => {
@@ -111,13 +133,31 @@ export const userSlice = createSlice({
         const error = action.payload ?? '';
         state.logoutState.status = ApiAsyncStatus.failed;
         state.logoutState.error = error;
+      })
+      .addCase(changePassword.pending, (state) => {
+        state.changePasswordState.status = ApiAsyncStatus.loading;
+        state.changePasswordState.error = null;
+      })
+      .addCase(changePassword.fulfilled, (state) => {
+        state.changePasswordState.status = ApiAsyncStatus.idle;
+        state.changePasswordState.error = null;
+      })
+      .addCase(changePassword.rejected, (state, action) => {
+        const error = action.payload ?? '';
+        state.changePasswordState.status = ApiAsyncStatus.failed;
+        state.changePasswordState.error = error;
       });
   },
 });
+
+export const { unsetChangePassword } = userSlice.actions;
+
+export const selectIsPreparingUserInfo = (state: RootState) => isApiPreparing(state.user.restoreState);
 
 export const selectUserInfo = (state: RootState) => state.user.userInfo;
 export const selectRestoreState = (state: RootState) => state.user.restoreState;
 export const selectLoginState = (state: RootState) => state.user.loginState;
 export const selectLogoutState = (state: RootState) => state.user.logoutState;
+export const selectChangePasswordState = (state: RootState) => state.user.changePasswordState;
 
 export default userSlice.reducer;

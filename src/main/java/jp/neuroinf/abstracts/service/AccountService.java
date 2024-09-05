@@ -1,16 +1,20 @@
 package jp.neuroinf.abstracts.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import jakarta.transaction.Transactional;
 import jp.neuroinf.abstracts.core.AppProperties;
+import jp.neuroinf.abstracts.core.RestSuccessResponseBody;
 import jp.neuroinf.abstracts.dto.AccountDto;
 import jp.neuroinf.abstracts.entity.Account;
+import jp.neuroinf.abstracts.form.UsersChangePasswordForm;
 import jp.neuroinf.abstracts.repository.AccountRepository;
 
 @Service
@@ -39,14 +43,36 @@ public class AccountService implements UserDetailsService {
     return new AccountDetails(account);
   }
 
-  public Account findByEmail(String username) {
-    return accountRepository.findFistByMail(username);
-  }
-
   public AccountDto getCurrentUser(AccountDetails user) {
+    if (user == null) {
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Login required");
+    }
     Account account = user.getAccount();
     boolean isAdmin = this.properties.getAdmins().contains(account.getMail());
     return AccountDto.of(account, isAdmin);
+  }
+
+  @Transactional
+  public RestSuccessResponseBody changePassword(AccountDetails user, String uuid, UsersChangePasswordForm form) {
+    if (user == null) {
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Login required");
+    }
+    Account currentUser = user.getAccount();
+    boolean isAdmin = this.properties.getAdmins().contains(currentUser.getMail());
+    Account account = accountRepository.findFistByUuid(uuid);
+    if (account == null) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid user id");
+    }
+    if (!account.getUuid().equals(currentUser.getUuid()) && !isAdmin) {
+
+      throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You don't have privileges");
+    }
+    if (!passwordEncoder.matches(form.getOldPassword(), account.getPassword()) && !isAdmin) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password mismatched");
+    }
+    account.setPassword(passwordEncoder.encode(form.getNewPassword()));
+    accountRepository.save(account);
+    return new RestSuccessResponseBody("success");
   }
 
   @Transactional

@@ -2,7 +2,7 @@ import React from 'react';
 
 import classNames from 'classnames';
 
-export type AlertPanelVariant = 'danger' | 'danger' | 'light' | 'dark' | 'danger' | 'info' | 'warning' | 'danger';
+export type AlertPanelVariant = 'primary' | 'secondary' | 'success' | 'info' | 'warning' | 'danger' | 'light' | 'dark';
 
 interface Props {
   variant: AlertPanelVariant;
