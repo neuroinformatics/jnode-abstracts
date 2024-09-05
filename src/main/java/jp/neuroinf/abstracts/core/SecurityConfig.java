@@ -1,6 +1,7 @@
 package jp.neuroinf.abstracts.core;
 
 import java.io.IOException;
+import java.time.ZonedDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -24,11 +25,16 @@ import org.springframework.security.web.authentication.logout.LogoutSuccessHandl
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.Value;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig
     implements AuthenticationSuccessHandler, AuthenticationFailureHandler, LogoutSuccessHandler {
+
+  private final String LOGIN_API_URL = "/api/login";
+  private final String LOGOUT_API_URL = "/api/logout";
+  private final String LOGIN_PAGE_URL = "/login";
 
   private final MappingJackson2HttpMessageConverter httpMessageConverter;
 
@@ -48,14 +54,14 @@ public class SecurityConfig
         .authorizeHttpRequests((authorize) -> authorize
             .anyRequest().permitAll())
         .formLogin((login) -> login
-            .loginPage("/login")
-            .loginProcessingUrl("/api/login").permitAll()
+            .loginPage(LOGIN_PAGE_URL)
+            .loginProcessingUrl(LOGIN_API_URL).permitAll()
             .usernameParameter("username")
             .passwordParameter("password")
             .successHandler(this)
             .failureHandler(this))
         .logout((logout) -> logout
-            .logoutUrl("/api/logout")
+            .logoutUrl(LOGOUT_API_URL)
             .logoutSuccessHandler(this));
     return http.build();
   }
@@ -72,9 +78,14 @@ public class SecurityConfig
   @Override
   public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
       AuthenticationException exception) throws IOException, ServletException {
-    AuthResultBody body = new AuthResultBody("failure");
     HttpOutputMessage outputMessage = new ServletServerHttpResponse(response);
-    response.setStatus(HttpStatus.UNAUTHORIZED.value());
+    HttpStatus status = HttpStatus.UNAUTHORIZED;
+    RestErrorResponseBody body = new RestErrorResponseBody();
+    body.setTimestamp(ZonedDateTime.now());
+    body.setCode(status.value());
+    body.setMessage(status.getReasonPhrase());
+    body.setPath(LOGOUT_API_URL);
+    response.setStatus(status.value());
     httpMessageConverter.write(body, MediaType.APPLICATION_JSON, outputMessage);
   }
 
@@ -87,7 +98,7 @@ public class SecurityConfig
     httpMessageConverter.write(body, MediaType.APPLICATION_JSON, outputMessage);
   }
 
-  @lombok.Value
+  @Value
   public static class AuthResultBody {
     private final String message;
   }

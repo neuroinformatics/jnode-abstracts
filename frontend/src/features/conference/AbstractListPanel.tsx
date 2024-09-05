@@ -9,7 +9,7 @@ import LinkOrSpan from '../../common/LinkOrSpan';
 import LoadingOverlay from '../../common/LoadingOverlay';
 import PageNotFound from '../../common/PageNotFound';
 import { AbstractSimpleEntity } from '../../entities/abstract';
-import { ApiAsyncStatus } from '../../entities/api';
+import { isApiPreparing } from '../../entities/api';
 import { ConferenceEntity } from '../../entities/conference';
 import AbstractPanel from './AbstractPanel';
 import { getConferenceAbstracts, selectAbstractsInfo, selectGetAbstractsState } from './conferenceSlice';
@@ -147,7 +147,7 @@ const AbstractListPanel: React.FC<Props> = (props) => {
         <div className="abstracts">
           <GeneralPanel title={conference.name} titleLinkTo={`/conference/${conference.shortName}/abstracts`}>
             <div>
-              {abstractsState.status === ApiAsyncStatus.loading && <LoadingOverlay message="Loading..." />}
+              {isApiPreparing(abstractsState) && <LoadingOverlay message="Loading..." />}
               {abstractsInfo.allIds.length > 0 && (
                 <>
                   <TabNavigationBar conference={conference} tab={tab} onClick={onClickTab} />

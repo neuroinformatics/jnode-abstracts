@@ -5,7 +5,7 @@ import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import AlertPanel from '../../common/AlertPanel';
 import GeneralPanel from '../../common/GeneralPanel';
 import LoadingOverlay from '../../common/LoadingOverlay';
-import { ApiAsyncStatus } from '../../entities/api';
+import { isApiPreparing } from '../../entities/api';
 import { logout, selectLogoutState, selectUserInfo } from './userSlice';
 
 const LogoutPanel: React.FC = () => {
@@ -26,7 +26,7 @@ const LogoutPanel: React.FC = () => {
 
   return (
     <GeneralPanel title={title} size={7}>
-      {logoutState.status === ApiAsyncStatus.loading && <LoadingOverlay message="Signing out.." />}
+      {isApiPreparing(logoutState) && <LoadingOverlay message="Signing out.." />}
       {logoutState.error != null && (
         <AlertPanel variant="danger" title="Error">
           {logoutState.error}

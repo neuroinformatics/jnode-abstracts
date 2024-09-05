@@ -128,7 +128,7 @@ const AbstractPanel: React.FC<Props> = (props) => {
               return (
                 <li key={reference.uuid}>
                   {html}
-                  {doiLink && <>, {doiLink}</>}
+                  {doiLink && <> {doiLink}</>}
                 </li>
               );
             })}

@@ -56,6 +56,6 @@ dist-ssr
 *.sln
 *.sw?
 
-development.properties
+*.properties
 /src/main/resources/static/
 package-lock.json

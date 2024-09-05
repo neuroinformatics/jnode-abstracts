@@ -4,7 +4,7 @@ import { Route, Routes, useParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import LoadingOverlay from '../../common/LoadingOverlay';
 import PageNotFound from '../../common/PageNotFound';
-import { ApiAsyncStatus } from '../../entities/api';
+import { isApiFailed, isApiPreparing } from '../../entities/api';
 import AbstractListPanel from './AbstractListPanel';
 import ConferencePanel from './ConferencePanel';
 import {
@@ -37,10 +37,10 @@ const ConferenceRouterPanel: React.FC = () => {
 
   return (
     <>
-      {(listState.status === ApiAsyncStatus.loading || detailState.status === ApiAsyncStatus.loading) && (
+      {(isApiPreparing(listState) || (uuid != null && isApiPreparing(detailState))) && (
         <LoadingOverlay message="Loading..." />
       )}
-      {(listState.status === ApiAsyncStatus.failed || detailState.status === ApiAsyncStatus.failed) && <PageNotFound />}
+      {(isApiFailed(listState) || uuid == null || isApiFailed(detailState)) && <PageNotFound />}
       {conferenceInfo != null && (
         <>
           <Routes>

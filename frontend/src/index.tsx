@@ -3,20 +3,20 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { HelmetProvider } from 'react-helmet-async';
 import { Provider } from 'react-redux';
-import { BrowserRouter } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import App from './App.tsx';
 import { store } from './app/store';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './index.scss';
 
+const router = createBrowserRouter([{ path: '*', element: <App /> }]);
+
 createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <HelmetProvider>
       <Provider store={store}>
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
+        <RouterProvider router={router} />
       </Provider>
     </HelmetProvider>
   </React.StrictMode>,

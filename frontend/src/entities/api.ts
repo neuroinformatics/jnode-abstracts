@@ -1,7 +1,10 @@
+import { arrayIncludes } from '../common/utilities';
+
 export const ApiAsyncStatus = {
-  idle: 0,
-  loading: 1,
-  failed: 2,
+  initializing: 0,
+  idle: 1,
+  loading: 2,
+  failed: 3,
 } as const;
 export type ApiAsyncStatuses = (typeof ApiAsyncStatus)[keyof typeof ApiAsyncStatus];
 
@@ -20,3 +23,11 @@ export interface ApiExceptionResponse {
 export interface ApiAuthResponse {
   message: string;
 }
+
+export const isApiPreparing = (state: ApiActionState) => {
+  return arrayIncludes([ApiAsyncStatus.initializing, ApiAsyncStatus.loading], state.status);
+};
+
+export const isApiFailed = (state: ApiActionState) => {
+  return state.status === ApiAsyncStatus.failed;
+};

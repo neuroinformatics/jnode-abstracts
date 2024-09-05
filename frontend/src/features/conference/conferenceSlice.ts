@@ -23,9 +23,9 @@ const initialState: Readonly<ConferenceState> = {
   conferenceInfo: null,
   conferencesInfo: { byId: {}, allIds: [] },
   abstractsInfo: { byId: {}, allIds: [] },
-  getListState: { error: null, status: ApiAsyncStatus.idle },
-  getDetailState: { error: null, status: ApiAsyncStatus.idle },
-  getAbstractsState: { error: null, status: ApiAsyncStatus.idle },
+  getListState: { error: null, status: ApiAsyncStatus.initializing },
+  getDetailState: { error: null, status: ApiAsyncStatus.initializing },
+  getAbstractsState: { error: null, status: ApiAsyncStatus.initializing },
 };
 
 export const getConferenceList = createAsyncThunk<ConferenceSimpleEntity[], void, { rejectValue: string }>(
@@ -75,7 +75,7 @@ export const conferenceSlice = createSlice({
   reducers: {
     unsetConferenceDetail: (state) => {
       state.conferenceInfo = null;
-      state.getDetailState.status = ApiAsyncStatus.idle;
+      state.getDetailState.status = ApiAsyncStatus.initializing;
       state.getDetailState.error = null;
     },
   },

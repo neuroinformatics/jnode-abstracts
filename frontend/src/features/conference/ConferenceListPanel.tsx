@@ -6,7 +6,7 @@ import { useAppSelector } from '../../app/hooks';
 import HeaderTitle from '../../common/HeaderTitle';
 import JumbotronPanel from '../../common/JumbotronPanel';
 import LoadingOverlay from '../../common/LoadingOverlay';
-import { ApiAsyncStatus } from '../../entities/api';
+import { isApiPreparing } from '../../entities/api';
 import { ConferenceSimpleEntity } from '../../entities/conference';
 import { selectUserInfo } from '../user/userSlice';
 import { selectConferencesInfo, selectGetListState } from './conferenceSlice';
@@ -140,7 +140,7 @@ const ConferenceListPanel: React.FC = () => {
   return (
     <div className="conferences">
       <HeaderTitle title={title} />
-      {getListState.status === ApiAsyncStatus.loading && <LoadingOverlay message="Loading.." />}
+      {isApiPreparing(getListState) && <LoadingOverlay message="Loading.." />}
       {actives.map((uuid) => (
         <ConferenceListActiveItem key={uuid} conference={conferencesInfo.byId[uuid]} isAdmin={isAdmin} />
       ))}

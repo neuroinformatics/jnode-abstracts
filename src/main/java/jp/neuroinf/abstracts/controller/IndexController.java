@@ -6,8 +6,18 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class IndexController {
 
-  @GetMapping("/{path:(?!api)[^\\.]*}")
+  @GetMapping("/{path:[^\\.]+}")
   public String index() {
+    return "forward:/index.html";
+  }
+
+  @GetMapping("/conference/**")
+  public String conferenceIndex() {
+    return "forward:/index.html";
+  }
+
+  @GetMapping("/dashboard/**")
+  public String dashboardIndex() {
     return "forward:/index.html";
   }
 

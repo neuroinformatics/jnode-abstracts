@@ -5,7 +5,7 @@ import java.time.ZonedDateTime;
 import lombok.Data;
 
 @Data
-public class GlobalExceptionResponseBody {
+public class RestErrorResponseBody {
   private ZonedDateTime timestamp;
   private int code;
   private String message;

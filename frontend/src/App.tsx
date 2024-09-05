@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { MathJaxContext } from 'better-react-mathjax';
+import { ScrollRestoration } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from './app/hooks';
 import { getConferenceList } from './features/conference/conferenceSlice';
 import { restore, selectUserInfo } from './features/user/userSlice';
@@ -48,6 +49,7 @@ const App: React.FC = () => {
         <HeaderPanel />
         <MainPanel />
         <FooterPanel />
+        <ScrollRestoration />
       </MathJaxContext>
     </div>
   );
