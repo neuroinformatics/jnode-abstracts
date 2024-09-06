@@ -35,14 +35,22 @@ const ChangePasswordPanel: React.FC = () => {
     };
   }, [dispatch, isPreparingUserInfo, navigate, userInfo]);
 
+  React.useEffect(() => {
+    if (changePasswordState.status === ApiAsyncStatus.idle) {
+      setOldPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+    }
+  }, [dispatch, changePasswordState]);
+
   const mismatchPassword = newPassword !== confirmPassword;
-  const tooShortPassword =
+  const invalidPassword =
     newPassword.length > 0 &&
     (newPassword.length < 10 ||
       !/[a-z]/i.test(newPassword) ||
       !/\d/.test(newPassword) ||
       !/[.,/<>?!@#$%^&*()=`_+|~{};':"\-\\[\]]/.test(newPassword));
-  const badPassword = mismatchPassword || tooShortPassword;
+  const canUpdatePassword = mismatchPassword || invalidPassword;
 
   const title = 'Change Password';
 
@@ -61,14 +69,14 @@ const ChangePasswordPanel: React.FC = () => {
     setConfirmPassword(e.target.value);
   }, []);
 
-  const onSubmitLogin = React.useCallback<React.FormEventHandler<HTMLFormElement>>(
+  const onSubmitSave = React.useCallback<React.FormEventHandler<HTMLFormElement>>(
     (e) => {
       e.preventDefault();
-      if (!badPassword && userInfo != null) {
+      if (!canUpdatePassword && userInfo != null) {
         dispatch(changePassword({ uuid: userInfo.uuid, oldPassword: oldPassword, newPassword: newPassword }));
       }
     },
-    [badPassword, oldPassword, dispatch, newPassword, userInfo],
+    [canUpdatePassword, oldPassword, dispatch, newPassword, userInfo],
   );
 
   return (
@@ -76,11 +84,11 @@ const ChangePasswordPanel: React.FC = () => {
       {isPreparingUserInfo && <LoadingOverlay message="Loading..." />}
       {changePasswordState.status === ApiAsyncStatus.loading && <LoadingOverlay message="Changing Password..." />}
       {changePasswordState.status === ApiAsyncStatus.idle && (
-        <AlertPanel variant="success">Password has been changed.</AlertPanel>
+        <AlertPanel variant="success">Password successfully changed.</AlertPanel>
       )}
       {changePasswordState.error != null && <AlertPanel variant="danger">{changePasswordState.error}</AlertPanel>}
       <fieldset>
-        <form onSubmit={onSubmitLogin}>
+        <form onSubmit={onSubmitSave} autoComplete="off">
           <div className="mb-3">
             <label className="form-label">
               Current Password <span className="text-danger">*</span>
@@ -88,9 +96,11 @@ const ChangePasswordPanel: React.FC = () => {
             <input
               className="form-control"
               type="password"
+              value={oldPassword}
               placeholder="Enter Current Password"
               required
               onChange={onChangeOldPassword}
+              autoComplete="off"
             />
           </div>
           <div className="mb-3">
@@ -98,26 +108,30 @@ const ChangePasswordPanel: React.FC = () => {
               New Password <span className="text-danger">*</span>
             </label>
             <input
-              className={classNames('form-control', { 'is-invalid': tooShortPassword })}
+              className={classNames('form-control', { 'is-invalid': invalidPassword })}
               type="password"
+              value={newPassword}
               placeholder="Enter New Password"
               required
               onChange={onChangeNewPassword}
+              autoComplete="new-password"
             />
             <div className="invalid-feedback">
               Please enter at least 10 characters, needs at least one number and one symbol.
             </div>
           </div>
-          <div className="mb-4">
+          <div className="mb-5">
             <label className="form-label">
               Confirm New Password <span className="text-danger">*</span>
             </label>
             <input
               className={classNames('form-control', { 'is-invalid': mismatchPassword })}
               type="password"
+              value={confirmPassword}
               placeholder="Confirm New Password"
               required
               onChange={onChangeConfirm}
+              autoComplete="off"
             />
             <div className="invalid-feedback">Please make sure your passwords match.</div>
           </div>

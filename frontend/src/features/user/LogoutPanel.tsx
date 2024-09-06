@@ -18,7 +18,7 @@ const LogoutPanel: React.FC = () => {
     if (userInfo != null) {
       dispatch(logout());
     } else {
-      navigate(-1);
+      navigate('/');
     }
   }, [dispatch, navigate, userInfo]);
 

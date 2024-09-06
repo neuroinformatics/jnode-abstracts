@@ -29,7 +29,7 @@ const LoginPanel: React.FC = () => {
 
   React.useEffect(() => {
     if (userInfo != null) {
-      navigate(-1);
+      navigate('/');
     }
   }, [navigate, userInfo]);
 

@@ -4,6 +4,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import PageNotFound from '../common/PageNotFound';
 import ConferenceListPanel from '../features/conference/ConferenceListPanel';
 import ConferenceRouterPanel from '../features/conference/ConferenceRouterPanel';
+import ChangeEmailPanel from '../features/user/ChangeEmailPanel';
 import ChangePasswordPanel from '../features/user/ChangePasswordPanel';
 import LoginPanel from '../features/user/LoginPanel';
 import LogoutPanel from '../features/user/LogoutPanel';
@@ -18,6 +19,7 @@ const MainPanel: React.FC = () => {
         <Route path="login" element={<LoginPanel />} />
         <Route path="logout" element={<LogoutPanel />} />
         <Route path="password" element={<ChangePasswordPanel />} />
+        <Route path="email" element={<ChangeEmailPanel />} />
         <Route path="about" element={<AboutPanel />} />
         <Route path="contact" element={<ContactPanel />} />
         <Route path="conferences" element={<ConferenceListPanel />} />

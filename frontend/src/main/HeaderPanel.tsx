@@ -17,7 +17,7 @@ const HeaderPanel: React.FC = () => {
   const ACTIVES: { [key: string]: string } = {
     '/signup': 'Sing up',
     '/forgotpassword': 'Forgot Password',
-    '/mail': 'Change Email',
+    '/email': 'Change Email',
     '/password': 'Change Password',
     '/dashboard/conference': 'Create Conference',
     '/dashboard/accounts': 'Accounts',
@@ -75,7 +75,7 @@ const HeaderPanel: React.FC = () => {
                 <LinkContainer to="/password">
                   <NavDropdown.Item>Change Password</NavDropdown.Item>
                 </LinkContainer>
-                <LinkContainer to="/mail">
+                <LinkContainer to="/email">
                   <NavDropdown.Item>Change Email</NavDropdown.Item>
                 </LinkContainer>
                 {userInfo.isAdmin && (

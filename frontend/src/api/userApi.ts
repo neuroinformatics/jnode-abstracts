@@ -27,7 +27,7 @@ export const ApiUsersCurrent = async (signal: AbortSignal): Promise<UserEntity> 
   return response;
 };
 
-export const ApiUsersPassword = async (
+export const ApiUsersChangePassword = async (
   uuid: string,
   oldPassword: string,
   newPassword: string,
@@ -38,5 +38,19 @@ export const ApiUsersPassword = async (
   formData.append('oldPassword', oldPassword);
   formData.append('newPassword', newPassword);
   const response = await ky.put<ApiAuthResponse>(`/api/users/${uuid}/password`, { body: formData, signal }).json();
+  return response;
+};
+
+export const ApiUsersChangeEmail = async (
+  uuid: string,
+  email: string,
+  password: string,
+  signal: AbortSignal,
+): Promise<ApiAuthResponse> => {
+  // status code: 200
+  const formData = new FormData();
+  formData.append('email', email);
+  formData.append('password', password);
+  const response = await ky.put<ApiAuthResponse>(`/api/users/${uuid}/email`, { body: formData, signal }).json();
   return response;
 };

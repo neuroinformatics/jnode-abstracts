@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.Valid;
 import jp.neuroinf.abstracts.core.RestSuccessResponseBody;
 import jp.neuroinf.abstracts.dto.AccountDto;
+import jp.neuroinf.abstracts.form.UsersChangeEmailForm;
 import jp.neuroinf.abstracts.form.UsersChangePasswordForm;
 import jp.neuroinf.abstracts.service.AccountDetails;
 import jp.neuroinf.abstracts.service.AccountService;
@@ -36,4 +37,11 @@ public class RestApiUsersController {
             @PathVariable("uuid") String uuid, @Valid UsersChangePasswordForm form) {
         return accountService.changePassword(user, uuid, form);
     }
+
+    @PutMapping("/{uuid}/email")
+    public RestSuccessResponseBody changeEmail(@AuthenticationPrincipal AccountDetails user,
+            @PathVariable("uuid") String uuid, @Valid UsersChangeEmailForm form) {
+        return accountService.changeEmail(user, uuid, form);
+    }
+
 }

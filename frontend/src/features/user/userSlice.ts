@@ -1,5 +1,11 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { ApiUsersCurrent, ApiUsersLogin, ApiUsersLogout, ApiUsersPassword } from '../../api/userApi';
+import {
+  ApiUsersChangeEmail,
+  ApiUsersChangePassword,
+  ApiUsersCurrent,
+  ApiUsersLogin,
+  ApiUsersLogout,
+} from '../../api/userApi';
 import { getApiErrorMessage, getApiErrorStatusCode } from '../../api/utilities';
 import { RootState } from '../../app/store';
 import { ApiActionState, ApiAsyncStatus, ApiAuthResponse, isApiPreparing } from '../../entities/api';
@@ -11,6 +17,7 @@ interface UserState {
   loginState: ApiActionState;
   logoutState: ApiActionState;
   changePasswordState: ApiActionState;
+  changeEmailState: ApiActionState;
 }
 
 const initialState: Readonly<UserState> = {
@@ -19,6 +26,7 @@ const initialState: Readonly<UserState> = {
   loginState: { error: null, status: ApiAsyncStatus.initializing },
   logoutState: { error: null, status: ApiAsyncStatus.initializing },
   changePasswordState: { error: null, status: ApiAsyncStatus.initializing },
+  changeEmailState: { error: null, status: ApiAsyncStatus.initializing },
 };
 
 export const restore = createAsyncThunk<UserEntity, void, { rejectValue: string }>(
@@ -73,8 +81,21 @@ export const changePassword = createAsyncThunk<
 >('user/changePassword', async (params, thunkApi) => {
   const { uuid, oldPassword, newPassword } = params;
   try {
-    await new Promise((resolve) => setTimeout(resolve, 300));
-    return await ApiUsersPassword(uuid, oldPassword, newPassword, thunkApi.signal);
+    return await ApiUsersChangePassword(uuid, oldPassword, newPassword, thunkApi.signal);
+  } catch (e: unknown) {
+    const message = await getApiErrorMessage(e);
+    return thunkApi.rejectWithValue(message);
+  }
+});
+
+export const changeEmail = createAsyncThunk<
+  ApiAuthResponse,
+  { uuid: string; email: string; password: string },
+  { rejectValue: string }
+>('user/changeEmail', async (params, thunkApi) => {
+  const { uuid, email, password } = params;
+  try {
+    return await ApiUsersChangeEmail(uuid, email, password, thunkApi.signal);
   } catch (e: unknown) {
     const message = await getApiErrorMessage(e);
     return thunkApi.rejectWithValue(message);
@@ -88,6 +109,10 @@ export const userSlice = createSlice({
     unsetChangePassword: (state) => {
       state.changePasswordState.status = ApiAsyncStatus.initializing;
       state.changePasswordState.error = null;
+    },
+    unsetChangeEmail: (state) => {
+      state.changeEmailState.status = ApiAsyncStatus.initializing;
+      state.changeEmailState.error = null;
     },
   },
   extraReducers: (builder) => {
@@ -146,11 +171,24 @@ export const userSlice = createSlice({
         const error = action.payload ?? '';
         state.changePasswordState.status = ApiAsyncStatus.failed;
         state.changePasswordState.error = error;
+      })
+      .addCase(changeEmail.pending, (state) => {
+        state.changeEmailState.status = ApiAsyncStatus.loading;
+        state.changeEmailState.error = null;
+      })
+      .addCase(changeEmail.fulfilled, (state) => {
+        state.changeEmailState.status = ApiAsyncStatus.idle;
+        state.changeEmailState.error = null;
+      })
+      .addCase(changeEmail.rejected, (state, action) => {
+        const error = action.payload ?? '';
+        state.changeEmailState.status = ApiAsyncStatus.failed;
+        state.changeEmailState.error = error;
       });
   },
 });
 
-export const { unsetChangePassword } = userSlice.actions;
+export const { unsetChangePassword, unsetChangeEmail } = userSlice.actions;
 
 export const selectIsPreparingUserInfo = (state: RootState) => isApiPreparing(state.user.restoreState);
 
@@ -159,5 +197,6 @@ export const selectRestoreState = (state: RootState) => state.user.restoreState;
 export const selectLoginState = (state: RootState) => state.user.loginState;
 export const selectLogoutState = (state: RootState) => state.user.logoutState;
 export const selectChangePasswordState = (state: RootState) => state.user.changePasswordState;
+export const selectChangeEmailState = (state: RootState) => state.user.changeEmailState;
 
 export default userSlice.reducer;

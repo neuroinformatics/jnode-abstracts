@@ -37,7 +37,6 @@ public class CustomErrorController implements ErrorController {
     } else if (exception instanceof MethodArgumentNotValidException) {
       message = "Invalid form parameter(s)";
     }
-    System.out.println(exception);
     RestErrorResponseBody body = new RestErrorResponseBody();
     body.setTimestamp(ZonedDateTime.now());
     body.setCode(status.value());

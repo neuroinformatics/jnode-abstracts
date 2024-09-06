@@ -14,6 +14,7 @@ import jp.neuroinf.abstracts.core.AppProperties;
 import jp.neuroinf.abstracts.core.RestSuccessResponseBody;
 import jp.neuroinf.abstracts.dto.AccountDto;
 import jp.neuroinf.abstracts.entity.Account;
+import jp.neuroinf.abstracts.form.UsersChangeEmailForm;
 import jp.neuroinf.abstracts.form.UsersChangePasswordForm;
 import jp.neuroinf.abstracts.repository.AccountRepository;
 
@@ -64,13 +65,34 @@ public class AccountService implements UserDetailsService {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid user id");
     }
     if (!account.getUuid().equals(currentUser.getUuid()) && !isAdmin) {
-
       throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You don't have privileges");
     }
     if (!passwordEncoder.matches(form.getOldPassword(), account.getPassword()) && !isAdmin) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password mismatched");
     }
     account.setPassword(passwordEncoder.encode(form.getNewPassword()));
+    accountRepository.save(account);
+    return new RestSuccessResponseBody("success");
+  }
+
+  @Transactional
+  public RestSuccessResponseBody changeEmail(AccountDetails user, String uuid, UsersChangeEmailForm form) {
+    if (user == null) {
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Login required");
+    }
+    Account currentUser = user.getAccount();
+    boolean isAdmin = this.properties.getAdmins().contains(currentUser.getMail());
+    Account account = accountRepository.findFistByUuid(uuid);
+    if (account == null) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid user id");
+    }
+    if (!account.getUuid().equals(currentUser.getUuid()) && !isAdmin) {
+      throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You don't have privileges");
+    }
+    if (!passwordEncoder.matches(form.getPassword(), account.getPassword()) && !isAdmin) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password mismatched");
+    }
+    account.setMail(form.getEmail());
     accountRepository.save(account);
     return new RestSuccessResponseBody("success");
   }
