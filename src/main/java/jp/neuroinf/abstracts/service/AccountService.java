@@ -1,6 +1,7 @@
 package jp.neuroinf.abstracts.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -53,7 +54,6 @@ public class AccountService implements UserDetailsService {
     return AccountDto.of(account, isAdmin);
   }
 
-  @Transactional
   public RestSuccessResponseBody changePassword(AccountDetails user, String uuid, UsersChangePasswordForm form) {
     if (user == null) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Login required");
@@ -75,7 +75,6 @@ public class AccountService implements UserDetailsService {
     return new RestSuccessResponseBody("success");
   }
 
-  @Transactional
   public RestSuccessResponseBody changeEmail(AccountDetails user, String uuid, UsersChangeEmailForm form) {
     if (user == null) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Login required");
@@ -93,7 +92,11 @@ public class AccountService implements UserDetailsService {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password mismatched");
     }
     account.setMail(form.getEmail());
-    accountRepository.save(account);
+    try {
+      accountRepository.save(account);
+    } catch (DataIntegrityViolationException e) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This email is already taken. Try another email.");
+    }
     return new RestSuccessResponseBody("success");
   }
 
