@@ -5,6 +5,8 @@ import {
   ApiUsersCurrent,
   ApiUsersLogin,
   ApiUsersLogout,
+  ApiUsersRequestPasswordReset,
+  ApiUsersResetPassword,
 } from '../../api/userApi';
 import { getApiErrorMessage, getApiErrorStatusCode } from '../../api/utilities';
 import { RootState } from '../../app/store';
@@ -14,19 +16,13 @@ import { UserEntity } from '../../entities/user';
 interface UserState {
   userInfo: UserEntity | null;
   restoreState: ApiActionState;
-  loginState: ApiActionState;
-  logoutState: ApiActionState;
-  changePasswordState: ApiActionState;
-  changeEmailState: ApiActionState;
+  pageActionState: ApiActionState;
 }
 
 const initialState: Readonly<UserState> = {
   userInfo: null,
   restoreState: { error: null, status: ApiAsyncStatus.initializing },
-  loginState: { error: null, status: ApiAsyncStatus.initializing },
-  logoutState: { error: null, status: ApiAsyncStatus.initializing },
-  changePasswordState: { error: null, status: ApiAsyncStatus.initializing },
-  changeEmailState: { error: null, status: ApiAsyncStatus.initializing },
+  pageActionState: { error: null, status: ApiAsyncStatus.initializing },
 };
 
 export const restore = createAsyncThunk<UserEntity, void, { rejectValue: string }>(
@@ -74,6 +70,32 @@ export const logout = createAsyncThunk<ApiAuthResponse, void, { rejectValue: str
   },
 );
 
+export const requestPasswordReset = createAsyncThunk<ApiAuthResponse, { email: string }, { rejectValue: string }>(
+  'user/requestPasswordReset',
+  async (params, thunkApi) => {
+    const { email } = params;
+    try {
+      return await ApiUsersRequestPasswordReset(email, thunkApi.signal);
+    } catch (e: unknown) {
+      const message = await getApiErrorMessage(e);
+      return thunkApi.rejectWithValue(message);
+    }
+  },
+);
+
+export const resetPassword = createAsyncThunk<ApiAuthResponse, { token: string }, { rejectValue: string }>(
+  'user/resetPassword',
+  async (params, thunkApi) => {
+    const { token } = params;
+    try {
+      return await ApiUsersResetPassword(token, thunkApi.signal);
+    } catch (e: unknown) {
+      const message = await getApiErrorMessage(e);
+      return thunkApi.rejectWithValue(message);
+    }
+  },
+);
+
 export const changePassword = createAsyncThunk<
   ApiAuthResponse,
   { uuid: string; oldPassword: string; newPassword: string },
@@ -102,17 +124,30 @@ export const changeEmail = createAsyncThunk<
   }
 });
 
+const StateFuncPageActionInitialize = (state: Readonly<UserState>) => {
+  state.pageActionState.status = ApiAsyncStatus.initializing;
+  state.pageActionState.error = null;
+};
+const StateFuncPageActionPending = (state: Readonly<UserState>) => {
+  state.pageActionState.status = ApiAsyncStatus.loading;
+  state.pageActionState.error = null;
+};
+const StateFuncPageActionFulfilled = (state: Readonly<UserState>) => {
+  state.pageActionState.status = ApiAsyncStatus.idle;
+  state.pageActionState.error = null;
+};
+const StateFuncPageActionRejected = (state: Readonly<UserState>, payload: string | undefined) => {
+  const error = payload || '';
+  state.pageActionState.status = ApiAsyncStatus.failed;
+  state.pageActionState.error = error;
+};
+
 export const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
-    unsetChangePassword: (state) => {
-      state.changePasswordState.status = ApiAsyncStatus.initializing;
-      state.changePasswordState.error = null;
-    },
-    unsetChangeEmail: (state) => {
-      state.changeEmailState.status = ApiAsyncStatus.initializing;
-      state.changeEmailState.error = null;
+    unsetPageActionState: (state) => {
+      StateFuncPageActionInitialize(state);
     },
   },
   extraReducers: (builder) => {
@@ -132,71 +167,71 @@ export const userSlice = createSlice({
         state.restoreState.error = error;
       })
       .addCase(login.pending, (state) => {
-        state.loginState.status = ApiAsyncStatus.loading;
+        StateFuncPageActionPending(state);
       })
       .addCase(login.fulfilled, (state, action) => {
         const user = action.payload;
-        state.loginState.status = ApiAsyncStatus.idle;
-        state.loginState.error = null;
+        StateFuncPageActionFulfilled(state);
         state.userInfo = user;
       })
       .addCase(login.rejected, (state, action) => {
-        const error = action.payload ?? '';
-        state.loginState.status = ApiAsyncStatus.failed;
-        state.loginState.error = error;
+        StateFuncPageActionRejected(state, action.payload);
       })
       .addCase(logout.pending, (state) => {
-        state.logoutState.status = ApiAsyncStatus.loading;
-        state.logoutState.error = null;
+        StateFuncPageActionPending(state);
       })
       .addCase(logout.fulfilled, (state) => {
-        state.logoutState.status = ApiAsyncStatus.idle;
-        state.logoutState.error = null;
+        StateFuncPageActionFulfilled(state);
         state.userInfo = null;
       })
       .addCase(logout.rejected, (state, action) => {
-        const error = action.payload ?? '';
-        state.logoutState.status = ApiAsyncStatus.failed;
-        state.logoutState.error = error;
+        StateFuncPageActionRejected(state, action.payload);
+      })
+      .addCase(requestPasswordReset.pending, (state) => {
+        StateFuncPageActionPending(state);
+      })
+      .addCase(requestPasswordReset.fulfilled, (state) => {
+        StateFuncPageActionFulfilled(state);
+      })
+      .addCase(requestPasswordReset.rejected, (state, action) => {
+        StateFuncPageActionRejected(state, action.payload);
+      })
+      .addCase(resetPassword.pending, (state) => {
+        StateFuncPageActionPending(state);
+      })
+      .addCase(resetPassword.fulfilled, (state) => {
+        StateFuncPageActionFulfilled(state);
       })
       .addCase(changePassword.pending, (state) => {
-        state.changePasswordState.status = ApiAsyncStatus.loading;
-        state.changePasswordState.error = null;
+        StateFuncPageActionPending(state);
       })
       .addCase(changePassword.fulfilled, (state) => {
-        state.changePasswordState.status = ApiAsyncStatus.idle;
-        state.changePasswordState.error = null;
+        StateFuncPageActionFulfilled(state);
       })
       .addCase(changePassword.rejected, (state, action) => {
-        const error = action.payload ?? '';
-        state.changePasswordState.status = ApiAsyncStatus.failed;
-        state.changePasswordState.error = error;
+        StateFuncPageActionRejected(state, action.payload);
+      })
+      .addCase(resetPassword.rejected, (state, action) => {
+        StateFuncPageActionRejected(state, action.payload);
       })
       .addCase(changeEmail.pending, (state) => {
-        state.changeEmailState.status = ApiAsyncStatus.loading;
-        state.changeEmailState.error = null;
+        StateFuncPageActionPending(state);
       })
       .addCase(changeEmail.fulfilled, (state) => {
-        state.changeEmailState.status = ApiAsyncStatus.idle;
-        state.changeEmailState.error = null;
+        StateFuncPageActionFulfilled(state);
       })
       .addCase(changeEmail.rejected, (state, action) => {
-        const error = action.payload ?? '';
-        state.changeEmailState.status = ApiAsyncStatus.failed;
-        state.changeEmailState.error = error;
+        StateFuncPageActionRejected(state, action.payload);
       });
   },
 });
 
-export const { unsetChangePassword, unsetChangeEmail } = userSlice.actions;
+export const { unsetPageActionState } = userSlice.actions;
 
 export const selectIsPreparingUserInfo = (state: RootState) => isApiPreparing(state.user.restoreState);
 
 export const selectUserInfo = (state: RootState) => state.user.userInfo;
 export const selectRestoreState = (state: RootState) => state.user.restoreState;
-export const selectLoginState = (state: RootState) => state.user.loginState;
-export const selectLogoutState = (state: RootState) => state.user.logoutState;
-export const selectChangePasswordState = (state: RootState) => state.user.changePasswordState;
-export const selectChangeEmailState = (state: RootState) => state.user.changeEmailState;
+export const selectPageActionState = (state: RootState) => state.user.pageActionState;
 
 export default userSlice.reducer;

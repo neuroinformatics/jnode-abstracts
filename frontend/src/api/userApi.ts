@@ -27,6 +27,24 @@ export const ApiUsersCurrent = async (signal: AbortSignal): Promise<UserEntity> 
   return response;
 };
 
+export const ApiUsersRequestPasswordReset = async (email: string, signal: AbortSignal): Promise<ApiAuthResponse> => {
+  // status code: 200
+  const formData = new FormData();
+  formData.append('email', email);
+  const response = await ky
+    .post<ApiAuthResponse>(`/api/users/password/reset/request`, { body: formData, signal })
+    .json();
+  return response;
+};
+
+export const ApiUsersResetPassword = async (token: string, signal: AbortSignal): Promise<ApiAuthResponse> => {
+  // status code: 200
+  const formData = new FormData();
+  formData.append('token', token);
+  const response = await ky.post<ApiAuthResponse>(`/api/users/password/reset`, { body: formData, signal }).json();
+  return response;
+};
+
 export const ApiUsersChangePassword = async (
   uuid: string,
   oldPassword: string,

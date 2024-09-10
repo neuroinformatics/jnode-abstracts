@@ -8,10 +8,13 @@ import org.springframework.stereotype.Component;
 
 import lombok.Data;
 
-@ConfigurationProperties("app")
 @Component
+@ConfigurationProperties("app")
 @Data
 public class AppProperties {
+
+  @Value("${app.url:http://localhost:8080}")
+  private String url;
 
   @Value("${app.admins:admin@example.com}")
   private List<String> admins;
@@ -21,5 +24,14 @@ public class AppProperties {
 
   @Value("${app.path.figures:./figures}")
   private String pathFigures;
+
+  @Value("${app.mail.mock:true}")
+  private Boolean mailMock;
+
+  @Value("${app.mail.from.address:abstracts@example.com}")
+  private String mailFromAddress;
+
+  @Value("${app.mail.from.name:The J-Node Abstract System}")
+  private String mailFromName;
 
 }

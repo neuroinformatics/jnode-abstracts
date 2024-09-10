@@ -19,12 +19,12 @@ import jp.neuroinf.abstracts.repository.ConferenceRepository;
 public class ConferenceService {
 
   private final ConferenceRepository conferenceRepository;
-  private final AppProperties properties;
+  private final AppProperties appProperties;
 
   @Autowired
-  public ConferenceService(ConferenceRepository conferenceRepository, AppProperties properties) {
+  public ConferenceService(ConferenceRepository conferenceRepository, AppProperties appProperties) {
     this.conferenceRepository = conferenceRepository;
-    this.properties = properties;
+    this.appProperties = appProperties;
   }
 
   @Transactional
@@ -47,7 +47,7 @@ public class ConferenceService {
     if (conference == null) {
       return null;
     }
-    boolean isAdmin = account != null ? this.properties.getAdmins().contains(account.getMail()) : false;
+    boolean isAdmin = account != null ? this.appProperties.getAdmins().contains(account.getMail()) : false;
     boolean isConferenceOwner = conference.isOwner(account);
     if (!isAdmin && !isConferenceOwner && !conference.getIsPublished()) {
       return null; // no permissions

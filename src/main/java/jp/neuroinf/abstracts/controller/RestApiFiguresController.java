@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import jakarta.servlet.http.HttpServletResponse;
+import jp.neuroinf.abstracts.core.AccountDetails;
 import jp.neuroinf.abstracts.dto.FigureDto;
 import jp.neuroinf.abstracts.entity.Account;
-import jp.neuroinf.abstracts.service.AccountDetails;
 import jp.neuroinf.abstracts.service.FigureService;
 
 @RestController

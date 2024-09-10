@@ -22,13 +22,14 @@ public class FigureService {
 
   private final FigureRepository figureRepository;
   private final AbstractService abstractService;
-  private final AppProperties properties;
+  private final AppProperties appProperties;
 
   @Autowired
-  public FigureService(FigureRepository figureRepository, AbstractService abstractService, AppProperties properties) {
+  public FigureService(FigureRepository figureRepository, AbstractService abstractService,
+      AppProperties appProperties) {
     this.figureRepository = figureRepository;
     this.abstractService = abstractService;
-    this.properties = properties;
+    this.appProperties = appProperties;
   }
 
   @Transactional
@@ -46,7 +47,7 @@ public class FigureService {
     if (figure == null) {
       throw new Exception("file not found");
     }
-    String filePath = this.properties.getPathFigures() + '/' + uuid;
+    String filePath = this.appProperties.getPathFigures() + '/' + uuid;
     try (InputStream inputStream = new FileInputStream(filePath);
         OutputStream outputStream = response.getOutputStream();) {
       byte[] fileByteArray = inputStream.readAllBytes();

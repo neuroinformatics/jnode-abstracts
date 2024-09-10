@@ -4,16 +4,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
+import jp.neuroinf.abstracts.core.AccountDetails;
 import jp.neuroinf.abstracts.core.RestSuccessResponseBody;
 import jp.neuroinf.abstracts.dto.AccountDto;
 import jp.neuroinf.abstracts.form.UsersChangeEmailForm;
 import jp.neuroinf.abstracts.form.UsersChangePasswordForm;
-import jp.neuroinf.abstracts.service.AccountDetails;
+import jp.neuroinf.abstracts.form.UsersRequestPasswordResetForm;
+import jp.neuroinf.abstracts.form.UsersResetPasswordForm;
 import jp.neuroinf.abstracts.service.AccountService;
 
 @RestController
@@ -30,6 +33,16 @@ public class RestApiUsersController {
     @GetMapping("/current")
     public AccountDto getCurrentUser(@AuthenticationPrincipal AccountDetails user) {
         return accountService.getCurrentUser(user);
+    }
+
+    @PostMapping("/password/reset/request")
+    public RestSuccessResponseBody requestPasswordReset(@Valid UsersRequestPasswordResetForm form) {
+        return accountService.requestPasswordReset(form);
+    }
+
+    @PostMapping("/password/reset")
+    public RestSuccessResponseBody resetPassword(@Valid UsersResetPasswordForm form) {
+        return accountService.resetPassword(form);
     }
 
     @PutMapping("/{uuid}/password")

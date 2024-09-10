@@ -1,4 +1,4 @@
-package jp.neuroinf.abstracts.service;
+package jp.neuroinf.abstracts.core;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -55,4 +55,5 @@ public class AccountDetails implements UserDetails {
   public boolean isEnabled() {
     return this.account.getIsActive();
   }
+
 }

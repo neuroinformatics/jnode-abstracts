@@ -3,16 +3,16 @@ import React from 'react';
 import classNames from 'classnames';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
-import AlertPanel from '../../common/AlertPanel';
 import GeneralPanel from '../../common/GeneralPanel';
 import LoadingOverlay from '../../common/LoadingOverlay';
 import { ApiAsyncStatus } from '../../entities/api';
+import { showMessage } from '../common/commonSlice';
 import {
   changePassword,
-  selectChangePasswordState,
   selectIsPreparingUserInfo,
+  selectPageActionState,
   selectUserInfo,
-  unsetChangePassword,
+  unsetPageActionState,
 } from './userSlice';
 
 const ChangePasswordPanel: React.FC = () => {
@@ -20,28 +20,35 @@ const ChangePasswordPanel: React.FC = () => {
   const dispatch = useAppDispatch();
   const userInfo = useAppSelector(selectUserInfo);
   const isPreparingUserInfo = useAppSelector(selectIsPreparingUserInfo);
-  const changePasswordState = useAppSelector(selectChangePasswordState);
+  const pageActionState = useAppSelector(selectPageActionState);
 
   const [oldPassword, setOldPassword] = React.useState<string>('');
   const [newPassword, setNewPassword] = React.useState<string>('');
   const [confirmPassword, setConfirmPassword] = React.useState<string>('');
 
   React.useEffect(() => {
+    return () => {
+      dispatch(unsetPageActionState());
+    };
+  }, [dispatch]);
+
+  React.useEffect(() => {
     if (!isPreparingUserInfo && userInfo == null) {
       navigate('/');
     }
-    return () => {
-      dispatch(unsetChangePassword());
-    };
-  }, [dispatch, isPreparingUserInfo, navigate, userInfo]);
+  }, [isPreparingUserInfo, navigate, userInfo]);
 
   React.useEffect(() => {
-    if (changePasswordState.status === ApiAsyncStatus.idle) {
+    if (pageActionState.status === ApiAsyncStatus.idle) {
       setOldPassword('');
       setNewPassword('');
       setConfirmPassword('');
+      const message = 'Password successfully changed.';
+      dispatch(showMessage({ variant: 'success', message }));
+    } else if (pageActionState.status === ApiAsyncStatus.failed) {
+      dispatch(showMessage({ variant: 'danger', message: pageActionState.error ?? '' }));
     }
-  }, [dispatch, changePasswordState]);
+  }, [dispatch, navigate, pageActionState]);
 
   const mismatchPassword = newPassword !== confirmPassword;
   const invalidPassword =
@@ -82,11 +89,7 @@ const ChangePasswordPanel: React.FC = () => {
   return (
     <GeneralPanel title={title} size={7}>
       {isPreparingUserInfo && <LoadingOverlay message="Loading..." />}
-      {changePasswordState.status === ApiAsyncStatus.loading && <LoadingOverlay message="Changing Password..." />}
-      {changePasswordState.status === ApiAsyncStatus.idle && (
-        <AlertPanel variant="success">Password successfully changed.</AlertPanel>
-      )}
-      {changePasswordState.error != null && <AlertPanel variant="danger">{changePasswordState.error}</AlertPanel>}
+      {pageActionState.status === ApiAsyncStatus.loading && <LoadingOverlay message="Changing Password..." />}
       <fieldset>
         <form onSubmit={onSubmitSave} autoComplete="off">
           <div className="mb-3">

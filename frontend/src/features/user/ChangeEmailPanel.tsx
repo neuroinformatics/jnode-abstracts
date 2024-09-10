@@ -3,16 +3,16 @@ import React from 'react';
 import classNames from 'classnames';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
-import AlertPanel from '../../common/AlertPanel';
 import GeneralPanel from '../../common/GeneralPanel';
 import LoadingOverlay from '../../common/LoadingOverlay';
 import { ApiAsyncStatus } from '../../entities/api';
+import { showMessage } from '../common/commonSlice';
 import {
   changeEmail,
-  selectChangeEmailState,
   selectIsPreparingUserInfo,
+  selectPageActionState,
   selectUserInfo,
-  unsetChangeEmail,
+  unsetPageActionState,
 } from './userSlice';
 
 const ChangeEmailPanel: React.FC = () => {
@@ -20,28 +20,35 @@ const ChangeEmailPanel: React.FC = () => {
   const dispatch = useAppDispatch();
   const userInfo = useAppSelector(selectUserInfo);
   const isPreparingUserInfo = useAppSelector(selectIsPreparingUserInfo);
-  const changeEmailState = useAppSelector(selectChangeEmailState);
+  const pageActionState = useAppSelector(selectPageActionState);
 
   const [newEmail, setNewEmail] = React.useState<string>('');
   const [confirmEmail, setConfirmEmail] = React.useState<string>('');
   const [password, setPassword] = React.useState<string>('');
 
   React.useEffect(() => {
+    return () => {
+      dispatch(unsetPageActionState());
+    };
+  }, [dispatch]);
+
+  React.useEffect(() => {
     if (!isPreparingUserInfo && userInfo == null) {
       navigate('/');
     }
-    return () => {
-      dispatch(unsetChangeEmail());
-    };
-  }, [dispatch, isPreparingUserInfo, navigate, userInfo]);
+  }, [isPreparingUserInfo, navigate, userInfo]);
 
   React.useEffect(() => {
-    if (changeEmailState.status === ApiAsyncStatus.idle) {
+    if (pageActionState.status === ApiAsyncStatus.idle) {
       setNewEmail('');
       setConfirmEmail('');
       setPassword('');
+      const message = 'E-Mail address successfully changed.';
+      dispatch(showMessage({ variant: 'success', message }));
+    } else if (pageActionState.status === ApiAsyncStatus.failed) {
+      dispatch(showMessage({ variant: 'danger', message: pageActionState.error ?? '' }));
     }
-  }, [dispatch, changeEmailState]);
+  }, [dispatch, navigate, pageActionState]);
 
   const mismatchEmail = newEmail !== confirmEmail;
   const invalidEmail = newEmail.length > 0 && !/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i.test(newEmail);
@@ -77,11 +84,7 @@ const ChangeEmailPanel: React.FC = () => {
   return (
     <GeneralPanel title={title} size={7}>
       {isPreparingUserInfo && <LoadingOverlay message="Loading..." />}
-      {changeEmailState.status === ApiAsyncStatus.loading && <LoadingOverlay message="Changing E-Mail Address..." />}
-      {changeEmailState.status === ApiAsyncStatus.idle && (
-        <AlertPanel variant="success">E-Mail address successfully changed.</AlertPanel>
-      )}
-      {changeEmailState.error != null && <AlertPanel variant="danger">{changeEmailState.error}</AlertPanel>}
+      {pageActionState.status === ApiAsyncStatus.loading && <LoadingOverlay message="Changing E-Mail Address..." />}
       <fieldset>
         <form onSubmit={onSubmitSave} autoComplete="off">
           <div className="mb-3">

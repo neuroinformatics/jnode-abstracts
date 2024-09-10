@@ -9,10 +9,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import jp.neuroinf.abstracts.core.AccountDetails;
 import jp.neuroinf.abstracts.dto.AbstractDto;
 import jp.neuroinf.abstracts.entity.Account;
 import jp.neuroinf.abstracts.service.AbstractService;
-import jp.neuroinf.abstracts.service.AccountDetails;
 
 @RestController
 @RequestMapping("/api/abstracts")

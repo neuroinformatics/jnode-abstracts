@@ -15,18 +15,18 @@ import jp.neuroinf.abstracts.repository.AbstractRepository;
 public class AbstractService {
 
   private final AbstractRepository abstractRepository;
-  private final AppProperties properties;
+  private final AppProperties appProperties;
 
   @Autowired
-  public AbstractService(AbstractRepository abstractRepository, AppProperties properties) {
+  public AbstractService(AbstractRepository abstractRepository, AppProperties appProperties) {
     this.abstractRepository = abstractRepository;
-    this.properties = properties;
+    this.appProperties = appProperties;
   }
 
   @Transactional
   public boolean isReadable(Account account, Abstract abstract_) {
     Conference conference = abstract_.getConference();
-    boolean isAdmin = account != null ? this.properties.getAdmins().contains(account.getMail()) : false;
+    boolean isAdmin = account != null ? this.appProperties.getAdmins().contains(account.getMail()) : false;
     boolean isConferenceOwner = conference.isOwner(account);
     boolean isOwner = abstract_.isOwner(account);
     boolean isReadable = isAdmin || isConferenceOwner || isOwner

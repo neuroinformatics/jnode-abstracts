@@ -2,22 +2,28 @@ import React from 'react';
 
 import { Navigate, Route, Routes } from 'react-router-dom';
 import PageNotFound from '../common/PageNotFound';
+import MessageBar from '../features/common/MessageBar';
 import ConferenceListPanel from '../features/conference/ConferenceListPanel';
 import ConferenceRouterPanel from '../features/conference/ConferenceRouterPanel';
 import ChangeEmailPanel from '../features/user/ChangeEmailPanel';
 import ChangePasswordPanel from '../features/user/ChangePasswordPanel';
+import ForgotPasswordPanel from '../features/user/ForgotPasswordPanel';
 import LoginPanel from '../features/user/LoginPanel';
 import LogoutPanel from '../features/user/LogoutPanel';
+import ResetPasswordPanel from '../features/user/ResetPasswordPanel';
 import AboutPanel from './AboutPanel';
 import ContactPanel from './ContactPanel';
 
 const MainPanel: React.FC = () => {
   return (
     <main className="main-content">
+      <MessageBar />
       <Routes>
         <Route path="/" element={<Navigate to="/conferences" />} />
         <Route path="login" element={<LoginPanel />} />
         <Route path="logout" element={<LogoutPanel />} />
+        <Route path="forgotpassword" element={<ForgotPasswordPanel />} />
+        <Route path="resetpassword" element={<ResetPasswordPanel />} />
         <Route path="password" element={<ChangePasswordPanel />} />
         <Route path="email" element={<ChangeEmailPanel />} />
         <Route path="about" element={<AboutPanel />} />

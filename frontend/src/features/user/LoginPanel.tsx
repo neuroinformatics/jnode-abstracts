@@ -4,40 +4,53 @@ import { faEnvelope, faKey } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
-import AlertPanel from '../../common/AlertPanel';
 import GeneralPanel from '../../common/GeneralPanel';
 import LoadingOverlay from '../../common/LoadingOverlay';
 import { ApiAsyncStatus } from '../../entities/api';
-import { login, selectLoginState, selectUserInfo } from './userSlice';
+import { hideMessage, showMessage } from '../common/commonSlice';
+import { login, selectPageActionState, selectUserInfo, unsetPageActionState } from './userSlice';
 
 const LoginPanel: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const userInfo = useAppSelector(selectUserInfo);
-  const loginState = useAppSelector(selectLoginState);
+  const pageActionState = useAppSelector(selectPageActionState);
 
   const [username, setUsername] = React.useState<string>('');
   const [password, setPassword] = React.useState<string>('');
 
-  const onSubmitLogin = React.useCallback<React.FormEventHandler<HTMLFormElement>>(
-    (e) => {
-      e.preventDefault();
-      void dispatch(login({ username, password }));
-    },
-    [dispatch, password, username],
-  );
+  React.useEffect(() => {
+    return () => {
+      dispatch(unsetPageActionState());
+    };
+  }, [dispatch]);
 
   React.useEffect(() => {
     if (userInfo != null) {
+      dispatch(hideMessage());
       navigate('/');
     }
-  }, [navigate, userInfo]);
+  }, [dispatch, navigate, userInfo]);
+
+  React.useEffect(() => {
+    if (pageActionState.status === ApiAsyncStatus.failed) {
+      dispatch(showMessage({ variant: 'danger', message: pageActionState.error ?? '' }));
+    }
+  }, [dispatch, navigate, pageActionState]);
+
+  const onSubmitLogin = React.useCallback<React.FormEventHandler<HTMLFormElement>>(
+    (e) => {
+      e.preventDefault();
+      dispatch(login({ username, password }));
+    },
+    [dispatch, password, username],
+  );
 
   const title = 'Sign In';
 
   return (
     <GeneralPanel title={title} size={7}>
-      {loginState.status === ApiAsyncStatus.loading && <LoadingOverlay message="Signing in.." />}
+      {pageActionState.status === ApiAsyncStatus.loading && <LoadingOverlay message="Signing in.." />}
       <fieldset>
         <form onSubmit={onSubmitLogin}>
           <div className="input-group mb-4">
@@ -64,7 +77,6 @@ const LoginPanel: React.FC = () => {
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
-          {loginState.error != null && <AlertPanel variant="danger">{loginState.error}</AlertPanel>}
           <div className="mb-3">
             <Link to="/forgotpassword">Forgot password?</Link> or <Link to="/signup">Create a new account</Link>
           </div>

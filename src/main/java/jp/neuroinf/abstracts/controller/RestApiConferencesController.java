@@ -11,11 +11,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import jp.neuroinf.abstracts.core.AccountDetails;
 import jp.neuroinf.abstracts.dto.AbstractSimpleDto;
 import jp.neuroinf.abstracts.dto.ConferenceDto;
 import jp.neuroinf.abstracts.dto.ConferenceSimpleDto;
 import jp.neuroinf.abstracts.entity.Account;
-import jp.neuroinf.abstracts.service.AccountDetails;
 import jp.neuroinf.abstracts.service.ConferenceService;
 
 @RestController
