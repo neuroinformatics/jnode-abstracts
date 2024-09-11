@@ -104,6 +104,12 @@ const AbstractListPanel: React.FC<Props> = (props) => {
   const [keyword, setKeyword] = React.useState<string>('');
   const [tab, setTab] = React.useState<string>('');
 
+  const hashAbstractGroups = location.hash.match(/^#\/groups\/(.*)/)?.[1] ?? null;
+  const abstractGroups =
+    (hashAbstractGroups != null && conference.abstractGroups.find((g) => g.shortName === hashAbstractGroups)) || null;
+  const badAbstractGroups =
+    hashAbstractGroups != null && abstractGroups == null && conference.abstractGroups.length > 0;
+
   const hashAbstractUuid = location.hash.match(/^#\/uuid\/(.*)/)?.[1] ?? null;
   const hasAbstract = hashAbstractUuid != null && abstractsInfo.allIds.includes(hashAbstractUuid);
   const badAbstract = hashAbstractUuid != null && !hasAbstract && abstractsInfo.allIds.length > 0;
@@ -111,6 +117,16 @@ const AbstractListPanel: React.FC<Props> = (props) => {
   React.useEffect(() => {
     dispatch(getConferenceAbstracts(conference.uuid));
   }, [dispatch, conference.uuid]);
+
+  React.useEffect(() => {
+    if (!badAbstractGroups) {
+      if (abstractGroups != null && tab !== abstractGroups.uuid) {
+        setTab(abstractGroups.uuid);
+      } else if (abstractGroups == null && tab !== '' && !badAbstract && !hasAbstract) {
+        setTab('');
+      }
+    }
+  }, [abstractGroups, badAbstract, badAbstractGroups, hasAbstract, tab]);
 
   const filterTab = (uuid: string): boolean => {
     return tab === '' ? true : abstractsInfo.byId[uuid].abstractGroupUuid === tab;
@@ -132,16 +148,15 @@ const AbstractListPanel: React.FC<Props> = (props) => {
   };
   const abstractUuids = abstractsInfo.allIds.filter(filterTab).filter(filterKeyword);
 
-  const onClickTab = (name: string) => {
-    setTab(name);
-    if (location.hash.length > 0) {
-      navigate(`/conference/${conference.shortName}/abstracts`);
-    }
+  const onClickTab = (uuid: string) => {
+    const abstractGroup = conference.abstractGroups.find((g) => g.uuid === uuid)?.shortName;
+    const hash = abstractGroup != null ? `#/groups/${abstractGroup}` : '';
+    navigate(`/conference/${conference.shortName}/abstracts${hash}`);
   };
 
   return (
     <>
-      {badAbstract ? (
+      {badAbstract || badAbstractGroups ? (
         <PageNotFound />
       ) : (
         <div className="abstracts">
