@@ -34,7 +34,7 @@ const TabNavigationBar: React.FC<TabNavigationBarProps> = (props) => {
         <li key={abstractGroup.uuid} className="nav-item">
           <button
             className={classNames('nav-link', { active: tab === abstractGroup.uuid })}
-            onClick={() => onClickTab(abstractGroup.uuid)}
+            onClick={() => onClickTab(abstractGroup.uuid ?? '')}
           >
             {abstractGroup.name}
           </button>
@@ -121,7 +121,7 @@ const AbstractListPanel: React.FC<Props> = (props) => {
   React.useEffect(() => {
     if (!badAbstractGroups) {
       if (abstractGroups != null && tab !== abstractGroups.uuid) {
-        setTab(abstractGroups.uuid);
+        setTab(abstractGroups.uuid ?? '');
       } else if (abstractGroups == null && tab !== '' && !badAbstract && !hasAbstract) {
         setTab('');
       }

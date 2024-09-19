@@ -11,10 +11,10 @@ export interface TopicEntity {
 }
 
 export interface AbstractGroupEntity {
-  uuid: string;
-  name: string;
+  uuid: string | null;
   prefix: number;
   shortName: string;
+  name: string;
 }
 
 export interface ConferenceSimpleEntity {

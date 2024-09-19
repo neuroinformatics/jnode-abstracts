@@ -7,6 +7,7 @@ import HeaderTitle from '../../common/HeaderTitle';
 import JumbotronPanel from '../../common/JumbotronPanel';
 import { ConferenceEntity } from '../../entities/conference';
 import { selectUserInfo } from '../user/userSlice';
+import ConferenceNotice from './ConferenceNotice';
 import { formatDuration, getLogoUrl } from './conferenceUtilities';
 
 interface Props {
@@ -23,11 +24,7 @@ const ConferencePanel: React.FC<Props> = (props) => {
   return (
     <div className="conference">
       <HeaderTitle title={conference.name} />
-      {conference.notice != null && (
-        <JumbotronPanel>
-          <Markdown className="mb-3">{conference.notice}</Markdown>
-        </JumbotronPanel>
-      )}
+      <ConferenceNotice conference={conference} />
       <JumbotronPanel>
         <div className="page-title my-4 border-bottom">
           <h2 className="mb-4">{conference.name}</h2>

@@ -20,11 +20,11 @@ public class AbstractGroup {
   @Column(name = "uuid")
   private String uuid;
 
-  @Column(name = "name", nullable = false)
-  private String name;
-
   @Column(name = "prefix", nullable = false)
   private Integer prefix;
+
+  @Column(name = "name", nullable = false)
+  private String name;
 
   @Column(name = "short", nullable = false)
   private String shortName;

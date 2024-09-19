@@ -5,6 +5,7 @@ import PageNotFound from '../common/PageNotFound';
 import MessageBar from '../features/common/MessageBar';
 import ConferenceListPanel from '../features/conference/ConferenceListPanel';
 import ConferenceRouterPanel from '../features/conference/ConferenceRouterPanel';
+import DashboardConferenceRouterPanel from '../features/conference/DashboardConferenceRouterPanel';
 import ChangeEmailPanel from '../features/user/ChangeEmailPanel';
 import ChangePasswordPanel from '../features/user/ChangePasswordPanel';
 import ForgotPasswordPanel from '../features/user/ForgotPasswordPanel';
@@ -30,6 +31,7 @@ const MainPanel: React.FC = () => {
         <Route path="contact" element={<ContactPanel />} />
         <Route path="conferences" element={<ConferenceListPanel />} />
         <Route path="conference/:shortName/*" element={<ConferenceRouterPanel />} />
+        <Route path="dashboard/conference/:uuid/*" element={<DashboardConferenceRouterPanel />} />
         <Route path="*" element={<PageNotFound />} />
       </Routes>
     </main>

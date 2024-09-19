@@ -1,5 +1,7 @@
+@use 'sass:color';
+
 @function to-rgb($value) {
-  @return red($value), green($value), blue($value);
+  @return color.channel($value, "red", $space: rgb), color.channel($value, "green", $space: rgb), color.channel($value, "blue", $space: rgb);
 }
 
 @mixin enum-with-comma($selector: '') {
@@ -33,12 +35,12 @@ $custom-font-monospace: Menlo, Monaco, Consolas, "Courier New", monospace;
 
 $custom-primary: #557bb9;
 $custom-primary-rgb: to-rgb($custom-primary);
-$custom-primary-active: darken($custom-primary, 10%);
-$custom-primary-hover: darken($custom-primary, 10%);
-$custom-primary-border: darken($custom-primary, 12%);
-$custom-primary-hover-border: darken($custom-primary, 15%);
-$custom-primary-active-hover: darken($custom-primary, 17%);
-$custom-primary-active-border: darken($custom-primary, 25%);
+$custom-primary-active: color.adjust($custom-primary, $lightness: -10%);
+$custom-primary-hover: color.adjust($custom-primary, $lightness: -10%);
+$custom-primary-border: color.adjust($custom-primary, $lightness: -12%);
+$custom-primary-hover-border: color.adjust($custom-primary, $lightness: -15%);
+$custom-primary-active-hover: color.adjust($custom-primary, $lightness: -17%);
+$custom-primary-active-border: color.adjust($custom-primary, $lightness: -25%);
 $custom-body-color: #282828;
 $custom-body-color-rgb: to-rgb($custom-body-color);
 $custom-secondary-color: #646464;

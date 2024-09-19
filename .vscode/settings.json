@@ -47,7 +47,8 @@
     "reduxjs",
     "riken",
     "Servlet",
-    "signup"
+    "signup",
+    "Xmark"
   ],
   // Extensions - HTML
   "html.format.wrapLineLength": 0,
