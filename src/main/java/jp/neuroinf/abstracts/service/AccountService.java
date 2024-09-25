@@ -23,6 +23,7 @@ import jp.neuroinf.abstracts.dto.AccountDto;
 import jp.neuroinf.abstracts.entity.Account;
 import jp.neuroinf.abstracts.form.UsersChangeEmailForm;
 import jp.neuroinf.abstracts.form.UsersChangePasswordForm;
+import jp.neuroinf.abstracts.form.UsersExistsForm;
 import jp.neuroinf.abstracts.form.UsersRequestPasswordResetForm;
 import jp.neuroinf.abstracts.form.UsersResetPasswordForm;
 import jp.neuroinf.abstracts.repository.AccountRepository;
@@ -54,7 +55,7 @@ public class AccountService implements UserDetailsService {
 
   @Override
   public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-    Account account = accountRepository.findFistByMail(email);
+    Account account = this.accountRepository.findFirstByMail(email);
     if (account == null) {
       throw new UsernameNotFoundException("User not found");
     }
@@ -70,16 +71,27 @@ public class AccountService implements UserDetailsService {
     return AccountDto.of(account, isAdmin);
   }
 
+  public RestSuccessResponseBody exists(AccountDetails user, UsersExistsForm form) {
+    if (user == null) {
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Login required");
+    }
+    Account account = this.accountRepository.findFirstByMail(form.getEmail());
+    if (account == null) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Account with this email does not exist");
+    }
+    return new RestSuccessResponseBody("found");
+  }
+
   public RestSuccessResponseBody requestPasswordReset(UsersRequestPasswordResetForm form) {
     final String email = form.getEmail();
-    final Account account = accountRepository.findFistByMail(email);
+    final Account account = this.accountRepository.findFirstByMail(email);
     if (account == null) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Account with this email does not exist.");
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Account with this email does not exist");
     }
-    final String token = timestampSigner.sign(email);
+    final String token = this.timestampSigner.sign(email);
     final Map<String, Object> variables = new HashMap<>();
     variables.put("firstName", account.getFirstName());
-    variables.put("resetUrl", String.format("%s/resetpassword?token=%s", appProperties.getUrl(), token));
+    variables.put("resetUrl", String.format("%s/resetpassword?token=%s", this.appProperties.getUrl(), token));
     if (!this.emailTemplateSender.send(account.getMail(), "Request to reset password", "requestPasswordReset",
         variables)) {
       throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to send mail");
@@ -92,19 +104,19 @@ public class AccountService implements UserDetailsService {
     if (email == null) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Token is invalid or already expired");
     }
-    final Account account = accountRepository.findFistByMail(email);
+    final Account account = this.accountRepository.findFirstByMail(email);
     if (account == null) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Account with this email does not exist.");
     }
     final PasswordGeneratorBuilder builder = new PasswordGenerator.PasswordGeneratorBuilder();
     final PasswordGenerator generator = builder.useLower(true).useUpper(true).useDigit(true).usePunct(true).build();
     final String password = generator.generate(16);
-    account.setPassword(passwordEncoder.encode(password));
-    accountRepository.save(account);
+    account.setPassword(this.passwordEncoder.encode(password));
+    this.accountRepository.save(account);
     final Map<String, Object> variables = new HashMap<>();
     variables.put("firstName", account.getFirstName());
     variables.put("password", password);
-    variables.put("loginUrl", String.format("%s/login", appProperties.getUrl()));
+    variables.put("loginUrl", String.format("%s/login", this.appProperties.getUrl()));
     if (!this.emailTemplateSender.send(account.getMail(), "Reset password", "resetPassword", variables)) {
       throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to send mail");
     }
@@ -117,18 +129,18 @@ public class AccountService implements UserDetailsService {
     }
     Account currentUser = user.getAccount();
     boolean isAdmin = this.appProperties.getAdmins().contains(currentUser.getMail());
-    Account account = accountRepository.findFistByUuid(uuid);
+    Account account = this.accountRepository.findFirstByUuid(uuid);
     if (account == null) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid user id");
     }
     if (!account.getUuid().equals(currentUser.getUuid()) && !isAdmin) {
       throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You don't have privileges");
     }
-    if (!passwordEncoder.matches(form.getOldPassword(), account.getPassword()) && !isAdmin) {
+    if (!this.passwordEncoder.matches(form.getOldPassword(), account.getPassword()) && !isAdmin) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password mismatched");
     }
-    account.setPassword(passwordEncoder.encode(form.getNewPassword()));
-    accountRepository.save(account);
+    account.setPassword(this.passwordEncoder.encode(form.getNewPassword()));
+    this.accountRepository.save(account);
     return new RestSuccessResponseBody("success");
   }
 
@@ -138,19 +150,19 @@ public class AccountService implements UserDetailsService {
     }
     Account currentUser = user.getAccount();
     boolean isAdmin = this.appProperties.getAdmins().contains(currentUser.getMail());
-    Account account = accountRepository.findFistByUuid(uuid);
+    Account account = this.accountRepository.findFirstByUuid(uuid);
     if (account == null) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid user id");
     }
     if (!account.getUuid().equals(currentUser.getUuid()) && !isAdmin) {
       throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You don't have privileges");
     }
-    if (!passwordEncoder.matches(form.getPassword(), account.getPassword()) && !isAdmin) {
+    if (!this.passwordEncoder.matches(form.getPassword(), account.getPassword()) && !isAdmin) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password mismatched");
     }
     account.setMail(form.getEmail());
     try {
-      accountRepository.save(account);
+      this.accountRepository.save(account);
     } catch (DataIntegrityViolationException e) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This email is already taken. Try another email.");
     }
@@ -161,11 +173,11 @@ public class AccountService implements UserDetailsService {
   public void create(AccountDto dto, String password) {
     Account account = new Account();
     account.setMail(dto.getMail());
-    account.setPassword(passwordEncoder.encode(password));
+    account.setPassword(this.passwordEncoder.encode(password));
     account.setFirstName(dto.getFirstName());
     account.setLastName(dto.getLastName());
     account.setIsActive(true);
-    accountRepository.save(account);
+    this.accountRepository.save(account);
   }
 
 }

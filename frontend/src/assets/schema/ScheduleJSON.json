@@ -1,0 +1,74 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://git.ni.riken.jp/niu/abstracts/raw/branch/master/frontend/src/assets/schema/ScheduleJSON.json",
+  "title": "ScheduleJSON",
+  "$defs": {
+    "event": {
+      "title": "ScheduleJSON Event",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "subtitle": { "type": ["string", "null"] },
+        "start": { "type": "string" },
+        "end": { "type": ["string", "null"] },
+        "date": { "type": "string", "format": "date" },
+        "location": { "type": ["string", "null"] },
+        "type": { "type": "string", "enum": ["symposium", "workshop", "social", "talk", "poster", "break"] },
+        "authors": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "abstract": { "type": ["string", "null"] }
+      },
+      "required": ["title", "start", "date", "type"]
+    },
+    "track": {
+      "title": "ScheduleJSON Track",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "subtitle": { "type": ["string", "null"] },
+        "chair": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "events": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/event"
+          }
+        }
+      },
+      "required": ["title", "chair", "events"]
+    },
+    "session": {
+      "title": "ScheduleJSON Session",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "subtitle": { "type": ["string", "null"] },
+        "tracks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/track"
+          }
+        }
+      },
+      "required": ["title", "tracks"]
+    }
+  },
+  "type": "array",
+  "items": {
+    "oneOf": [
+      {
+        "$ref": "#/$defs/event"
+      },
+      {
+        "$ref": "#/$defs/track"
+      },
+      {
+        "$ref": "#/$defs/session"
+      }
+    ]
+  }
+}

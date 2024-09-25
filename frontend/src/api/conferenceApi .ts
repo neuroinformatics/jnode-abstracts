@@ -1,5 +1,6 @@
 import ky from 'ky';
 import { AbstractSimpleEntity } from '../entities/abstract';
+import { ApiSuccessResponse } from '../entities/api';
 import { ConferenceEntity, ConferenceSimpleEntity } from '../entities/conference';
 
 export const ApiConferenceList = async (
@@ -24,5 +25,21 @@ export const ApiConferenceRetrieve = async (uuid: string, signal: AbortSignal): 
 export const ApiConferenceAbstractList = async (uuid: string, signal: AbortSignal): Promise<AbstractSimpleEntity[]> => {
   // status code: 200
   const response = await ky.get<AbstractSimpleEntity[]>(`/api/conferences/${uuid}/abstracts`, { signal }).json();
+  return response;
+};
+
+export const ApiConferenceOwnersUpdate = async (
+  uuid: string,
+  owners: string[],
+  signal: AbortSignal,
+): Promise<ApiSuccessResponse> => {
+  // status code: 200
+  const formData = new FormData();
+  owners.forEach((owner) => {
+    formData.append(`owners`, owner);
+  });
+  const response = await ky
+    .put<ApiSuccessResponse>(`/api/conferences/${uuid}/owners`, { body: formData, signal })
+    .json();
   return response;
 };

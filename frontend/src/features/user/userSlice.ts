@@ -3,6 +3,7 @@ import {
   ApiUsersChangeEmail,
   ApiUsersChangePassword,
   ApiUsersCurrent,
+  ApiUsersExists,
   ApiUsersLogin,
   ApiUsersLogout,
   ApiUsersRequestPasswordReset,
@@ -10,7 +11,7 @@ import {
 } from '../../api/userApi';
 import { getApiErrorMessage, getApiErrorStatusCode } from '../../api/utilities';
 import { RootState } from '../../app/store';
-import { ApiActionState, ApiAsyncStatus, ApiAuthResponse, isApiPreparing } from '../../entities/api';
+import { ApiActionState, ApiAsyncStatus, ApiSuccessResponse, isApiPreparing } from '../../entities/api';
 import { UserEntity } from '../../entities/user';
 
 interface UserState {
@@ -57,7 +58,7 @@ export const login = createAsyncThunk<UserEntity, { username: string; password: 
   },
 );
 
-export const logout = createAsyncThunk<ApiAuthResponse, void, { rejectValue: string }>(
+export const logout = createAsyncThunk<ApiSuccessResponse, void, { rejectValue: string }>(
   'user/logout',
   async (_, thunkApi) => {
     try {
@@ -70,7 +71,21 @@ export const logout = createAsyncThunk<ApiAuthResponse, void, { rejectValue: str
   },
 );
 
-export const requestPasswordReset = createAsyncThunk<ApiAuthResponse, { email: string }, { rejectValue: string }>(
+export const exists = createAsyncThunk<ApiSuccessResponse, { email: string }, { rejectValue: string }>(
+  'user/exists',
+  async (params, thunkApi) => {
+    const { email } = params;
+    console.log(email);
+    try {
+      return await ApiUsersExists(email, thunkApi.signal);
+    } catch (e: unknown) {
+      const message = await getApiErrorMessage(e);
+      return thunkApi.rejectWithValue(message);
+    }
+  },
+);
+
+export const requestPasswordReset = createAsyncThunk<ApiSuccessResponse, { email: string }, { rejectValue: string }>(
   'user/requestPasswordReset',
   async (params, thunkApi) => {
     const { email } = params;
@@ -83,7 +98,7 @@ export const requestPasswordReset = createAsyncThunk<ApiAuthResponse, { email: s
   },
 );
 
-export const resetPassword = createAsyncThunk<ApiAuthResponse, { token: string }, { rejectValue: string }>(
+export const resetPassword = createAsyncThunk<ApiSuccessResponse, { token: string }, { rejectValue: string }>(
   'user/resetPassword',
   async (params, thunkApi) => {
     const { token } = params;
@@ -97,7 +112,7 @@ export const resetPassword = createAsyncThunk<ApiAuthResponse, { token: string }
 );
 
 export const changePassword = createAsyncThunk<
-  ApiAuthResponse,
+  ApiSuccessResponse,
   { uuid: string; oldPassword: string; newPassword: string },
   { rejectValue: string }
 >('user/changePassword', async (params, thunkApi) => {
@@ -111,7 +126,7 @@ export const changePassword = createAsyncThunk<
 });
 
 export const changeEmail = createAsyncThunk<
-  ApiAuthResponse,
+  ApiSuccessResponse,
   { uuid: string; email: string; password: string },
   { rejectValue: string }
 >('user/changeEmail', async (params, thunkApi) => {
@@ -185,6 +200,15 @@ export const userSlice = createSlice({
         state.userInfo = null;
       })
       .addCase(logout.rejected, (state, action) => {
+        StateFuncPageActionRejected(state, action.payload);
+      })
+      .addCase(exists.pending, (state) => {
+        StateFuncPageActionPending(state);
+      })
+      .addCase(exists.fulfilled, (state) => {
+        StateFuncPageActionFulfilled(state);
+      })
+      .addCase(exists.rejected, (state, action) => {
         StateFuncPageActionRejected(state, action.payload);
       })
       .addCase(requestPasswordReset.pending, (state) => {

@@ -1,5 +1,5 @@
 export interface UserSimpleEntity {
-  uuid: string | null;
+  uuid: string;
   mail: string;
 }
 

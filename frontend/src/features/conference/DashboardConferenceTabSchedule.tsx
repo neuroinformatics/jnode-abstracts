@@ -2,7 +2,7 @@ import React from 'react';
 
 import Ajv from 'ajv';
 import classNames from 'classnames';
-import GeoJsonSchema from '../../assets/schema/GeoJSON.json';
+import ScheduleJsonSchema from '../../assets/schema/ScheduleJSON.json';
 import { DashboardConferenceTabProps } from './DashboardConferenceTab';
 
 const DashboardConferenceTabSchedule: React.FC<DashboardConferenceTabProps> = (props) => {
@@ -15,7 +15,7 @@ const DashboardConferenceTabSchedule: React.FC<DashboardConferenceTabProps> = (p
   const validateJson = (text: string): boolean => {
     try {
       const ajv = new Ajv();
-      return !!ajv.validate(GeoJsonSchema, JSON.parse(text));
+      return !!ajv.validate(ScheduleJsonSchema, JSON.parse(text));
     } catch {
       return false;
     }

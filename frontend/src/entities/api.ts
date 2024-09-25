@@ -20,7 +20,7 @@ export interface ApiExceptionResponse {
   path: string;
 }
 
-export interface ApiAuthResponse {
+export interface ApiSuccessResponse {
   message: string;
 }
 

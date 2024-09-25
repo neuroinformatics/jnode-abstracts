@@ -7,15 +7,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import jakarta.validation.Valid;
 import jp.neuroinf.abstracts.core.AccountDetails;
+import jp.neuroinf.abstracts.core.RestSuccessResponseBody;
 import jp.neuroinf.abstracts.dto.AbstractSimpleDto;
 import jp.neuroinf.abstracts.dto.ConferenceDto;
 import jp.neuroinf.abstracts.dto.ConferenceSimpleDto;
 import jp.neuroinf.abstracts.entity.Account;
+import jp.neuroinf.abstracts.form.ConferenceUpdateOwnersForm;
 import jp.neuroinf.abstracts.service.ConferenceService;
 
 @RestController
@@ -58,4 +62,11 @@ public class RestApiConferencesController {
         }
         return abstracts;
     }
+
+    @PutMapping("/{uuid}/owners")
+    public RestSuccessResponseBody updateConferenceOwners(@AuthenticationPrincipal AccountDetails user,
+            @PathVariable("uuid") String uuid, @Valid ConferenceUpdateOwnersForm form) {
+        return this.conferenceService.updateConferenceOwners(user, uuid, form);
+    }
+
 }

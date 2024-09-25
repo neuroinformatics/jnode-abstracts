@@ -1,10 +1,15 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { ApiConferenceAbstractList, ApiConferenceList, ApiConferenceRetrieve } from '../../api/conferenceApi ';
+import {
+  ApiConferenceAbstractList,
+  ApiConferenceList,
+  ApiConferenceOwnersUpdate,
+  ApiConferenceRetrieve,
+} from '../../api/conferenceApi ';
 import { getApiErrorMessage } from '../../api/utilities';
 import { RootState } from '../../app/store';
 import { NormalizedState } from '../../common/normalizedState';
 import { AbstractSimpleEntity } from '../../entities/abstract';
-import { ApiActionState, ApiAsyncStatus } from '../../entities/api';
+import { ApiActionState, ApiAsyncStatus, ApiSuccessResponse } from '../../entities/api';
 import { ConferenceEntity, ConferenceSimpleEntity } from '../../entities/conference';
 
 export type ConferenceStateConferences = NormalizedState<ConferenceSimpleEntity, string>;
@@ -17,6 +22,7 @@ interface ConferenceState {
   getListState: ApiActionState;
   getDetailState: ApiActionState;
   getAbstractsState: ApiActionState;
+  pageActionState: ApiActionState;
 }
 
 const initialState: Readonly<ConferenceState> = {
@@ -26,6 +32,7 @@ const initialState: Readonly<ConferenceState> = {
   getListState: { error: null, status: ApiAsyncStatus.initializing },
   getDetailState: { error: null, status: ApiAsyncStatus.initializing },
   getAbstractsState: { error: null, status: ApiAsyncStatus.initializing },
+  pageActionState: { error: null, status: ApiAsyncStatus.initializing },
 };
 
 export const getConferenceList = createAsyncThunk<ConferenceSimpleEntity[], void, { rejectValue: string }>(
@@ -69,6 +76,39 @@ export const getConferenceAbstracts = createAsyncThunk<AbstractSimpleEntity[], s
   },
 );
 
+export const updateConferenceOwners = createAsyncThunk<
+  ApiSuccessResponse,
+  { uuid: string; owners: string[] },
+  { rejectValue: string }
+>('conference/owners/update', async (params, thunkApi) => {
+  const { uuid, owners } = params;
+  try {
+    const abstracts = await ApiConferenceOwnersUpdate(uuid, owners, thunkApi.signal);
+    return abstracts;
+  } catch (e: unknown) {
+    const message = await getApiErrorMessage(e);
+    return thunkApi.rejectWithValue(message);
+  }
+});
+
+const StateFuncPageActionInitialize = (state: Readonly<ConferenceState>) => {
+  state.pageActionState.status = ApiAsyncStatus.initializing;
+  state.pageActionState.error = null;
+};
+const StateFuncPageActionPending = (state: Readonly<ConferenceState>) => {
+  state.pageActionState.status = ApiAsyncStatus.loading;
+  state.pageActionState.error = null;
+};
+const StateFuncPageActionFulfilled = (state: Readonly<ConferenceState>) => {
+  state.pageActionState.status = ApiAsyncStatus.idle;
+  state.pageActionState.error = null;
+};
+const StateFuncPageActionRejected = (state: Readonly<ConferenceState>, payload: string | undefined) => {
+  const error = payload || '';
+  state.pageActionState.status = ApiAsyncStatus.failed;
+  state.pageActionState.error = error;
+};
+
 export const conferenceSlice = createSlice({
   name: 'conference',
   initialState,
@@ -77,6 +117,9 @@ export const conferenceSlice = createSlice({
       state.conferenceInfo = null;
       state.getDetailState.status = ApiAsyncStatus.initializing;
       state.getDetailState.error = null;
+    },
+    unsetPageActionState: (state) => {
+      StateFuncPageActionInitialize(state);
     },
   },
   extraReducers: (builder) => {
@@ -130,11 +173,20 @@ export const conferenceSlice = createSlice({
         const error = action.payload ?? '';
         state.getAbstractsState.status = ApiAsyncStatus.failed;
         state.getAbstractsState.error = error;
+      })
+      .addCase(updateConferenceOwners.pending, (state) => {
+        StateFuncPageActionPending(state);
+      })
+      .addCase(updateConferenceOwners.fulfilled, (state) => {
+        StateFuncPageActionFulfilled(state);
+      })
+      .addCase(updateConferenceOwners.rejected, (state, action) => {
+        StateFuncPageActionRejected(state, action.payload);
       });
   },
 });
 
-export const { unsetConferenceDetail } = conferenceSlice.actions;
+export const { unsetConferenceDetail, unsetPageActionState } = conferenceSlice.actions;
 
 export const selectConferenceInfo = (state: RootState) => state.conference.conferenceInfo;
 export const selectConferencesInfo = (state: RootState) => state.conference.conferencesInfo;
@@ -142,5 +194,6 @@ export const selectAbstractsInfo = (state: RootState) => state.conference.abstra
 export const selectGetListState = (state: RootState) => state.conference.getListState;
 export const selectGetDetailState = (state: RootState) => state.conference.getDetailState;
 export const selectGetAbstractsState = (state: RootState) => state.conference.getAbstractsState;
+export const selectPageActionState = (state: RootState) => state.conference.pageActionState;
 
 export default conferenceSlice.reducer;

@@ -15,6 +15,7 @@ import jp.neuroinf.abstracts.core.RestSuccessResponseBody;
 import jp.neuroinf.abstracts.dto.AccountDto;
 import jp.neuroinf.abstracts.form.UsersChangeEmailForm;
 import jp.neuroinf.abstracts.form.UsersChangePasswordForm;
+import jp.neuroinf.abstracts.form.UsersExistsForm;
 import jp.neuroinf.abstracts.form.UsersRequestPasswordResetForm;
 import jp.neuroinf.abstracts.form.UsersResetPasswordForm;
 import jp.neuroinf.abstracts.service.AccountService;
@@ -32,29 +33,35 @@ public class RestApiUsersController {
 
     @GetMapping("/current")
     public AccountDto getCurrentUser(@AuthenticationPrincipal AccountDetails user) {
-        return accountService.getCurrentUser(user);
+        return this.accountService.getCurrentUser(user);
+    }
+
+    @GetMapping("/exists")
+    public RestSuccessResponseBody userExists(@AuthenticationPrincipal AccountDetails user,
+            @Valid UsersExistsForm form) {
+        return this.accountService.exists(user, form);
     }
 
     @PostMapping("/password/reset/request")
     public RestSuccessResponseBody requestPasswordReset(@Valid UsersRequestPasswordResetForm form) {
-        return accountService.requestPasswordReset(form);
+        return this.accountService.requestPasswordReset(form);
     }
 
     @PostMapping("/password/reset")
     public RestSuccessResponseBody resetPassword(@Valid UsersResetPasswordForm form) {
-        return accountService.resetPassword(form);
+        return this.accountService.resetPassword(form);
     }
 
     @PutMapping("/{uuid}/password")
     public RestSuccessResponseBody changePassword(@AuthenticationPrincipal AccountDetails user,
             @PathVariable("uuid") String uuid, @Valid UsersChangePasswordForm form) {
-        return accountService.changePassword(user, uuid, form);
+        return this.accountService.changePassword(user, uuid, form);
     }
 
     @PutMapping("/{uuid}/email")
     public RestSuccessResponseBody changeEmail(@AuthenticationPrincipal AccountDetails user,
             @PathVariable("uuid") String uuid, @Valid UsersChangeEmailForm form) {
-        return accountService.changeEmail(user, uuid, form);
+        return this.accountService.changeEmail(user, uuid, form);
     }
 
 }

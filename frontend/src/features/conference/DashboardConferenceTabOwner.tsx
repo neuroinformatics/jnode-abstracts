@@ -2,22 +2,60 @@ import React from 'react';
 
 import { faPlus, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import _ from 'lodash';
-import { UserSimpleEntity } from '../../entities/user';
+import { useAppDispatch, useAppSelector } from '../../app/hooks';
+import LoadingOverlay from '../../common/LoadingOverlay';
+import { ApiAsyncStatus } from '../../entities/api';
+import { showMessage } from '../common/commonSlice';
+import {
+  exists,
+  selectPageActionState as selectUserPageActionState,
+  unsetPageActionState as unsetUserPageActionState,
+} from '../user/userSlice';
 import { DashboardConferenceTabProps } from './DashboardConferenceTab';
+import { selectPageActionState, unsetPageActionState, updateConferenceOwners } from './conferenceSlice';
 
 const DashboardConferenceTabOwner: React.FC<DashboardConferenceTabProps> = (props) => {
   const { conference } = props;
 
-  const [owners, setOwners] = React.useState<UserSimpleEntity[]>(
-    conference.owners != null ? _.cloneDeep(conference.owners) : [],
+  const dispatch = useAppDispatch();
+  const [owners, setOwners] = React.useState<string[]>(
+    conference.owners != null ? conference.owners.map((o) => o.mail).sort((a, b) => a.localeCompare(b)) : [],
   );
   const [isChanged, setIsChanged] = React.useState<boolean>(false);
   const [email, setEmail] = React.useState<string>('');
+  const userPageActionState = useAppSelector(selectUserPageActionState);
+  const pageActionState = useAppSelector(selectPageActionState);
+
+  React.useEffect(() => {
+    if (userPageActionState.status === ApiAsyncStatus.idle) {
+      const data = email.trim();
+      setOwners((prev) => [...prev, data].sort((a, b) => a.localeCompare(b)));
+      dispatch(unsetUserPageActionState());
+      setEmail('');
+      setIsChanged(true);
+    } else if (userPageActionState.status === ApiAsyncStatus.failed) {
+      dispatch(showMessage({ variant: 'danger', message: userPageActionState.error ?? '' }));
+      dispatch(unsetUserPageActionState());
+      setEmail('');
+    }
+  }, [dispatch, email, userPageActionState.error, userPageActionState.status]);
+
+  React.useEffect(() => {
+    if (pageActionState.status === ApiAsyncStatus.idle) {
+      const message = 'Owners successfully updated.';
+      dispatch(showMessage({ variant: 'success', message }));
+      dispatch(unsetPageActionState());
+      setEmail('');
+      setIsChanged(false);
+    } else if (pageActionState.status === ApiAsyncStatus.failed) {
+      dispatch(showMessage({ variant: 'danger', message: pageActionState.error ?? '' }));
+      dispatch(unsetPageActionState());
+      setEmail('');
+    }
+  }, [dispatch, pageActionState.error, pageActionState.status]);
 
   const onChangeEmail: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     setEmail(e.target.value.trim());
-    setIsChanged(true);
   };
 
   const onClickRemove = (idx: number): void => {
@@ -25,27 +63,31 @@ const DashboardConferenceTabOwner: React.FC<DashboardConferenceTabProps> = (prop
     setOwners((prev) => prev.filter((_, pIdx) => pIdx !== idx));
   };
 
-  const onSubmitAdd: React.FormEventHandler<HTMLFormElement> = (e) => {
-    e.preventDefault();
-    setIsChanged(true);
-    setOwners((prev) => [...prev, { uuid: null, mail: email }]);
-    setEmail('');
-  };
+  const onSubmitAdd = React.useCallback<React.FormEventHandler<HTMLFormElement>>(
+    (e) => {
+      e.preventDefault();
+      const data = email.trim();
+      dispatch(exists({ email: data }));
+    },
+    [dispatch, email],
+  );
 
-  const onSubmitOwner = React.useCallback<React.FormEventHandler<HTMLFormElement>>((e) => {
-    e.preventDefault();
-    // save
-    setEmail('');
-    setIsChanged(false);
-  }, []);
+  const onSubmitOwner = React.useCallback<React.FormEventHandler<HTMLFormElement>>(
+    (e) => {
+      e.preventDefault();
+      dispatch(updateConferenceOwners({ uuid: conference.uuid, owners }));
+    },
+    [conference.uuid, dispatch, owners],
+  );
 
   return (
     <div>
+      {pageActionState.status === ApiAsyncStatus.loading && <LoadingOverlay message="Updating Owners..." />}
       <p>Here is the list of current owners:</p>
       <ul>
         {owners.map((owner, idx) => (
           <li className="my-1" key={idx}>
-            <strong>{owner.mail}</strong>{' '}
+            <strong>{owner}</strong>{' '}
             <button className="btn btn-sm btn-danger" onClick={() => onClickRemove(idx)}>
               <FontAwesomeIcon icon={faXmark} />
             </button>
