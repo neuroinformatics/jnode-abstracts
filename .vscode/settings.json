@@ -31,6 +31,7 @@
   "java.compile.nullAnalysis.mode": "automatic",
   // Extensions - Code Spell Checker
   "cSpell.words": [
+    "bbox",
     "Embeddable",
     "favouriteabstracts",
     "Favourites",

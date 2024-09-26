@@ -2,6 +2,7 @@ import React from 'react';
 
 import { faHouse, faUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Feature, FeatureCollection, GeoJsonObject } from 'geojson';
 import { Container, Nav, Navbar, NavDropdown } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import { useLocation } from 'react-router-dom';
@@ -25,6 +26,26 @@ const HeaderPanel: React.FC = () => {
     '/contact': 'Contact',
   };
   const active = pathname in ACTIVES ? ACTIVES[pathname] : null;
+
+  const hasFloorPlans = (geo: string): boolean => {
+    const data = JSON.parse(geo) as GeoJsonObject;
+    const hasFloorPlan = (feature: Feature): boolean => {
+      if (feature.geometry.type === 'Point' && feature.properties != null) {
+        const { name, floorplans } = feature.properties;
+        if (name != null && floorplans != null && Array.isArray(floorplans)) {
+          return true;
+        }
+      }
+      return false;
+    };
+    if (data.type === 'FeatureCollection') {
+      const featureCollection = data as FeatureCollection;
+      return featureCollection.features.map((feature) => hasFloorPlan(feature)).filter((data) => data).length > 0;
+    } else if (data.type === 'Feature') {
+      return hasFloorPlan(data as Feature);
+    }
+    return false;
+  };
 
   return (
     <Navbar
@@ -147,11 +168,13 @@ const HeaderPanel: React.FC = () => {
                       <Nav.Link>Locations</Nav.Link>
                     </LinkContainer>
                   </Nav.Item>
-                  <Nav.Item>
-                    <LinkContainer to={`/conference/${conferenceInfo.shortName}/floodplains`}>
-                      <Nav.Link>Floorplans</Nav.Link>
-                    </LinkContainer>
-                  </Nav.Item>
+                  {hasFloorPlans(conferenceInfo.geo) && (
+                    <Nav.Item>
+                      <LinkContainer to={`/conference/${conferenceInfo.shortName}/floorplans`}>
+                        <Nav.Link>Floorplans</Nav.Link>
+                      </LinkContainer>
+                    </Nav.Item>
+                  )}
                 </>
               )}
               {conferenceInfo.link != null && (

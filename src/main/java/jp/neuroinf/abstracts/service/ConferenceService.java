@@ -41,7 +41,8 @@ public class ConferenceService {
   }
 
   @Transactional
-  public List<ConferenceSimpleDto> getConferenceList(Account account) {
+  public List<ConferenceSimpleDto> getConferenceList(AccountDetails user) {
+    Account account = user != null ? user.getAccount() : null;
     List<Conference> conferences = this.conferenceRepository.getConferences();
     List<ConferenceSimpleDto> dtoList = conferences.stream().map(c -> ConferenceSimpleDto.of(c, account))
         .collect(Collectors.toList());
@@ -49,20 +50,26 @@ public class ConferenceService {
   }
 
   @Transactional
-  public ConferenceDto getConference(Account account, String uuid) {
+  public ConferenceDto getConference(AccountDetails user, String uuid) {
+    Account account = user != null ? user.getAccount() : null;
     Conference conference = this.conferenceRepository.findFirstByUuid(uuid);
-    return conference != null ? ConferenceDto.of(conference, account) : null;
+    if (conference == null) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "no conference data found");
+    }
+    return ConferenceDto.of(conference, account);
   }
 
   @Transactional
-  public List<AbstractSimpleDto> getConferenceAbstracts(Account account, String uuid) {
+  public List<AbstractSimpleDto> getConferenceAbstracts(AccountDetails user, String uuid) {
+    Account account = user != null ? user.getAccount() : null;
     Conference conference = this.conferenceRepository.findFirstByUuid(uuid);
     if (conference == null) {
       return null;
     }
     boolean isWritable = isWritable(conference, account);
     if (!isWritable && !conference.getIsPublished()) {
-      return null; // no permissions
+      // no permissions
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "abstracts data found");
     }
     return conference.getAbstracts().stream().map(AbstractSimpleDto::of)
         .filter((d) -> isWritable || d.getState().equals("Accepted"))

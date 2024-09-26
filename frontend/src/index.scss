@@ -101,6 +101,11 @@ $custom-tertiary-bg-rgb: to-rgb($custom-tertiary-bg);
   --bs-pagination-active-border-color: var(--bs-border-color);
 }
 
+.leaflet-container {
+  width: 100%;
+  height: 700px;
+}
+
 html {
   font-size: 14px;
 }
