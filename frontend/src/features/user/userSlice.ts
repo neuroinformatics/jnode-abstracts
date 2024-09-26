@@ -22,8 +22,8 @@ interface UserState {
 
 const initialState: Readonly<UserState> = {
   userInfo: null,
-  restoreState: { error: null, status: ApiAsyncStatus.initializing },
-  pageActionState: { error: null, status: ApiAsyncStatus.initializing },
+  restoreState: { type: null, error: null, status: ApiAsyncStatus.initializing },
+  pageActionState: { type: null, error: null, status: ApiAsyncStatus.initializing },
 };
 
 export const restore = createAsyncThunk<UserEntity, void, { rejectValue: string }>(

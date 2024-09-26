@@ -9,6 +9,7 @@ export const ApiAsyncStatus = {
 export type ApiAsyncStatuses = (typeof ApiAsyncStatus)[keyof typeof ApiAsyncStatus];
 
 export interface ApiActionState {
+  type: string | null;
   error: string | null;
   status: ApiAsyncStatuses;
 }

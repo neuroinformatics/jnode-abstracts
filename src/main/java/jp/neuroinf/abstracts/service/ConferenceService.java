@@ -17,7 +17,10 @@ import jp.neuroinf.abstracts.dto.ConferenceSimpleDto;
 import jp.neuroinf.abstracts.entity.Account;
 import jp.neuroinf.abstracts.entity.Conference;
 import jp.neuroinf.abstracts.entity.ConferenceOwners;
+import jp.neuroinf.abstracts.form.ConferenceUpdateGeoForm;
+import jp.neuroinf.abstracts.form.ConferenceUpdateInfoForm;
 import jp.neuroinf.abstracts.form.ConferenceUpdateOwnersForm;
+import jp.neuroinf.abstracts.form.ConferenceUpdateScheduleForm;
 import jp.neuroinf.abstracts.repository.AccountRepository;
 import jp.neuroinf.abstracts.repository.ConferenceRepository;
 
@@ -64,6 +67,72 @@ public class ConferenceService {
     return conference.getAbstracts().stream().map(AbstractSimpleDto::of)
         .filter((d) -> isWritable || d.getState().equals("Accepted"))
         .collect(Collectors.toList());
+  }
+
+  @Transactional
+  public RestSuccessResponseBody updateConferenceGeo(AccountDetails user, String uuid,
+      ConferenceUpdateGeoForm form) {
+    if (user == null) {
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Login required");
+    }
+    final Account currentUser = user.getAccount();
+    final Conference conference = this.conferenceRepository.findFirstByUuid(uuid);
+    if (conference == null) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid conference id");
+    }
+    final boolean isAdmin = isAdmin(currentUser);
+    final boolean isConferenceOwner = conference.isOwner(currentUser);
+    final boolean isWritable = isAdmin || isConferenceOwner;
+    if (!isWritable) {
+      throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You don't have privileges");
+    }
+    final String geo = form.getGeo().trim();
+    conference.setGeo(geo.length() != 0 ? geo : null);
+    return new RestSuccessResponseBody("success");
+  }
+
+  @Transactional
+  public RestSuccessResponseBody updateConferenceSchedule(AccountDetails user, String uuid,
+      ConferenceUpdateScheduleForm form) {
+    if (user == null) {
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Login required");
+    }
+    final Account currentUser = user.getAccount();
+    final Conference conference = this.conferenceRepository.findFirstByUuid(uuid);
+    if (conference == null) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid conference id");
+    }
+    final boolean isAdmin = isAdmin(currentUser);
+    final boolean isConferenceOwner = conference.isOwner(currentUser);
+    final boolean isWritable = isAdmin || isConferenceOwner;
+    if (!isWritable) {
+      throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You don't have privileges");
+    }
+    final String schedule = form.getSchedule().trim();
+    conference.setSchedule(schedule.length() != 0 ? schedule : null);
+    return new RestSuccessResponseBody("success");
+  }
+
+  @Transactional
+  public RestSuccessResponseBody updateConferenceInfo(AccountDetails user, String uuid,
+      ConferenceUpdateInfoForm form) {
+    if (user == null) {
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Login required");
+    }
+    final Account currentUser = user.getAccount();
+    final Conference conference = this.conferenceRepository.findFirstByUuid(uuid);
+    if (conference == null) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid conference id");
+    }
+    final boolean isAdmin = isAdmin(currentUser);
+    final boolean isConferenceOwner = conference.isOwner(currentUser);
+    final boolean isWritable = isAdmin || isConferenceOwner;
+    if (!isWritable) {
+      throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You don't have privileges");
+    }
+    final String info = form.getInfo().trim();
+    conference.setInfo(info.length() != 0 ? info : null);
+    return new RestSuccessResponseBody("success");
   }
 
   @Transactional

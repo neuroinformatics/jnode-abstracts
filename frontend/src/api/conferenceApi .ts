@@ -28,6 +28,44 @@ export const ApiConferenceAbstractList = async (uuid: string, signal: AbortSigna
   return response;
 };
 
+export const ApiConferenceGeoUpdate = async (
+  uuid: string,
+  geo: string,
+  signal: AbortSignal,
+): Promise<ApiSuccessResponse> => {
+  // status code: 200
+  const formData = new FormData();
+  formData.append('geo', geo);
+  const response = await ky.put<ApiSuccessResponse>(`/api/conferences/${uuid}/geo`, { body: formData, signal }).json();
+  return response;
+};
+
+export const ApiConferenceScheduleUpdate = async (
+  uuid: string,
+  schedule: string,
+  signal: AbortSignal,
+): Promise<ApiSuccessResponse> => {
+  // status code: 200
+  const formData = new FormData();
+  formData.append('schedule', schedule);
+  const response = await ky
+    .put<ApiSuccessResponse>(`/api/conferences/${uuid}/schedule`, { body: formData, signal })
+    .json();
+  return response;
+};
+
+export const ApiConferenceInfoUpdate = async (
+  uuid: string,
+  info: string,
+  signal: AbortSignal,
+): Promise<ApiSuccessResponse> => {
+  // status code: 200
+  const formData = new FormData();
+  formData.append('info', info);
+  const response = await ky.put<ApiSuccessResponse>(`/api/conferences/${uuid}/info`, { body: formData, signal }).json();
+  return response;
+};
+
 export const ApiConferenceOwnersUpdate = async (
   uuid: string,
   owners: string[],
@@ -36,7 +74,7 @@ export const ApiConferenceOwnersUpdate = async (
   // status code: 200
   const formData = new FormData();
   owners.forEach((owner) => {
-    formData.append(`owners`, owner);
+    formData.append('owners', owner);
   });
   const response = await ky
     .put<ApiSuccessResponse>(`/api/conferences/${uuid}/owners`, { body: formData, signal })

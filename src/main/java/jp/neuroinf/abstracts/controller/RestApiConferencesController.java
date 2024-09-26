@@ -18,7 +18,10 @@ import jp.neuroinf.abstracts.dto.AbstractSimpleDto;
 import jp.neuroinf.abstracts.dto.ConferenceDto;
 import jp.neuroinf.abstracts.dto.ConferenceSimpleDto;
 import jp.neuroinf.abstracts.entity.Account;
+import jp.neuroinf.abstracts.form.ConferenceUpdateGeoForm;
+import jp.neuroinf.abstracts.form.ConferenceUpdateInfoForm;
 import jp.neuroinf.abstracts.form.ConferenceUpdateOwnersForm;
+import jp.neuroinf.abstracts.form.ConferenceUpdateScheduleForm;
 import jp.neuroinf.abstracts.service.ConferenceService;
 
 @RestController
@@ -59,6 +62,24 @@ public class RestApiConferencesController {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "abstracts data found");
         }
         return abstracts;
+    }
+
+    @PutMapping("/{uuid}/geo")
+    public RestSuccessResponseBody updateConferenceGeo(@AuthenticationPrincipal AccountDetails user,
+            @PathVariable("uuid") String uuid, @Valid ConferenceUpdateGeoForm form) {
+        return this.conferenceService.updateConferenceGeo(user, uuid, form);
+    }
+
+    @PutMapping("/{uuid}/schedule")
+    public RestSuccessResponseBody updateConferenceSchedule(@AuthenticationPrincipal AccountDetails user,
+            @PathVariable("uuid") String uuid, @Valid ConferenceUpdateScheduleForm form) {
+        return this.conferenceService.updateConferenceSchedule(user, uuid, form);
+    }
+
+    @PutMapping("/{uuid}/info")
+    public RestSuccessResponseBody updateConferenceInfo(@AuthenticationPrincipal AccountDetails user,
+            @PathVariable("uuid") String uuid, @Valid ConferenceUpdateInfoForm form) {
+        return this.conferenceService.updateConferenceInfo(user, uuid, form);
     }
 
     @PutMapping("/{uuid}/owners")

@@ -41,18 +41,20 @@ const DashboardConferenceTabOwner: React.FC<DashboardConferenceTabProps> = (prop
   }, [dispatch, email, userPageActionState.error, userPageActionState.status]);
 
   React.useEffect(() => {
-    if (pageActionState.status === ApiAsyncStatus.idle) {
-      const message = 'Owners successfully updated.';
-      dispatch(showMessage({ variant: 'success', message }));
-      dispatch(unsetPageActionState());
-      setEmail('');
-      setIsChanged(false);
-    } else if (pageActionState.status === ApiAsyncStatus.failed) {
-      dispatch(showMessage({ variant: 'danger', message: pageActionState.error ?? '' }));
-      dispatch(unsetPageActionState());
-      setEmail('');
+    if (pageActionState.type === 'owners') {
+      if (pageActionState.status === ApiAsyncStatus.idle) {
+        const message = 'Owners successfully updated.';
+        dispatch(showMessage({ variant: 'success', message }));
+        dispatch(unsetPageActionState());
+        setEmail('');
+        setIsChanged(false);
+      } else if (pageActionState.status === ApiAsyncStatus.failed) {
+        dispatch(showMessage({ variant: 'danger', message: pageActionState.error ?? '' }));
+        dispatch(unsetPageActionState());
+        setEmail('');
+      }
     }
-  }, [dispatch, pageActionState.error, pageActionState.status]);
+  }, [dispatch, pageActionState.error, pageActionState.status, pageActionState.type]);
 
   const onChangeEmail: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     setEmail(e.target.value.trim());
@@ -82,7 +84,9 @@ const DashboardConferenceTabOwner: React.FC<DashboardConferenceTabProps> = (prop
 
   return (
     <div>
-      {pageActionState.status === ApiAsyncStatus.loading && <LoadingOverlay message="Updating Owners..." />}
+      {pageActionState.type === 'owners' && pageActionState.status === ApiAsyncStatus.loading && (
+        <LoadingOverlay message="Updating Owners..." />
+      )}
       <p>Here is the list of current owners:</p>
       <ul>
         {owners.map((owner, idx) => (

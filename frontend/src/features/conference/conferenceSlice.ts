@@ -1,9 +1,12 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import {
   ApiConferenceAbstractList,
+  ApiConferenceGeoUpdate,
+  ApiConferenceInfoUpdate,
   ApiConferenceList,
   ApiConferenceOwnersUpdate,
   ApiConferenceRetrieve,
+  ApiConferenceScheduleUpdate,
 } from '../../api/conferenceApi ';
 import { getApiErrorMessage } from '../../api/utilities';
 import { RootState } from '../../app/store';
@@ -29,10 +32,10 @@ const initialState: Readonly<ConferenceState> = {
   conferenceInfo: null,
   conferencesInfo: { byId: {}, allIds: [] },
   abstractsInfo: { byId: {}, allIds: [] },
-  getListState: { error: null, status: ApiAsyncStatus.initializing },
-  getDetailState: { error: null, status: ApiAsyncStatus.initializing },
-  getAbstractsState: { error: null, status: ApiAsyncStatus.initializing },
-  pageActionState: { error: null, status: ApiAsyncStatus.initializing },
+  getListState: { type: null, error: null, status: ApiAsyncStatus.initializing },
+  getDetailState: { type: null, error: null, status: ApiAsyncStatus.initializing },
+  getAbstractsState: { type: null, error: null, status: ApiAsyncStatus.initializing },
+  pageActionState: { type: null, error: null, status: ApiAsyncStatus.initializing },
 };
 
 export const getConferenceList = createAsyncThunk<ConferenceSimpleEntity[], void, { rejectValue: string }>(
@@ -76,6 +79,51 @@ export const getConferenceAbstracts = createAsyncThunk<AbstractSimpleEntity[], s
   },
 );
 
+export const updateConferenceGeo = createAsyncThunk<
+  ApiSuccessResponse,
+  { uuid: string; geo: string },
+  { rejectValue: string }
+>('conference/geo/update', async (params, thunkApi) => {
+  const { uuid, geo } = params;
+  try {
+    const result = await ApiConferenceGeoUpdate(uuid, geo, thunkApi.signal);
+    return result;
+  } catch (e: unknown) {
+    const message = await getApiErrorMessage(e);
+    return thunkApi.rejectWithValue(message);
+  }
+});
+
+export const updateConferenceSchedule = createAsyncThunk<
+  ApiSuccessResponse,
+  { uuid: string; schedule: string },
+  { rejectValue: string }
+>('conference/schedule/update', async (params, thunkApi) => {
+  const { uuid, schedule } = params;
+  try {
+    const result = await ApiConferenceScheduleUpdate(uuid, schedule, thunkApi.signal);
+    return result;
+  } catch (e: unknown) {
+    const message = await getApiErrorMessage(e);
+    return thunkApi.rejectWithValue(message);
+  }
+});
+
+export const updateConferenceInfo = createAsyncThunk<
+  ApiSuccessResponse,
+  { uuid: string; info: string },
+  { rejectValue: string }
+>('conference/info/update', async (params, thunkApi) => {
+  const { uuid, info } = params;
+  try {
+    const result = await ApiConferenceInfoUpdate(uuid, info, thunkApi.signal);
+    return result;
+  } catch (e: unknown) {
+    const message = await getApiErrorMessage(e);
+    return thunkApi.rejectWithValue(message);
+  }
+});
+
 export const updateConferenceOwners = createAsyncThunk<
   ApiSuccessResponse,
   { uuid: string; owners: string[] },
@@ -83,8 +131,8 @@ export const updateConferenceOwners = createAsyncThunk<
 >('conference/owners/update', async (params, thunkApi) => {
   const { uuid, owners } = params;
   try {
-    const abstracts = await ApiConferenceOwnersUpdate(uuid, owners, thunkApi.signal);
-    return abstracts;
+    const result = await ApiConferenceOwnersUpdate(uuid, owners, thunkApi.signal);
+    return result;
   } catch (e: unknown) {
     const message = await getApiErrorMessage(e);
     return thunkApi.rejectWithValue(message);
@@ -92,21 +140,23 @@ export const updateConferenceOwners = createAsyncThunk<
 });
 
 const StateFuncPageActionInitialize = (state: Readonly<ConferenceState>) => {
+  state.pageActionState.type = null;
+  state.pageActionState.error = null;
   state.pageActionState.status = ApiAsyncStatus.initializing;
-  state.pageActionState.error = null;
 };
-const StateFuncPageActionPending = (state: Readonly<ConferenceState>) => {
-  state.pageActionState.status = ApiAsyncStatus.loading;
+const StateFuncPageActionPending = (state: Readonly<ConferenceState>, type: string) => {
+  state.pageActionState.type = type;
   state.pageActionState.error = null;
+  state.pageActionState.status = ApiAsyncStatus.loading;
 };
 const StateFuncPageActionFulfilled = (state: Readonly<ConferenceState>) => {
-  state.pageActionState.status = ApiAsyncStatus.idle;
   state.pageActionState.error = null;
+  state.pageActionState.status = ApiAsyncStatus.idle;
 };
 const StateFuncPageActionRejected = (state: Readonly<ConferenceState>, payload: string | undefined) => {
   const error = payload || '';
-  state.pageActionState.status = ApiAsyncStatus.failed;
   state.pageActionState.error = error;
+  state.pageActionState.status = ApiAsyncStatus.failed;
 };
 
 export const conferenceSlice = createSlice({
@@ -115,8 +165,8 @@ export const conferenceSlice = createSlice({
   reducers: {
     unsetConferenceDetail: (state) => {
       state.conferenceInfo = null;
-      state.getDetailState.status = ApiAsyncStatus.initializing;
       state.getDetailState.error = null;
+      state.getDetailState.status = ApiAsyncStatus.initializing;
     },
     unsetPageActionState: (state) => {
       StateFuncPageActionInitialize(state);
@@ -129,8 +179,8 @@ export const conferenceSlice = createSlice({
       })
       .addCase(getConferenceList.fulfilled, (state, action) => {
         const conferences = action.payload;
-        state.getListState.status = ApiAsyncStatus.idle;
         state.getListState.error = null;
+        state.getListState.status = ApiAsyncStatus.idle;
         state.conferencesInfo = { allIds: [], byId: {} };
         conferences.forEach((conference) => {
           state.conferencesInfo.allIds.push(conference.uuid);
@@ -139,30 +189,30 @@ export const conferenceSlice = createSlice({
       })
       .addCase(getConferenceList.rejected, (state, action) => {
         const error = action.payload ?? '';
-        state.getListState.status = ApiAsyncStatus.failed;
         state.getListState.error = error;
+        state.getListState.status = ApiAsyncStatus.failed;
       })
       .addCase(getConferenceDetail.pending, (state) => {
         state.getDetailState.status = ApiAsyncStatus.loading;
       })
       .addCase(getConferenceDetail.fulfilled, (state, action) => {
         const conference = action.payload;
-        state.getDetailState.status = ApiAsyncStatus.idle;
         state.getDetailState.error = null;
+        state.getDetailState.status = ApiAsyncStatus.idle;
         state.conferenceInfo = conference;
       })
       .addCase(getConferenceDetail.rejected, (state, action) => {
         const error = action.payload ?? '';
-        state.getDetailState.status = ApiAsyncStatus.failed;
         state.getDetailState.error = error;
+        state.getDetailState.status = ApiAsyncStatus.failed;
       })
       .addCase(getConferenceAbstracts.pending, (state) => {
         state.getAbstractsState.status = ApiAsyncStatus.loading;
       })
       .addCase(getConferenceAbstracts.fulfilled, (state, action) => {
         const abstracts = action.payload;
-        state.getAbstractsState.status = ApiAsyncStatus.idle;
         state.getAbstractsState.error = null;
+        state.getAbstractsState.status = ApiAsyncStatus.idle;
         state.abstractsInfo = { allIds: [], byId: {} };
         abstracts.forEach((abstract) => {
           state.abstractsInfo.allIds.push(abstract.uuid);
@@ -171,11 +221,38 @@ export const conferenceSlice = createSlice({
       })
       .addCase(getConferenceAbstracts.rejected, (state, action) => {
         const error = action.payload ?? '';
-        state.getAbstractsState.status = ApiAsyncStatus.failed;
         state.getAbstractsState.error = error;
+        state.getAbstractsState.status = ApiAsyncStatus.failed;
+      })
+      .addCase(updateConferenceGeo.pending, (state) => {
+        StateFuncPageActionPending(state, 'geo');
+      })
+      .addCase(updateConferenceGeo.fulfilled, (state) => {
+        StateFuncPageActionFulfilled(state);
+      })
+      .addCase(updateConferenceGeo.rejected, (state, action) => {
+        StateFuncPageActionRejected(state, action.payload);
+      })
+      .addCase(updateConferenceSchedule.pending, (state) => {
+        StateFuncPageActionPending(state, 'schedule');
+      })
+      .addCase(updateConferenceSchedule.fulfilled, (state) => {
+        StateFuncPageActionFulfilled(state);
+      })
+      .addCase(updateConferenceSchedule.rejected, (state, action) => {
+        StateFuncPageActionRejected(state, action.payload);
+      })
+      .addCase(updateConferenceInfo.pending, (state) => {
+        StateFuncPageActionPending(state, 'info');
+      })
+      .addCase(updateConferenceInfo.fulfilled, (state) => {
+        StateFuncPageActionFulfilled(state);
+      })
+      .addCase(updateConferenceInfo.rejected, (state, action) => {
+        StateFuncPageActionRejected(state, action.payload);
       })
       .addCase(updateConferenceOwners.pending, (state) => {
-        StateFuncPageActionPending(state);
+        StateFuncPageActionPending(state, 'owners');
       })
       .addCase(updateConferenceOwners.fulfilled, (state) => {
         StateFuncPageActionFulfilled(state);

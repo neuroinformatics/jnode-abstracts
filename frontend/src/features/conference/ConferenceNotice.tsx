@@ -11,7 +11,7 @@ interface Props {
 const ConferenceNotice: React.FC<Props> = (props) => {
   const { conference } = props;
 
-  if (conference.info == null) {
+  if (conference.notice == null) {
     return null;
   }
 

@@ -1,23 +1,47 @@
 import React from 'react';
 
+import { useAppDispatch, useAppSelector } from '../../app/hooks';
+import { ApiAsyncStatus } from '../../entities/api';
+import { showMessage } from '../common/commonSlice';
+import { selectPageActionState, unsetPageActionState, updateConferenceInfo } from './conferenceSlice';
 import { DashboardConferenceTabProps } from './DashboardConferenceTab';
 
 const DashboardConferenceTabInfo: React.FC<DashboardConferenceTabProps> = (props) => {
   const { conference } = props;
+
+  const dispatch = useAppDispatch();
   const [info, setInfo] = React.useState<string>(conference.info ?? '');
   const [isChanged, setIsChanged] = React.useState<boolean>(false);
+  const pageActionState = useAppSelector(selectPageActionState);
+
+  React.useEffect(() => {
+    if (pageActionState.type === 'info') {
+      if (pageActionState.status === ApiAsyncStatus.idle) {
+        const message = 'Info successfully updated.';
+        dispatch(showMessage({ variant: 'success', message }));
+        dispatch(unsetPageActionState());
+        setIsChanged(false);
+      } else if (pageActionState.status === ApiAsyncStatus.failed) {
+        dispatch(showMessage({ variant: 'danger', message: pageActionState.error ?? '' }));
+        dispatch(unsetPageActionState());
+      }
+    }
+  }, [dispatch, pageActionState.error, pageActionState.status, pageActionState.type]);
 
   const onChangeInfo: React.ChangeEventHandler<HTMLTextAreaElement> = (e) => {
     setInfo(e.target.value);
     setIsChanged(true);
   };
 
-  const onSubmitJson = React.useCallback<React.FormEventHandler<HTMLFormElement>>((e) => {
-    e.preventDefault();
-    // const text = info.trim();
-    // save
-    setIsChanged(false);
-  }, []);
+  const onSubmitJson = React.useCallback<React.FormEventHandler<HTMLFormElement>>(
+    (e) => {
+      e.preventDefault();
+      dispatch(updateConferenceInfo({ uuid: conference.uuid, info: info.trim() }));
+      setIsChanged(false);
+    },
+    [conference.uuid, dispatch, info],
+  );
+
   return (
     <div className="row">
       <form onSubmit={onSubmitJson}>
