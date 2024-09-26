@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +23,6 @@ public class FigureService {
   private final AbstractService abstractService;
   private final AppProperties appProperties;
 
-  @Autowired
   public FigureService(FigureRepository figureRepository, AbstractService abstractService,
       AppProperties appProperties) {
     this.figureRepository = figureRepository;

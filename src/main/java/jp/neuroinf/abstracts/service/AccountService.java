@@ -3,7 +3,6 @@ package jp.neuroinf.abstracts.service;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -39,7 +38,6 @@ public class AccountService implements UserDetailsService {
   private final EmailTemplateSender emailTemplateSender;
   private final AppProperties appProperties;
 
-  @Autowired
   public AccountService(
       AccountRepository accountRepository,
       PasswordEncoder passwordEncoder,

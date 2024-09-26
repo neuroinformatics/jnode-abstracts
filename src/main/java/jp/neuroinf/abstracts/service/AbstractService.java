@@ -1,6 +1,5 @@
 package jp.neuroinf.abstracts.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
@@ -17,7 +16,6 @@ public class AbstractService {
   private final AbstractRepository abstractRepository;
   private final AppProperties appProperties;
 
-  @Autowired
   public AbstractService(AbstractRepository abstractRepository, AppProperties appProperties) {
     this.abstractRepository = abstractRepository;
     this.appProperties = appProperties;

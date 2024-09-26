@@ -3,7 +3,6 @@ package jp.neuroinf.abstracts.core;
 import java.io.IOException;
 import java.time.ZonedDateTime;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpOutputMessage;
@@ -37,7 +36,6 @@ public class SecurityConfig
 
   private final MappingJackson2HttpMessageConverter httpMessageConverter;
 
-  @Autowired
   public SecurityConfig(MappingJackson2HttpMessageConverter httpMessageConverter) {
     this.httpMessageConverter = httpMessageConverter;
   }

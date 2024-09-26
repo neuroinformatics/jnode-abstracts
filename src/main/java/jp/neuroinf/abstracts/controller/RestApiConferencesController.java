@@ -2,7 +2,6 @@ package jp.neuroinf.abstracts.controller;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,7 +27,6 @@ public class RestApiConferencesController {
 
     private final ConferenceService conferenceService;
 
-    @Autowired
     public RestApiConferencesController(ConferenceService conferenceService) {
         this.conferenceService = conferenceService;
     }

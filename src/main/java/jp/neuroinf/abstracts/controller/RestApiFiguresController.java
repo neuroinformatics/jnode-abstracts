@@ -1,6 +1,5 @@
 package jp.neuroinf.abstracts.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,7 +20,6 @@ public class RestApiFiguresController {
 
     private final FigureService figureService;
 
-    @Autowired
     public RestApiFiguresController(FigureService abstractService) {
         this.figureService = abstractService;
     }

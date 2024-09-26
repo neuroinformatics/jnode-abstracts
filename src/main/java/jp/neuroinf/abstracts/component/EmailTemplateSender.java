@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -24,7 +23,6 @@ public class EmailTemplateSender {
   private final JavaMailSender javaMailSender;
   private final AppProperties appProperties;
 
-  @Autowired
   public EmailTemplateSender(JavaMailSender javaMailSender, AppProperties appProperties) {
     this.javaMailSender = javaMailSender;
     this.appProperties = appProperties;
