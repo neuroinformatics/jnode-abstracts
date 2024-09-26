@@ -20,7 +20,7 @@ const DashboardConferenceTabMaps: React.FC<DashboardConferenceTabProps> = (props
   const pageActionState = useAppSelector(selectPageActionState);
 
   React.useEffect(() => {
-    if (pageActionState.type === 'maps') {
+    if (pageActionState.type === 'geo') {
       if (pageActionState.status === ApiAsyncStatus.idle) {
         const message = 'Maps successfully updated.';
         dispatch(showMessage({ variant: 'success', message }));
