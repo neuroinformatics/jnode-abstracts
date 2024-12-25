@@ -48,6 +48,38 @@ $custom-secondary-color-rgb: to-rgb($custom-secondary-color);
 $custom-tertiary-bg: #f5f7fa;
 $custom-tertiary-bg-rgb: to-rgb($custom-tertiary-bg);
 
+// conference scheduler
+:root {
+  --dhx-scheduler-xy-scale_height: 0 !important;
+  --dhx-scheduler-xy-scroll_width: 0 !important;
+  --dhx-scheduler-event-color: var(--bs-body-color) !important;
+  --dhx-scheduler-event-background: var(--bs-body-bg) !important;
+}
+
+$conference-schedule-event-badge-color: blue;
+$conference-schedule-track-badge-color: green;
+$conference-schedule-session-badge-color: red;
+
+%conference-schedule-badge {
+  padding: .4rem .7rem;
+  font-size: .9rem;
+  font-weight: 400;
+  border-radius: 3px;
+  line-height: 1.5;
+
+  &.badge-e {
+    background-color: $conference-schedule-event-badge-color;
+  }
+
+  &.badge-t {
+    background-color: $conference-schedule-track-badge-color;
+  }
+
+  &.badge-s {
+    background-color: $conference-schedule-session-badge-color;
+  }
+}
+
 :root {
   --bs-primary: #{$custom-primary};
   --bs-primary-rgb: #{$custom-primary-rgb};
@@ -318,10 +350,158 @@ a {
         }
       }
     }
+
+    .scheduler {
+      .conference-scheduler-navbar {
+        height: 60px;
+        padding: 12px;
+
+        .btn svg {
+          margin: 0 0.4rem;
+        }
+      }
+
+      .dhx_cal_container {
+        width: 100%;
+
+        .dhx_cal_navline {
+          display: none;
+        }
+
+        .dhx_cal_header {
+          display: none;
+        }
+
+        .dhx_cal_data {
+          .dhx_cal_event {
+            padding: 0;
+
+            .dhx_header,
+            .dhx_footer {
+              display: none;
+            }
+
+            .conference-scheduler-event {
+              height: 100%;
+              min-height: 100%;
+              width: 100%;
+              padding: .3rem .5rem;
+              border: 1px solid var(--bs-border-color);
+              border-radius: 4px;
+              overflow: hidden;
+              background-color: white;
+
+              &:hover {
+                overflow: visible;
+                position: absolute;
+                height: auto;
+                z-index: 10;
+              }
+
+              &.event-st {
+                border: 2px solid $conference-schedule-session-badge-color;
+              }
+
+              &.event-te,
+              &.event-ste {
+                border: 2px solid $conference-schedule-track-badge-color;
+              }
+
+              .conference-scheduler-header {
+                padding: .5rem 0;
+                border-bottom: 1px solid var(--bs-border-color);
+
+                &:hover {
+                  cursor: pointer;
+                }
+
+                .badge {
+                  @extend %conference-schedule-badge;
+                  vertical-align: middle;
+                }
+
+                h4 {
+                  font-size: 1.29rem;
+                  margin: .5rem;
+                  display: inline-block;
+                  vertical-align: middle;
+                }
+
+                .time {
+                  font-size: 1.1rem;
+                  display: block;
+                  text-align: right;
+                }
+              }
+
+              .conference-scheduler-body {
+                padding: .5rem 0;
+
+                .conference-scheduler-modification {
+                  text-align: right;
+
+                  span {
+                    padding: .3rem;
+                    margin: 0 .1rem;
+
+                    &:hover {
+                      cursor: pointer;
+                      background-color: var(--bs-border-color);
+                    }
+                  }
+                }
+
+                .conference-scheduler-timeline {
+                  .d-flex {
+                    &:not(:last-child) {
+                      border-bottom: 1px solid var(--bs-border-color);
+                    }
+
+                    &:hover {
+                      cursor: pointer;
+                      background-color: var(--bs-border-color);
+                    }
+
+                    >div {
+                      font-size: .9rem;
+                      padding: .5rem;
+
+                      &:last-child {
+                        text-align: right;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   }
 
   // main/FooterPanel
   div.footer a {
     color: var(--bs-secondary-color);
+  }
+}
+
+#conference-scheduler-info {
+  .modal-header {
+    .modal-title {
+      width: 100%;
+
+      .badge {
+        @extend %conference-schedule-badge;
+        margin-right: 20px;
+      }
+
+    }
+  }
+
+  .modal-body {
+    >p {
+      margin: 0 0 .5rem;
+    }
   }
 }

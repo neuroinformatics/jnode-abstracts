@@ -13,9 +13,9 @@
         "end": { "type": ["string", "null"] },
         "date": { "type": "string", "format": "date" },
         "location": { "type": ["string", "null"] },
-        "type": { "type": "string", "enum": ["symposium", "workshop", "social", "talk", "poster", "break"] },
+        "type": { "type": ["string", "null"] },
         "authors": {
-          "type": "array",
+          "type": ["array", "null"],
           "items": { "type": "string" }
         },
         "abstract": { "type": ["string", "null"] }

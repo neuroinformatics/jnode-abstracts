@@ -32,6 +32,9 @@
   // Extensions - Code Spell Checker
   "cSpell.words": [
     "bbox",
+    "Dhtmlx",
+    "dhtmlxscheduler",
+    "eirslett",
     "Embeddable",
     "favouriteabstracts",
     "Favourites",
@@ -41,14 +44,19 @@
     "fortawesome",
     "hstack",
     "INCF",
+    "jdbc",
     "mathjax",
     "myabstracts",
     "neuroinf",
     "prefs",
+    "projectlombok",
     "reduxjs",
     "riken",
     "Servlet",
     "signup",
+    "springframework",
+    "springsecurity",
+    "thymeleaf",
     "Xmark"
   ],
   // Extensions - HTML

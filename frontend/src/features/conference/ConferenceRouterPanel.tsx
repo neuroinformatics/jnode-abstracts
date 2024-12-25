@@ -9,6 +9,7 @@ import AbstractListPanel from './AbstractListPanel';
 import ConferenceFloorplansPanel from './ConferenceFloorplansPanel';
 import ConferenceLocationsPanel from './ConferenceLocationsPanel';
 import ConferencePanel from './ConferencePanel';
+import ConferenceSchedulePanel from './ConferenceSchedulePanel';
 import {
   getConferenceDetail,
   selectConferenceInfo,
@@ -47,7 +48,7 @@ const ConferenceRouterPanel: React.FC = () => {
         <>
           <Routes>
             <Route path="/" element={<ConferencePanel conference={conferenceInfo} />} />
-            <Route path="/schedule" element={<PageNotFound />} />
+            <Route path="/schedule" element={<ConferenceSchedulePanel conference={conferenceInfo} />} />
             <Route path="/abstracts" element={<AbstractListPanel conference={conferenceInfo} />} />
             <Route path="/locations" element={<ConferenceLocationsPanel conference={conferenceInfo} />} />
             <Route path="/floorplans" element={<ConferenceFloorplansPanel conference={conferenceInfo} />} />
