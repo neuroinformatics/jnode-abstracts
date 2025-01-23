@@ -3,6 +3,7 @@ package jp.neuroinf.abstracts.entity;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.hibernate.annotations.OnDelete;
@@ -85,7 +86,7 @@ public class Conference {
   @Column(name = "notice", length = 500)
   private String notice;
 
-  @Column(name = "has_presentation_prefs")
+  @Column(name = "has_presentation_prefs", nullable = false)
   private Boolean hasPresentationPrefs;
 
   @Column(name = "abstract_max_length", nullable = false)
@@ -148,4 +149,13 @@ public class Conference {
     return getOwners().stream().filter(o -> o.getUuid().equals(account.getUuid())).findFirst().orElse(null) != null;
   }
 
+  public Optional<Banner> getLogoBanner() {
+    return getBanners().stream()
+        .filter(item -> item.getType().compareTo("logo") == 0).findFirst();
+  }
+
+  public Optional<Banner> getThumbnailBanner() {
+    return getBanners().stream()
+        .filter(item -> item.getType().compareTo("thumbnail") == 0).findFirst();
+  }
 }

@@ -24,18 +24,28 @@ export const formatDuration = (conference: ConferenceSimpleEntity): string => {
   }
 };
 
-const getBannerUrl = (uuid: string): string => {
+export const getBannerUrl = (uuid: string): string => {
   return `/api/banners/${uuid}/image`;
 };
 
-export const getLogoUrl = (conference: ConferenceSimpleEntity): string | null => {
+export const getLogoUuid = (conference: ConferenceSimpleEntity): string | null => {
   const banner = conference.banners.filter((banner) => banner.type === 'logo');
-  return banner.length === 1 ? getBannerUrl(banner[0].uuid) : conference.logo;
+  return banner.length === 1 ? banner[0].uuid : null;
+};
+
+export const getLogoUrl = (conference: ConferenceSimpleEntity): string | null => {
+  const uuid = getLogoUuid(conference);
+  return uuid != null ? getBannerUrl(uuid) : conference.logo;
+};
+
+export const getThumbnailUuid = (conference: ConferenceSimpleEntity): string | null => {
+  const banner = conference.banners.filter((banner) => banner.type === 'thumbnail');
+  return banner.length === 1 ? banner[0].uuid : null;
 };
 
 export const getThumbnailUrl = (conference: ConferenceSimpleEntity): string | null => {
-  const banner = conference.banners.filter((banner) => banner.type === 'thumbnail');
-  return banner.length === 1 ? getBannerUrl(banner[0].uuid) : conference.thumbnail;
+  const uuid = getThumbnailUuid(conference);
+  return uuid != null ? getBannerUrl(uuid) : conference.thumbnail;
 };
 
 export const getAbstractGroup = (conference: ConferenceEntity, uuid: string | null): AbstractGroupEntity | null => {

@@ -7,13 +7,14 @@ import {
   ApiConferenceOwnersUpdate,
   ApiConferenceRetrieve,
   ApiConferenceScheduleUpdate,
+  ApiConferenceUpdate,
 } from '../../api/conferenceApi ';
 import { getApiErrorMessage } from '../../api/utilities';
 import { RootState } from '../../app/store';
 import { NormalizedState } from '../../common/normalizedState';
 import { AbstractSimpleEntity } from '../../entities/abstract';
 import { ApiActionState, ApiAsyncStatus, ApiSuccessResponse } from '../../entities/api';
-import { ConferenceEntity, ConferenceSimpleEntity } from '../../entities/conference';
+import { ConferenceEntity, ConferenceSimpleEntity, TopicEntity } from '../../entities/conference';
 
 export type ConferenceStateConferences = NormalizedState<ConferenceSimpleEntity, string>;
 export type ConferenceStateAbstracts = NormalizedState<AbstractSimpleEntity, string>;
@@ -78,6 +79,100 @@ export const getConferenceAbstracts = createAsyncThunk<AbstractSimpleEntity[], s
     }
   },
 );
+
+export const updateConference = createAsyncThunk<
+  ApiSuccessResponse,
+  {
+    uuid: string;
+    isOpen: boolean;
+    isPublished: boolean;
+    isActive: boolean;
+    name: string;
+    shortName: string;
+    conferenceGroup: string;
+    cite: string;
+    startDate: string;
+    endDate: string;
+    deadline: string;
+    logoUuid: string | null;
+    logoFile: File | null;
+    logoLink: string;
+    thumbnailUuid: string | null;
+    thumbnailFile: File | null;
+    thumbnailLink: string;
+    iosApp: string;
+    link: string;
+    description: string;
+    notice: string;
+    hasPresentationPrefs: boolean;
+    topics: TopicEntity[];
+    abstractMaxLength: number;
+    abstractMaxFigures: number;
+  },
+  { rejectValue: string }
+>('conference/update', async (params, thunkApi) => {
+  const {
+    uuid,
+    isOpen,
+    isPublished,
+    isActive,
+    name,
+    shortName,
+    conferenceGroup,
+    cite,
+    startDate,
+    endDate,
+    deadline,
+    logoUuid,
+    logoFile,
+    logoLink,
+    thumbnailUuid,
+    thumbnailFile,
+    thumbnailLink,
+    iosApp,
+    link,
+    description,
+    notice,
+    hasPresentationPrefs,
+    topics,
+    abstractMaxLength,
+    abstractMaxFigures,
+  } = params;
+  try {
+    const result = await ApiConferenceUpdate(
+      uuid,
+      isOpen,
+      isPublished,
+      isActive,
+      name,
+      shortName,
+      conferenceGroup,
+      cite,
+      startDate,
+      endDate,
+      deadline,
+      logoUuid,
+      logoFile,
+      logoLink,
+      thumbnailUuid,
+      thumbnailFile,
+      thumbnailLink,
+      iosApp,
+      link,
+      description,
+      notice,
+      hasPresentationPrefs,
+      topics,
+      abstractMaxLength,
+      abstractMaxFigures,
+      thunkApi.signal,
+    );
+    return result;
+  } catch (e: unknown) {
+    const message = await getApiErrorMessage(e);
+    return thunkApi.rejectWithValue(message);
+  }
+});
 
 export const updateConferenceGeo = createAsyncThunk<
   ApiSuccessResponse,
@@ -223,6 +318,15 @@ export const conferenceSlice = createSlice({
         const error = action.payload ?? '';
         state.getAbstractsState.error = error;
         state.getAbstractsState.status = ApiAsyncStatus.failed;
+      })
+      .addCase(updateConference.pending, (state) => {
+        StateFuncPageActionPending(state, 'general');
+      })
+      .addCase(updateConference.fulfilled, (state) => {
+        StateFuncPageActionFulfilled(state);
+      })
+      .addCase(updateConference.rejected, (state, action) => {
+        StateFuncPageActionRejected(state, action.payload);
       })
       .addCase(updateConferenceGeo.pending, (state) => {
         StateFuncPageActionPending(state, 'geo');

@@ -232,12 +232,7 @@ const DashboardConferenceTabGroups: React.FC<DashboardConferenceTabProps> = (pro
         <AlertPanel variant="danger">Please check values that does not conflict with others.</AlertPanel>
       )}
       <form id="groups" onSubmit={onSubmitSave}>
-        <button
-          type="submit"
-          className="btn btn-success"
-          data-bind="click: $root.saveConference, text: $root.saveButtonText, disable: $root.saveButtonDisabled"
-          disabled={!isChanged}
-        >
+        <button type="submit" className="btn btn-success" disabled={!isChanged}>
           Save
         </button>
       </form>

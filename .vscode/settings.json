@@ -47,6 +47,7 @@
     "jdbc",
     "mathjax",
     "myabstracts",
+    "navline",
     "neuroinf",
     "prefs",
     "projectlombok",
@@ -66,5 +67,8 @@
   // Extentions - Typescript
   "javascript.updateImportsOnFileMove.enabled": "always",
   "typescript.updateImportsOnFileMove.enabled": "always",
-  "java.configuration.updateBuildConfiguration": "interactive"
+  "java.configuration.updateBuildConfiguration": "interactive",
+  "files.watcherExclude": {
+    "**/target": true
+  }
 }

@@ -1,7 +1,7 @@
 import ky from 'ky';
 import { AbstractSimpleEntity } from '../entities/abstract';
 import { ApiSuccessResponse } from '../entities/api';
-import { ConferenceEntity, ConferenceSimpleEntity } from '../entities/conference';
+import { ConferenceEntity, ConferenceSimpleEntity, TopicEntity } from '../entities/conference';
 
 export const ApiConferenceList = async (
   shortName: string | null,
@@ -25,6 +25,94 @@ export const ApiConferenceRetrieve = async (uuid: string, signal: AbortSignal): 
 export const ApiConferenceAbstractList = async (uuid: string, signal: AbortSignal): Promise<AbstractSimpleEntity[]> => {
   // status code: 200
   const response = await ky.get<AbstractSimpleEntity[]>(`/api/conferences/${uuid}/abstracts`, { signal }).json();
+  return response;
+};
+
+export const ApiConferenceUpdate = async (
+  uuid: string,
+  isOpen: boolean,
+  isPublished: boolean,
+  isActive: boolean,
+  name: string,
+  shortName: string,
+  conferenceGroup: string,
+  cite: string,
+  startDate: string,
+  endDate: string,
+  deadline: string,
+  logoUuid: string | null,
+  logoFile: File | null,
+  logoLink: string,
+  thumbnailUuid: string | null,
+  thumbnailFile: File | null,
+  thumbnailLink: string,
+  iosApp: string,
+  link: string,
+  description: string,
+  notice: string,
+  hasPresentationPrefs: boolean,
+  topics: TopicEntity[],
+  abstractMaxLength: number,
+  abstractMaxFigures: number,
+  signal: AbortSignal,
+): Promise<ApiSuccessResponse> => {
+  // status code: 200
+  const formData = new FormData();
+  formData.append('isOpen', isOpen ? '1' : '0');
+  formData.append('isPublished', isPublished ? '1' : '0');
+  formData.append('isActive', isActive ? '1' : '0');
+  formData.append('name', name);
+  formData.append('shortName', shortName);
+  if (conferenceGroup.length > 0) {
+    formData.append('conferenceGroup', conferenceGroup);
+  }
+  if (cite.length > 0) {
+    formData.append('cite', cite);
+  }
+  formData.append('startDate', startDate);
+  formData.append('endDate', endDate);
+  formData.append('deadline', deadline);
+  if (logoUuid != null) {
+    formData.append('logoUuid', logoUuid);
+  }
+  if (logoFile != null) {
+    formData.append('logoFile', logoFile);
+  }
+  if (logoLink.length > 0) {
+    formData.append('logoLink', logoLink);
+  }
+  if (thumbnailUuid != null) {
+    formData.append('thumbnailUuid', thumbnailUuid);
+  }
+  if (thumbnailFile != null) {
+    formData.append('thumbnailFile', thumbnailFile);
+  }
+  if (thumbnailLink.length > 0) {
+    formData.append('thumbnailLink', thumbnailLink);
+  }
+  if (iosApp.length > 0) {
+    formData.append('iosApp', iosApp);
+  }
+  if (link.length > 0) {
+    formData.append('link', link);
+  }
+  if (description.length > 0) {
+    formData.append('description', description);
+  }
+  if (notice.length > 0) {
+    formData.append('notice', notice);
+  }
+  formData.append('hasPresentationPrefs', hasPresentationPrefs ? '1' : '0');
+  topics.forEach((topic, idx) => {
+    if (topic.uuid.length > 0) {
+      formData.append(`topics[${idx}].uuid`, topic.uuid);
+    }
+    formData.append(`topics[${idx}].position`, String(topic.position));
+    formData.append(`topics[${idx}].topic`, topic.topic);
+  });
+  formData.append('abstractMaxLength', String(abstractMaxLength));
+  formData.append('abstractMaxFigures', String(abstractMaxFigures));
+  const response = await ky.put<ApiSuccessResponse>(`/api/conferences/${uuid}`, { body: formData, signal }).json();
   return response;
 };
 

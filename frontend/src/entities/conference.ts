@@ -24,7 +24,7 @@ export interface ConferenceSimpleEntity {
   isActive: boolean;
   name: string;
   shortName: string;
-  conference_group: string | null;
+  conferenceGroup: string | null;
   cite: string | null;
   startDate: string; // ISO8601
   endDate: string; // ISO8601

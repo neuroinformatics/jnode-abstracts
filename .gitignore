@@ -60,3 +60,4 @@ dist-ssr
 *.properties
 /src/main/resources/static/
 package-lock.json
+.metals

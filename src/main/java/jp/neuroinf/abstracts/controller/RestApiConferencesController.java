@@ -15,6 +15,7 @@ import jp.neuroinf.abstracts.core.RestSuccessResponseBody;
 import jp.neuroinf.abstracts.dto.AbstractSimpleDto;
 import jp.neuroinf.abstracts.dto.ConferenceDto;
 import jp.neuroinf.abstracts.dto.ConferenceSimpleDto;
+import jp.neuroinf.abstracts.form.ConferenceUpdateForm;
 import jp.neuroinf.abstracts.form.ConferenceUpdateGeoForm;
 import jp.neuroinf.abstracts.form.ConferenceUpdateInfoForm;
 import jp.neuroinf.abstracts.form.ConferenceUpdateOwnersForm;
@@ -48,6 +49,12 @@ public class RestApiConferencesController {
             @PathVariable String uuid)
             throws Exception {
         return this.conferenceService.getConferenceAbstracts(user, uuid);
+    }
+
+    @PutMapping("/{uuid}")
+    public RestSuccessResponseBody updateConference(@AuthenticationPrincipal AccountDetails user,
+            @PathVariable("uuid") String uuid, @Valid ConferenceUpdateForm form) throws Exception {
+        return this.conferenceService.updateConference(user, uuid, form);
     }
 
     @PutMapping("/{uuid}/geo")
