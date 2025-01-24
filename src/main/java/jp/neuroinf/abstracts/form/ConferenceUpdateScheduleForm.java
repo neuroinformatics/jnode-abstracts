@@ -7,6 +7,6 @@ import lombok.Value;
 public class ConferenceUpdateScheduleForm {
 
   @NotNull
-  final String schedule;
+  private String schedule;
 
 }

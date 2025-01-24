@@ -9,6 +9,6 @@ public class UsersExistsForm {
 
   @NotNull
   @Email
-  final String email;
+  private String email;
 
 }

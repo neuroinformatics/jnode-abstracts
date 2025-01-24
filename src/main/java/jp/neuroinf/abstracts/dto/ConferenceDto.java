@@ -2,7 +2,6 @@ package jp.neuroinf.abstracts.dto;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import jp.neuroinf.abstracts.entity.Account;
 import jp.neuroinf.abstracts.entity.Conference;
@@ -69,17 +68,13 @@ public class ConferenceDto {
     dto.setInfo(entity.getInfo());
     dto.setCtime(entity.getCtime());
     dto.setMtime(entity.getMtime());
-    dto.setTopics(entity.getTopics().stream().map(TopicDto::of)
-        .collect(Collectors.toList()));
-    dto.setAbstractGroups(entity.getAbstractGroups().stream().map(AbstractGroupDto::of)
-        .collect(Collectors.toList()));
-    dto.setBanners(entity.getBanners().stream().map(BannerDto::of)
-        .collect(Collectors.toList()));
+    dto.setTopics(entity.getTopics().stream().map(TopicDto::of).toList());
+    dto.setAbstractGroups(entity.getAbstractGroups().stream().map(AbstractGroupDto::of).toList());
+    dto.setBanners(entity.getBanners().stream().map(BannerDto::of).toList());
     dto.setIsOwner(entity.isOwner(account));
-    if (dto.isOwner) {
-      dto.setOwners(entity.getConferenceOwners().stream().map(AccountSimpleDto::of).collect(Collectors.toList()));
+    if (dto.getIsOwner()) {
+      dto.setOwners(entity.getConferenceOwners().stream().map(AccountSimpleDto::of).toList());
     }
-
     return dto;
   }
 

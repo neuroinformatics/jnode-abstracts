@@ -10,21 +10,22 @@ import lombok.Value;
 public class ConferenceUpdateGroupsForm {
 
   @NotNull
-  final List<AbstractGroupForm> groups;
+  private List<AbstractGroupForm> groups;
 
   @Value
   class AbstractGroupForm {
 
-    final private String uuid;
+    private String uuid;
 
     @NotNull
-    final private String name;
+    private String name;
 
     @NotNull
     @Min(0)
-    final private Integer prefix;
+    private Integer prefix;
 
     @NotNull
-    final private String shortName;
+    private String shortName;
   }
+
 }

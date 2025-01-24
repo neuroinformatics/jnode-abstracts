@@ -2,7 +2,6 @@ package jp.neuroinf.abstracts.dto;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import jp.neuroinf.abstracts.entity.Abstract;
 import jp.neuroinf.abstracts.entity.AbstractAbstractGroup;
@@ -49,20 +48,16 @@ public class AbstractDto {
     dto.setCtime(entity.getCtime());
     dto.setMtime(entity.getMtime());
     dto.setConferenceUuid(entity.getConference().getUuid());
-    dto.setAuthors(entity.getAuthors().stream().map(AuthorDto::of)
-        .collect(Collectors.toList()));
-    dto.setAffiliations(entity.getAffiliations().stream().map(AffiliationDto::of)
-        .collect(Collectors.toList()));
-    dto.setFigures(entity.getFigures().stream().map(FigureDto::of).collect(Collectors.toList()));
-    dto.setReferences(entity.getReferences().stream().map(ReferenceDto::of)
-        .collect(Collectors.toList()));
+    dto.setAuthors(entity.getAuthors().stream().map(AuthorDto::of).toList());
+    dto.setAffiliations(entity.getAffiliations().stream().map(AffiliationDto::of).toList());
+    dto.setFigures(entity.getFigures().stream().map(FigureDto::of).toList());
+    dto.setReferences(entity.getReferences().stream().map(ReferenceDto::of).toList());
     AbstractAbstractGroup abstractAbstractGroup = entity.getAbstractAbstractGroup();
     if (abstractAbstractGroup != null) {
       dto.setAbstractGroupUuid(AbstractGroupDto.of(abstractAbstractGroup.getAbstractGroup()).getUuid());
     }
-    dto.setStateLogs(entity.getStateLogs().stream().map(StateLogDto::of)
-        .collect(Collectors.toList()));
-    dto.setOwners(entity.getOwners().stream().map(AccountSimpleDto::of).collect(Collectors.toList()));
+    dto.setStateLogs(entity.getStateLogs().stream().map(StateLogDto::of).toList());
+    dto.setOwners(entity.getOwners().stream().map(AccountSimpleDto::of).toList());
     return dto;
   }
 

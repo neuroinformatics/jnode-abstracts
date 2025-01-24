@@ -78,13 +78,13 @@ public class ConferenceUpdateForm {
   @Value
   public class TopicForm {
 
-    final private String uuid;
+    private String uuid;
 
     @NotNull
     @Min(0)
-    final private Integer position;
+    private Integer position;
 
     @NotNull
-    final private String topic;
+    private String topic;
   }
 }

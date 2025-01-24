@@ -7,6 +7,6 @@ import lombok.Value;
 public class UsersResetPasswordForm {
 
   @NotNull
-  final String token;
+  private String token;
 
 }

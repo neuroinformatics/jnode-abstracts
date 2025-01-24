@@ -5,6 +5,9 @@ import java.util.Base64;
 
 public class StringUtility {
 
+  private StringUtility() {
+  }
+
   public static String[] rSplit(String pattern, String string) throws IllegalArgumentException {
     int pos = string.lastIndexOf(pattern);
     if (pos < 0) {

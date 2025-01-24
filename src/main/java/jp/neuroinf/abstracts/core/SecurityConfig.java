@@ -30,9 +30,9 @@ import jakarta.servlet.http.HttpServletResponse;
 public class SecurityConfig
     implements AuthenticationSuccessHandler, AuthenticationFailureHandler, LogoutSuccessHandler {
 
-  private final String LOGIN_API_URL = "/api/login";
-  private final String LOGOUT_API_URL = "/api/logout";
-  private final String LOGIN_PAGE_URL = "/login";
+  private static final String LOGIN_API_URL = "/api/login";
+  private static final String LOGOUT_API_URL = "/api/logout";
+  private static final String LOGIN_PAGE_URL = "/login";
 
   private final MappingJackson2HttpMessageConverter httpMessageConverter;
 

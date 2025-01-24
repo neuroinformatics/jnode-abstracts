@@ -32,8 +32,8 @@ public class CustomErrorController implements ErrorController {
     String message = status.getReasonPhrase();
     String path = request.getAttribute(RequestDispatcher.ERROR_REQUEST_URI).toString();
     Exception exception = (Exception) request.getAttribute(DispatcherServlet.EXCEPTION_ATTRIBUTE);
-    if (exception instanceof ResponseStatusException) {
-      message = ((ResponseStatusException) exception).getReason();
+    if (exception instanceof ResponseStatusException responseStatusException) {
+      message = responseStatusException.getReason();
     } else if (exception instanceof MethodArgumentNotValidException) {
       message = "Invalid form parameter(s)";
     }

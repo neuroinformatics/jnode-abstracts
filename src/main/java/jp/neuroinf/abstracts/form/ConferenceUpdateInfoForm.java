@@ -7,6 +7,6 @@ import lombok.Value;
 public class ConferenceUpdateInfoForm {
 
   @NotNull
-  final String info;
+  private String info;
 
 }

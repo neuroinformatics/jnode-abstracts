@@ -8,10 +8,10 @@ import lombok.Value;
 public class UsersChangePasswordForm {
 
   @NotNull
-  final String oldPassword;
+  private String oldPassword;
 
   @NotNull
   @Size(min = 10, max = 512)
-  final String newPassword;
+  private String newPassword;
 
 }

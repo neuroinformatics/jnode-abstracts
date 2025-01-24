@@ -9,6 +9,6 @@ public class UsersRequestPasswordResetForm {
 
   @NotNull
   @Email
-  final String email;
+  private String email;
 
 }

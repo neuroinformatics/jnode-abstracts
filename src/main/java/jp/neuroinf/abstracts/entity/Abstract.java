@@ -3,7 +3,6 @@ package jp.neuroinf.abstracts.entity;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -118,7 +117,7 @@ public class Abstract {
   private List<AbstractOwners> abstractOwners = new ArrayList<>();
 
   public List<Account> getOwners() {
-    return getAbstractOwners().stream().map((o) -> o.getOwner()).collect(Collectors.toList());
+    return getAbstractOwners().stream().map(o -> o.getOwner()).toList();
   }
 
   public boolean isOwner(Account account) {

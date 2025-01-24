@@ -27,9 +27,8 @@ public class AbstractService {
     boolean isAdmin = account != null ? this.appProperties.getAdmins().contains(account.getMail()) : false;
     boolean isConferenceOwner = conference.isOwner(account);
     boolean isOwner = abstract_.isOwner(account);
-    boolean isReadable = isAdmin || isConferenceOwner || isOwner
+    return isAdmin || isConferenceOwner || isOwner
         || conference.getIsPublished() && abstract_.getState().equals("Accepted");
-    return isReadable;
   }
 
   @Transactional

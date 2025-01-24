@@ -7,6 +7,6 @@ import lombok.Value;
 public class ConferenceUpdateGeoForm {
 
   @NotNull
-  final String geo;
+  private String geo;
 
 }

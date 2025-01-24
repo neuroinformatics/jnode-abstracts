@@ -139,7 +139,7 @@ public class Conference {
   private List<Abstract> abstracts = new ArrayList<>();
 
   public List<Account> getOwners() {
-    return getConferenceOwners().stream().map((o) -> o.getOwner()).collect(Collectors.toList());
+    return getConferenceOwners().stream().map(o -> o.getOwner()).collect(Collectors.toList());
   }
 
   public boolean isOwner(Account account) {

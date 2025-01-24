@@ -9,9 +9,9 @@ public class UsersChangeEmailForm {
 
   @NotNull
   @Email
-  final String email;
+  private String email;
 
   @NotNull
-  final String password;
+  private String password;
 
 }

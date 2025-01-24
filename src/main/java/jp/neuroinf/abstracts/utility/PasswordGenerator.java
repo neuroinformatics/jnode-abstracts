@@ -62,8 +62,7 @@ public class PasswordGenerator {
   }
 
   public boolean validate(String password) {
-    return !this.types.stream().filter((type) -> !Pattern.compile(type.regex).matcher(password).find()).findFirst()
-        .isPresent();
+    return this.types.stream().allMatch(type -> Pattern.compile(type.regex).matcher(password).find());
   }
 
   public static class PasswordGeneratorBuilder {

@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -51,9 +50,7 @@ public class ConferenceService {
   public List<ConferenceSimpleDto> getConferenceList(AccountDetails user) {
     Account account = user != null ? user.getAccount() : null;
     List<Conference> conferences = this.conferenceRepository.getConferences();
-    List<ConferenceSimpleDto> dtoList = conferences.stream().map(c -> ConferenceSimpleDto.of(c, account))
-        .collect(Collectors.toList());
-    return dtoList;
+    return conferences.stream().map(c -> ConferenceSimpleDto.of(c, account)).toList();
   }
 
   @Transactional
@@ -74,13 +71,12 @@ public class ConferenceService {
       return null;
     }
     boolean isWritable = isWritable(conference, account);
-    if (!isWritable && !conference.getIsPublished()) {
+    if (!isWritable && !conference.getIsPublished().booleanValue()) {
       // no permissions
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "abstracts data found");
     }
     return conference.getAbstracts().stream().map(AbstractSimpleDto::of)
-        .filter((d) -> isWritable || d.getState().equals("Accepted"))
-        .collect(Collectors.toList());
+        .filter(d -> isWritable || d.getState().equals("Accepted")).toList();
   }
 
   @Transactional
@@ -121,7 +117,7 @@ public class ConferenceService {
     conference.setAbstractMaxFigures(form.getAbstractMaxFigures());
     // topics
     conference.getTopics().clear();
-    final List<Topic> topics = form.getTopics().stream().map((topic) -> {
+    final List<Topic> topics = form.getTopics().stream().map(topic -> {
       final Topic ret = new Topic();
       ret.setUuid(topic.getUuid());
       ret.setPosition(topic.getPosition());
@@ -134,7 +130,7 @@ public class ConferenceService {
     if (form.getLogoUuid() == null) {
       final Optional<Banner> banner = conference.getLogoBanner();
       if (banner.isPresent()) {
-        final File bannerFile = new File(this.appProperties.getPathBanners() + "/" + banner.get().getUuid());
+        final File bannerFile = new File(this.appProperties.getPathBanners(), banner.get().getUuid());
         if (!bannerFile.delete()) {
           System.err.println("Failed to delete banner file: " + banner.get().getUuid());
         }
@@ -150,7 +146,7 @@ public class ConferenceService {
     if (form.getThumbnailUuid() == null) {
       final Optional<Banner> banner = conference.getThumbnailBanner();
       if (banner.isPresent()) {
-        final File bannerFile = new File(this.appProperties.getPathBanners() + "/" + banner.get().getUuid());
+        final File bannerFile = new File(this.appProperties.getPathBanners(), banner.get().getUuid());
         if (!bannerFile.delete()) {
           System.err.println("Failed to delete banner file: " + banner.get().getUuid());
         }
@@ -168,7 +164,7 @@ public class ConferenceService {
     if (form.getLogoFile() != null && !form.getLogoFile().isEmpty()) {
       final Optional<Banner> banner = conference.getLogoBanner();
       if (banner.isPresent()) {
-        final File uploadFile = new File(this.appProperties.getPathBanners() + "/" + banner.get().getUuid());
+        final File uploadFile = new File(this.appProperties.getPathBanners(), banner.get().getUuid());
         try {
           final byte[] bytes = form.getLogoFile().getBytes();
           try (BufferedOutputStream uploadFileStream = new BufferedOutputStream(new FileOutputStream(uploadFile))) {
@@ -182,7 +178,7 @@ public class ConferenceService {
     if (form.getThumbnailFile() != null && !form.getThumbnailFile().isEmpty()) {
       final Optional<Banner> banner = conference.getThumbnailBanner();
       if (banner.isPresent()) {
-        final File uploadFile = new File(this.appProperties.getPathBanners() + "/" + banner.get().getUuid());
+        final File uploadFile = new File(this.appProperties.getPathBanners(), banner.get().getUuid());
         try {
           final byte[] bytes = form.getThumbnailFile().getBytes();
           try (BufferedOutputStream uploadFileStream = new BufferedOutputStream(new FileOutputStream(uploadFile))) {
@@ -214,7 +210,7 @@ public class ConferenceService {
       throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You don't have privileges");
     }
     final String geo = form.getGeo().trim();
-    conference.setGeo(geo.length() != 0 ? geo : null);
+    conference.setGeo(!geo.isEmpty() ? geo : null);
     this.conferenceRepository.save(conference);
     return new RestSuccessResponseBody("success");
   }
@@ -237,7 +233,7 @@ public class ConferenceService {
       throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You don't have privileges");
     }
     final String schedule = form.getSchedule().trim();
-    conference.setSchedule(schedule.length() != 0 ? schedule : null);
+    conference.setSchedule(!schedule.isEmpty() ? schedule : null);
     this.conferenceRepository.save(conference);
     return new RestSuccessResponseBody("success");
   }
@@ -260,7 +256,7 @@ public class ConferenceService {
       throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You don't have privileges");
     }
     final String info = form.getInfo().trim();
-    conference.setInfo(info.length() != 0 ? info : null);
+    conference.setInfo(!info.isEmpty() ? info : null);
     return new RestSuccessResponseBody("success");
   }
 
@@ -285,16 +281,16 @@ public class ConferenceService {
     if (accounts.size() != form.getOwners().size()) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Some users not found");
     }
-    if (!isAdmin && accounts.stream().filter((a) -> a.getMail().equals(currentUser.getMail())).findFirst()
+    if (!isAdmin && accounts.stream().filter(a -> a.getMail().equals(currentUser.getMail())).findFirst()
         .orElse(null) == null) {
       throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You cannot remove your own privilege");
     }
-    List<ConferenceOwners> owners = accounts.stream().map((owner) -> {
+    List<ConferenceOwners> owners = accounts.stream().map(owner -> {
       final ConferenceOwners ret = new ConferenceOwners();
       ret.setConference(conference);
       ret.setOwner(owner);
       return ret;
-    }).collect(Collectors.toList());
+    }).toList();
     conference.getConferenceOwners().clear();
     conference.getConferenceOwners().addAll(owners);
     this.conferenceRepository.save(conference);
@@ -302,7 +298,7 @@ public class ConferenceService {
   }
 
   private boolean isAdmin(Account account) {
-    return account != null ? this.appProperties.getAdmins().contains(account.getMail()) : false;
+    return account != null && this.appProperties.getAdmins().contains(account.getMail());
   }
 
   private boolean isWritable(Conference conference, Account account) {

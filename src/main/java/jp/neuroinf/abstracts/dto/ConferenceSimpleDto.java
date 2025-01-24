@@ -2,7 +2,6 @@ package jp.neuroinf.abstracts.dto;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import jp.neuroinf.abstracts.entity.Account;
 import jp.neuroinf.abstracts.entity.Conference;
@@ -42,8 +41,7 @@ public class ConferenceSimpleDto {
     dto.setThumbnail(entity.getThumbnail());
     dto.setLink(entity.getLink());
     dto.setDescription(entity.getDescription());
-    dto.setBanners(entity.getBanners().stream().map(BannerDto::of)
-        .collect(Collectors.toList()));
+    dto.setBanners(entity.getBanners().stream().map(BannerDto::of).toList());
     dto.setIsOwner(entity.isOwner(account));
     return dto;
   }

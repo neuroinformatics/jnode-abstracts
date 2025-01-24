@@ -9,6 +9,6 @@ import lombok.Value;
 public class ConferenceUpdateOwnersForm {
 
   @NotNull
-  final List<String> owners;
+  private List<String> owners;
 
 }
