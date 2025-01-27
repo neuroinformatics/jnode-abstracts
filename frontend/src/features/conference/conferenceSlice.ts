@@ -1,5 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import {
+  ApiConferenceAbstractGroupsUpdate,
+  ApiConferenceAbstractGroupsUpdateParams,
   ApiConferenceAbstractList,
   ApiConferenceGeoUpdate,
   ApiConferenceInfoUpdate,
@@ -174,6 +176,20 @@ export const updateConference = createAsyncThunk<
   }
 });
 
+export const updateConferenceAbstractGroups = createAsyncThunk<
+  ApiSuccessResponse,
+  ApiConferenceAbstractGroupsUpdateParams,
+  { rejectValue: string }
+>('conference/abstractGroups/update', async (params, thunkApi) => {
+  try {
+    const result = await ApiConferenceAbstractGroupsUpdate(params, thunkApi.signal);
+    return result;
+  } catch (e: unknown) {
+    const message = await getApiErrorMessage(e);
+    return thunkApi.rejectWithValue(message);
+  }
+});
+
 export const updateConferenceGeo = createAsyncThunk<
   ApiSuccessResponse,
   { uuid: string; geo: string },
@@ -326,6 +342,15 @@ export const conferenceSlice = createSlice({
         StateFuncPageActionFulfilled(state);
       })
       .addCase(updateConference.rejected, (state, action) => {
+        StateFuncPageActionRejected(state, action.payload);
+      })
+      .addCase(updateConferenceAbstractGroups.pending, (state) => {
+        StateFuncPageActionPending(state, 'abstractGroups');
+      })
+      .addCase(updateConferenceAbstractGroups.fulfilled, (state) => {
+        StateFuncPageActionFulfilled(state);
+      })
+      .addCase(updateConferenceAbstractGroups.rejected, (state, action) => {
         StateFuncPageActionRejected(state, action.payload);
       })
       .addCase(updateConferenceGeo.pending, (state) => {

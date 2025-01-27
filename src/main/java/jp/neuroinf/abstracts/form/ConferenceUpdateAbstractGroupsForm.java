@@ -7,13 +7,12 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Value;
 
 @Value
-public class ConferenceUpdateGroupsForm {
+public class ConferenceUpdateAbstractGroupsForm {
 
-  @NotNull
-  private List<AbstractGroupForm> groups;
+  private List<AbstractGroupForm> abstractGroups;
 
   @Value
-  class AbstractGroupForm {
+  public class AbstractGroupForm {
 
     private String uuid;
 
@@ -26,6 +25,7 @@ public class ConferenceUpdateGroupsForm {
 
     @NotNull
     private String shortName;
+
   }
 
 }

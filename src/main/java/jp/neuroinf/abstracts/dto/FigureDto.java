@@ -17,4 +17,5 @@ public class FigureDto {
     dto.setPosition(entity.getPosition());
     return dto;
   }
+
 }

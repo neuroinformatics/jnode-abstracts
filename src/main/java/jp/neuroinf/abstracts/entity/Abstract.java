@@ -124,6 +124,7 @@ public class Abstract {
     if (account == null) {
       return false;
     }
-    return getOwners().stream().filter(o -> o.getUuid().equals(account.getUuid())).findFirst().orElse(null) != null;
+    return getOwners().stream().anyMatch(o -> o.getUuid().equals(account.getUuid()));
   }
+
 }

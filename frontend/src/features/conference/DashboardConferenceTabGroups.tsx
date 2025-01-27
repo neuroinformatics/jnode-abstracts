@@ -4,12 +4,24 @@ import { faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import classNames from 'classnames';
 import _ from 'lodash';
+import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import AlertPanel from '../../common/AlertPanel';
+import { ApiAsyncStatus } from '../../entities/api';
 import { AbstractGroupEntity } from '../../entities/conference';
+import { showMessage } from '../common/commonSlice';
+import {
+  getConferenceDetail,
+  selectPageActionState,
+  unsetPageActionState,
+  updateConferenceAbstractGroups,
+} from './conferenceSlice';
 import { DashboardConferenceTabProps } from './DashboardConferenceTab';
 
 const DashboardConferenceTabGroups: React.FC<DashboardConferenceTabProps> = (props) => {
   const { conference } = props;
+
+  const dispatch = useAppDispatch();
+  const pageActionState = useAppSelector(selectPageActionState);
 
   const [abstractGroups, setAbstractGroups] = React.useState<AbstractGroupEntity[]>(
     _.cloneDeep(conference.abstractGroups),
@@ -19,6 +31,20 @@ const DashboardConferenceTabGroups: React.FC<DashboardConferenceTabProps> = (pro
   const [prefix, setPrefix] = React.useState<string>('');
   const [shortName, setShortName] = React.useState<string>('');
   const [name, setName] = React.useState<string>('');
+
+  React.useEffect(() => {
+    if (pageActionState.type === 'abstractGroups') {
+      if (pageActionState.status === ApiAsyncStatus.idle) {
+        const message = 'Info successfully updated.';
+        dispatch(showMessage({ variant: 'success', message }));
+        dispatch(getConferenceDetail(conference.uuid));
+        dispatch(unsetPageActionState());
+      } else if (pageActionState.status === ApiAsyncStatus.failed) {
+        dispatch(showMessage({ variant: 'danger', message: pageActionState.error ?? '' }));
+        dispatch(unsetPageActionState());
+      }
+    }
+  }, [conference.uuid, dispatch, pageActionState.error, pageActionState.status, pageActionState.type]);
 
   const validationResult = React.useMemo(() => {
     const prefixMap: number[] = [];
@@ -77,9 +103,6 @@ const DashboardConferenceTabGroups: React.FC<DashboardConferenceTabProps> = (pro
   const onClickRemove = (idx: number): void => {
     setIsChanged(true);
     setWasValidated(false);
-    setPrefix(String(abstractGroups[idx].prefix));
-    setShortName(abstractGroups[idx].shortName);
-    setName(abstractGroups[idx].name);
     setAbstractGroups((prev) => prev.filter((_, pIdx) => pIdx !== idx));
   };
 
@@ -111,7 +134,8 @@ const DashboardConferenceTabGroups: React.FC<DashboardConferenceTabProps> = (pro
     setShortName('');
     setName('');
     setWasValidated(true);
-    if (cleanup()) {
+    if (cleanup() && validationResult.isValid) {
+      dispatch(updateConferenceAbstractGroups({ uuid: conference.uuid, abstractGroups }));
       setIsChanged(false);
     }
   };
@@ -129,7 +153,7 @@ const DashboardConferenceTabGroups: React.FC<DashboardConferenceTabProps> = (pro
         </thead>
         <tbody>
           {abstractGroups.map((g, idx) => (
-            <tr key={`${idx}`} className="align-middle">
+            <tr key={`${idx}:${g.uuid}`} className="align-middle">
               <td>
                 <input
                   form="groups"

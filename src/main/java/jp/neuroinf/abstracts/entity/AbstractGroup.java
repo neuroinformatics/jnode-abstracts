@@ -1,5 +1,12 @@
 package jp.neuroinf.abstracts.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -7,6 +14,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Data;
 
@@ -32,5 +40,13 @@ public class AbstractGroup {
   @ManyToOne
   @JoinColumn(name = "conference_uuid", referencedColumnName = "uuid", nullable = false)
   private Conference conference;
+
+  @OneToMany(cascade = CascadeType.ALL, mappedBy = "abstractGroup", orphanRemoval = true)
+  @OnDelete(action = OnDeleteAction.CASCADE)
+  private List<AbstractAbstractGroup> abstractAbstractGroups = new ArrayList<>();
+
+  public boolean hasAbstracts() {
+    return !getAbstractAbstractGroups().isEmpty();
+  }
 
 }

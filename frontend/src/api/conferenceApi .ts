@@ -1,7 +1,7 @@
 import ky from 'ky';
 import { AbstractSimpleEntity } from '../entities/abstract';
 import { ApiSuccessResponse } from '../entities/api';
-import { ConferenceEntity, ConferenceSimpleEntity, TopicEntity } from '../entities/conference';
+import { AbstractGroupEntity, ConferenceEntity, ConferenceSimpleEntity, TopicEntity } from '../entities/conference';
 
 export const ApiConferenceList = async (
   shortName: string | null,
@@ -113,6 +113,31 @@ export const ApiConferenceUpdate = async (
   formData.append('abstractMaxLength', String(abstractMaxLength));
   formData.append('abstractMaxFigures', String(abstractMaxFigures));
   const response = await ky.put<ApiSuccessResponse>(`/api/conferences/${uuid}`, { body: formData, signal }).json();
+  return response;
+};
+
+export interface ApiConferenceAbstractGroupsUpdateParams {
+  uuid: string;
+  abstractGroups: AbstractGroupEntity[];
+}
+export const ApiConferenceAbstractGroupsUpdate = async (
+  params: ApiConferenceAbstractGroupsUpdateParams,
+  signal: AbortSignal,
+): Promise<ApiSuccessResponse> => {
+  // status code: 200
+  const { uuid, abstractGroups } = params;
+  const formData = new FormData();
+  abstractGroups.forEach((abstractGroup, idx) => {
+    if (abstractGroup.uuid != null) {
+      formData.append(`abstractGroups[${idx}].uuid`, abstractGroup.uuid);
+    }
+    formData.append(`abstractGroups[${idx}].name`, abstractGroup.name);
+    formData.append(`abstractGroups[${idx}].prefix`, String(abstractGroup.prefix));
+    formData.append(`abstractGroups[${idx}].shortName`, abstractGroup.shortName);
+  });
+  const response = await ky
+    .put<ApiSuccessResponse>(`/api/conferences/${uuid}/abstractGroups`, { body: formData, signal })
+    .json();
   return response;
 };
 

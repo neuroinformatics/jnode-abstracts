@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -139,14 +138,14 @@ public class Conference {
   private List<Abstract> abstracts = new ArrayList<>();
 
   public List<Account> getOwners() {
-    return getConferenceOwners().stream().map(o -> o.getOwner()).collect(Collectors.toList());
+    return getConferenceOwners().stream().map(o -> o.getOwner()).toList();
   }
 
   public boolean isOwner(Account account) {
     if (account == null) {
       return false;
     }
-    return getOwners().stream().filter(o -> o.getUuid().equals(account.getUuid())).findFirst().orElse(null) != null;
+    return getOwners().stream().anyMatch(o -> o.getUuid().equals(account.getUuid()));
   }
 
   public Optional<Banner> getLogoBanner() {

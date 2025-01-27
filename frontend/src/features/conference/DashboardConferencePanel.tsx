@@ -1,11 +1,12 @@
 import React from 'react';
 
 import classNames from 'classnames';
+import { useLocation, useNavigate } from 'react-router-dom';
 import GeneralPanel from '../../common/GeneralPanel';
 import HeaderTitle from '../../common/HeaderTitle';
 import { ConferenceEntity } from '../../entities/conference';
 import ConferenceNotice from './ConferenceNotice';
-import { TABS } from './DashboardConferenceTab';
+import { TAB, TABS } from './DashboardConferenceTab';
 import DashboardConferenceTabGeneral from './DashboardConferenceTabGeneral';
 import DashboardConferenceTabGroups from './DashboardConferenceTabGroups';
 import DashboardConferenceTabInfo from './DashboardConferenceTabInfo';
@@ -19,9 +20,11 @@ interface Props {
 
 const DashboardConferencePanel: React.FC<Props> = (props) => {
   const { conference } = props;
-  const [tab, setTab] = React.useState<TABS>('general');
+  const location = useLocation();
+  const navigate = useNavigate();
+  const tab = TABS.find((tab) => `#${tab}` === location.hash) ?? 'general';
 
-  const tabs: { key: TABS; label: string; element: React.ReactNode }[] = [
+  const tabs: { key: TAB; label: string; element: React.ReactNode }[] = [
     { key: 'general', label: 'General', element: <DashboardConferenceTabGeneral conference={conference} /> },
     { key: 'groups', label: 'Groups', element: <DashboardConferenceTabGroups conference={conference} /> },
     { key: 'maps', label: 'Maps', element: <DashboardConferenceTabMaps conference={conference} /> },
@@ -38,7 +41,10 @@ const DashboardConferencePanel: React.FC<Props> = (props) => {
         <ul className="nav nav-tabs mb-4">
           {tabs.map((t) => (
             <li key={t.key} className="nav-item">
-              <button className={classNames('nav-link', { active: tab === t.key })} onClick={() => setTab(t.key)}>
+              <button
+                className={classNames('nav-link', { active: tab === t.key })}
+                onClick={() => navigate(`#${t.key}`)}
+              >
                 {t.label}
               </button>
             </li>
