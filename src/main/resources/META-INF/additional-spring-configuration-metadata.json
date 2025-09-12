@@ -1,0 +1,39 @@
+{
+  "properties": [
+    {
+      "name": "app.url",
+      "type": "java.lang.String",
+      "description": "The base URL of the application."
+    },
+    {
+      "name": "app.admins",
+      "type": "java.lang.String",
+      "description": "A comma-separated list of administrator email addresses."
+    },
+    {
+      "name": "app.path.banners",
+      "type": "java.lang.String",
+      "description": "The file system path where banner images are stored."
+    },
+    {
+      "name": "app.path.figures",
+      "type": "java.lang.String",
+      "description": "The file system path where figure images are stored."
+    },
+    {
+      "name": "app.mail.mock",
+      "type": "java.lang.String",
+      "description": "Enables or disables mock email sending for testing purposes."
+    },
+    {
+      "name": "app.mail.from.address",
+      "type": "java.lang.String",
+      "description": "The email address used as the sender in outgoing emails."
+    },
+    {
+      "name": "app.mail.from.name",
+      "type": "java.lang.String",
+      "description": "The display name used as the sender in outgoing emails."
+    }
+  ]
+}
