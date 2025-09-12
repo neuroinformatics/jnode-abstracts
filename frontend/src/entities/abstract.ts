@@ -1,4 +1,4 @@
-import { UserSimpleEntity } from './user';
+import { type UserSimpleEntity } from './user';
 
 export interface AuthorEntity {
   uuid: string;

@@ -7,7 +7,7 @@ import HeaderTitle from '../../common/HeaderTitle';
 import JumbotronPanel from '../../common/JumbotronPanel';
 import LoadingOverlay from '../../common/LoadingOverlay';
 import { isApiPreparing } from '../../entities/api';
-import { ConferenceSimpleEntity } from '../../entities/conference';
+import { type ConferenceSimpleEntity } from '../../entities/conference';
 import { selectUserInfo } from '../user/userSlice';
 import { selectConferencesInfo, selectGetListState } from './conferenceSlice';
 import { formatDuration, getLogoUrl, getThumbnailUrl } from './conferenceUtilities';
@@ -34,7 +34,9 @@ const ConferenceListActiveItem: React.FC<ConferenceListItemProps> = (props) => {
         <h3 className="mb-3">
           <Link to={`${url}`}>{conference.name}</Link>
         </h3>
-        <Markdown className="mb-3">{conference.description}</Markdown>
+        <div className="mb-3">
+          <Markdown>{conference.description}</Markdown>
+        </div>
         <p className="mb-3 fs-5">{formatDuration(conference)}</p>
         {(isAdmin || conference.isOwner) && (
           <div className="mb-2">

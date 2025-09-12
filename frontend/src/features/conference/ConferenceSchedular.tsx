@@ -15,7 +15,7 @@ import { scheduler } from 'dhtmlx-scheduler';
 import { Button, Modal } from 'react-bootstrap';
 import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
-import { DhtmlxSchedulerEvent, ScheduleJSON_Entities, SchedulerModel, ScheduleUtility } from './scheduler';
+import { type DhtmlxSchedulerEvent, type ScheduleJSON_Entities, SchedulerModel, ScheduleUtility } from './scheduler';
 
 import 'dhtmlx-scheduler/codebase/dhtmlxscheduler.css';
 

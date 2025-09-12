@@ -1,7 +1,12 @@
 import ky from 'ky';
-import { AbstractSimpleEntity } from '../entities/abstract';
-import { ApiSuccessResponse } from '../entities/api';
-import { AbstractGroupEntity, ConferenceEntity, ConferenceSimpleEntity, TopicEntity } from '../entities/conference';
+import { type AbstractSimpleEntity } from '../entities/abstract';
+import { type ApiSuccessResponse } from '../entities/api';
+import {
+  type AbstractGroupEntity,
+  type ConferenceEntity,
+  type ConferenceSimpleEntity,
+  type TopicEntity,
+} from '../entities/conference';
 
 export const ApiConferenceList = async (
   shortName: string | null,

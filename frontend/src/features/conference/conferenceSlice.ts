@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import {
   ApiConferenceAbstractGroupsUpdate,
-  ApiConferenceAbstractGroupsUpdateParams,
+  type ApiConferenceAbstractGroupsUpdateParams,
   ApiConferenceAbstractList,
   ApiConferenceGeoUpdate,
   ApiConferenceInfoUpdate,
@@ -12,11 +12,11 @@ import {
   ApiConferenceUpdate,
 } from '../../api/conferenceApi ';
 import { getApiErrorMessage } from '../../api/utilities';
-import { RootState } from '../../app/store';
-import { NormalizedState } from '../../common/normalizedState';
-import { AbstractSimpleEntity } from '../../entities/abstract';
-import { ApiActionState, ApiAsyncStatus, ApiSuccessResponse } from '../../entities/api';
-import { ConferenceEntity, ConferenceSimpleEntity, TopicEntity } from '../../entities/conference';
+import { type RootState } from '../../app/store';
+import { type NormalizedState } from '../../common/normalizedState';
+import { type AbstractSimpleEntity } from '../../entities/abstract';
+import { type ApiActionState, ApiAsyncStatus, type ApiSuccessResponse } from '../../entities/api';
+import { type ConferenceEntity, type ConferenceSimpleEntity, type TopicEntity } from '../../entities/conference';
 
 export type ConferenceStateConferences = NormalizedState<ConferenceSimpleEntity, string>;
 export type ConferenceStateAbstracts = NormalizedState<AbstractSimpleEntity, string>;

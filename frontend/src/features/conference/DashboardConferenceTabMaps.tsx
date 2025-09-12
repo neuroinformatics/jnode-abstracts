@@ -7,7 +7,7 @@ import GeoJsonSchema from '../../assets/schema/GeoJSON.json';
 import { ApiAsyncStatus } from '../../entities/api';
 import { showMessage } from '../common/commonSlice';
 import { selectPageActionState, unsetPageActionState, updateConferenceGeo } from './conferenceSlice';
-import { DashboardConferenceTabProps } from './DashboardConferenceTab';
+import { type DashboardConferenceTabProps } from './DashboardConferenceTab';
 
 const DashboardConferenceTabMaps: React.FC<DashboardConferenceTabProps> = (props) => {
   const { conference } = props;

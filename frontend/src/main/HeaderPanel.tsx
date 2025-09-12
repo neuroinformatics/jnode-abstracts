@@ -2,7 +2,7 @@ import React from 'react';
 
 import { faHouse, faUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Feature, FeatureCollection, GeoJsonObject } from 'geojson';
+import { type Feature, type FeatureCollection, type GeoJsonObject } from 'geojson';
 import { Container, Nav, Navbar, NavDropdown } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import { useLocation } from 'react-router-dom';

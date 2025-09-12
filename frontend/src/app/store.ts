@@ -1,4 +1,4 @@
-import { Action, configureStore, ThunkAction } from '@reduxjs/toolkit';
+import { type Action, configureStore, type ThunkAction } from '@reduxjs/toolkit';
 import commonReducer from '../features/common/commonSlice';
 import conferenceReducer from '../features/conference/conferenceSlice';
 import userReducer from '../features/user/userSlice';

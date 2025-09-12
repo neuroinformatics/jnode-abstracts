@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { useAppSelector } from '../../app/hooks';
 import HeaderTitle from '../../common/HeaderTitle';
 import JumbotronPanel from '../../common/JumbotronPanel';
-import { ConferenceEntity } from '../../entities/conference';
+import { type ConferenceEntity } from '../../entities/conference';
 import { selectUserInfo } from '../user/userSlice';
 import ConferenceNotice from './ConferenceNotice';
 import { formatDuration, getLogoUrl } from './conferenceUtilities';
@@ -34,7 +34,9 @@ const ConferencePanel: React.FC<Props> = (props) => {
             <img className="logo img-fluid rounded" src={logo} alt={conference.name} />
           </p>
         )}
-        <Markdown className="mb-3">{conference.description}</Markdown>
+        <div className="mb-3">
+          <Markdown>{conference.description}</Markdown>
+        </div>
         <p className="mb-3 fs-5">{formatDuration(conference)}</p>
         {conference.isOpen ? (
           <div className="mb-3">
@@ -94,7 +96,9 @@ const ConferencePanel: React.FC<Props> = (props) => {
           <div className="page-title my-3 border-bottom">
             <h2 className="mb-3">General Information</h2>
           </div>
-          <Markdown className="mb-3">{conference.info}</Markdown>
+          <div className="mb-3">
+            <Markdown>{conference.info}</Markdown>
+          </div>
         </JumbotronPanel>
       )}
     </div>

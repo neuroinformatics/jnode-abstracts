@@ -7,12 +7,12 @@ import { CSS } from '@dnd-kit/utilities';
 import { faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import classNames from 'classnames';
-import moment, { Moment } from 'moment';
+import moment, { type Moment } from 'moment';
 import Datetime from 'react-datetime';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { ApiAsyncStatus } from '../../entities/api';
-import { TopicEntity } from '../../entities/conference';
-import { DashboardConferenceTabProps } from './DashboardConferenceTab';
+import { type TopicEntity } from '../../entities/conference';
+import { type DashboardConferenceTabProps } from './DashboardConferenceTab';
 import { getConferenceDetail, selectPageActionState, unsetPageActionState, updateConference } from './conferenceSlice';
 import { getBannerUrl, getLogoUuid, getThumbnailUuid } from './conferenceUtilities';
 

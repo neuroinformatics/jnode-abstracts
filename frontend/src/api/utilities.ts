@@ -1,5 +1,5 @@
 import { HTTPError } from 'ky';
-import { ApiExceptionResponse } from '../entities/api';
+import { type ApiExceptionResponse } from '../entities/api';
 
 export const getApiErrorMessage = async (e: unknown): Promise<string> => {
   const error = e as Error | HTTPError;

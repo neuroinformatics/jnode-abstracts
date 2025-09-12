@@ -1,19 +1,9 @@
-import react from '@vitejs/plugin-react';
+import react from '@vitejs/plugin-react-swc';
 import { defineConfig } from 'vite';
 
-// https://vitejs.dev/config/
+// https://vite.dev/config/
 export default defineConfig({
   root: 'frontend',
-  css: {
-    preprocessorOptions: {
-      scss: {
-        api: 'modern-compiler',
-      },
-      sass: {
-        api: 'modern-compiler',
-      },
-    },
-  },
   build: {
     outDir: '../src/main/resources/static',
     emptyOutDir: true,

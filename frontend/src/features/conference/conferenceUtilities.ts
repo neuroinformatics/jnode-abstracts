@@ -1,6 +1,15 @@
 import dayjs from 'dayjs';
-import { AbstractSimpleEntity, AffiliationEntity, AuthorEntity, FigureEntity } from '../../entities/abstract';
-import { AbstractGroupEntity, ConferenceEntity, ConferenceSimpleEntity } from '../../entities/conference';
+import {
+  type AbstractSimpleEntity,
+  type AffiliationEntity,
+  type AuthorEntity,
+  type FigureEntity,
+} from '../../entities/abstract';
+import {
+  type AbstractGroupEntity,
+  type ConferenceEntity,
+  type ConferenceSimpleEntity,
+} from '../../entities/conference';
 
 export const formatDuration = (conference: ConferenceSimpleEntity): string => {
   const { startDate, endDate } = conference;
