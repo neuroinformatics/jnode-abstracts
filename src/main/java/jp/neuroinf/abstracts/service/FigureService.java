@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
+import jp.neuroinf.abstracts.core.AppException;
 import jp.neuroinf.abstracts.core.AppProperties;
 import jp.neuroinf.abstracts.dto.FigureDto;
 import jp.neuroinf.abstracts.entity.Account;
@@ -40,10 +41,10 @@ public class FigureService {
   }
 
   @Transactional
-  public void downloadFigureImage(Account account, String uuid, HttpServletResponse response) throws Exception {
+  public void downloadFigureImage(Account account, String uuid, HttpServletResponse response) throws AppException {
     FigureDto figure = getFigure(account, uuid);
     if (figure == null) {
-      throw new Exception("file not found");
+      throw new AppException("file not found");
     }
     String filePath = this.appProperties.getPathFigures() + '/' + uuid;
     try (InputStream inputStream = new FileInputStream(filePath);
@@ -54,7 +55,7 @@ public class FigureService {
       outputStream.write(fileByteArray);
       outputStream.flush();
     } catch (IOException e) {
-      throw e;
+      throw new AppException(e);
     }
   }
 }

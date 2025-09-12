@@ -25,7 +25,7 @@ public class RestApiAbstractsController {
 
     @GetMapping("/{uuid}")
     public AbstractDto retrieveAbstract(@AuthenticationPrincipal AccountDetails user, @PathVariable String uuid)
-            throws Exception {
+            throws ResponseStatusException {
         Account account = user != null ? user.getAccount() : null;
         AbstractDto abstract_ = this.abstractService.getAbstract(account, uuid);
         if (abstract_ == null) {

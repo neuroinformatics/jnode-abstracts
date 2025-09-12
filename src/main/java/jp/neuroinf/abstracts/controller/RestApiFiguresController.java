@@ -26,7 +26,7 @@ public class RestApiFiguresController {
 
     @GetMapping("/{uuid}")
     public FigureDto retrieveFigure(@AuthenticationPrincipal AccountDetails user, @PathVariable String uuid)
-            throws Exception {
+            throws ResponseStatusException {
         Account account = user != null ? user.getAccount() : null;
         FigureDto figure = this.figureService.getFigure(account, uuid);
         if (figure == null) {
@@ -38,7 +38,7 @@ public class RestApiFiguresController {
     @GetMapping("/{uuid}/image")
     public void imageFigure(@AuthenticationPrincipal AccountDetails user, @PathVariable String uuid,
             HttpServletResponse response)
-            throws Exception {
+            throws ResponseStatusException {
         Account account = user != null ? user.getAccount() : null;
         try {
             this.figureService.downloadFigureImage(account, uuid, response);

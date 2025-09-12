@@ -3,6 +3,8 @@ package jp.neuroinf.abstracts.component;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import jp.neuroinf.abstracts.utility.SigningUtility;
@@ -57,11 +59,12 @@ public class TimestampSigner {
   }
 
   public static void main(String[] args) throws Exception {
-    TimestampSigner signer = new TimestampSigner();
+    final Logger logger = LoggerFactory.getLogger(TimestampSigner.class);
+    final TimestampSigner signer = new TimestampSigner();
     String message = "hello";
     String token = signer.sign(message);
-    System.out.println(token);
+    logger.info(token);
     String ret = signer.unSign(token, 10);
-    System.out.println(ret);
+    logger.info(ret);
   }
 }

@@ -2,6 +2,13 @@
   "configurations": [
     {
       "type": "java",
+      "name": "TimestampSigner",
+      "request": "launch",
+      "mainClass": "jp.neuroinf.abstracts.component.TimestampSigner",
+      "projectName": "abstracts"
+    },
+    {
+      "type": "java",
       "name": "Spring Boot-AbstractsApplication<abstracts>",
       "request": "launch",
       "cwd": "${workspaceFolder}",

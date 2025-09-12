@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
+import jp.neuroinf.abstracts.core.AppException;
 import jp.neuroinf.abstracts.core.AppProperties;
 import jp.neuroinf.abstracts.dto.BannerDto;
 import jp.neuroinf.abstracts.entity.Banner;
@@ -33,10 +34,10 @@ public class BannerService {
   }
 
   @Transactional
-  public void downloadBannerImage(String uuid, HttpServletResponse response) throws Exception {
+  public void downloadBannerImage(String uuid, HttpServletResponse response) throws AppException {
     BannerDto banner = getBanner(uuid);
     if (banner == null) {
-      throw new Exception("file not found");
+      throw new AppException("file not found");
     }
     String filePath = this.appProperties.getPathBanners() + '/' + uuid;
     try (InputStream inputStream = new FileInputStream(filePath);
@@ -47,7 +48,7 @@ public class BannerService {
       outputStream.write(fileByteArray);
       outputStream.flush();
     } catch (IOException e) {
-      throw e;
+      throw new AppException(e);
     }
   }
 }

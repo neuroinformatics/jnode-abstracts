@@ -6,6 +6,7 @@ import java.util.Base64;
 public class StringUtility {
 
   private StringUtility() {
+    throw new UnsupportedOperationException("Unsupported operation");
   }
 
   public static String[] rSplit(String pattern, String string) throws IllegalArgumentException {

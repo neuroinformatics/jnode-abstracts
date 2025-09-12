@@ -61,7 +61,7 @@ public class ConferenceService {
   }
 
   @Transactional
-  public ConferenceDto getConference(AccountDetails user, String uuid) {
+  public ConferenceDto getConference(AccountDetails user, String uuid) throws ResponseStatusException {
     Account account = user != null ? user.getAccount() : null;
     Conference conference = this.conferenceRepository.findFirstByUuid(uuid);
     if (conference == null) {
@@ -71,7 +71,8 @@ public class ConferenceService {
   }
 
   @Transactional
-  public List<AbstractSimpleDto> getConferenceAbstracts(AccountDetails user, String uuid) {
+  public List<AbstractSimpleDto> getConferenceAbstracts(AccountDetails user, String uuid)
+      throws ResponseStatusException {
     Account account = user != null ? user.getAccount() : null;
     Conference conference = this.conferenceRepository.findFirstByUuid(uuid);
     if (conference == null) {
@@ -88,7 +89,7 @@ public class ConferenceService {
 
   @Transactional
   public RestSuccessResponseBody updateConference(AccountDetails user, String uuid,
-      ConferenceUpdateForm form) {
+      ConferenceUpdateForm form) throws ResponseStatusException {
     if (user == null) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, RESPONSE_MESSAGE_LOGIN_REQUIRED);
     }
@@ -203,7 +204,7 @@ public class ConferenceService {
 
   @Transactional
   public RestSuccessResponseBody updateConferenceAbstractGroups(AccountDetails user, String uuid,
-      ConferenceUpdateAbstractGroupsForm form) {
+      ConferenceUpdateAbstractGroupsForm form) throws ResponseStatusException {
     if (user == null) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, RESPONSE_MESSAGE_LOGIN_REQUIRED);
     }
@@ -244,7 +245,7 @@ public class ConferenceService {
 
   @Transactional
   public RestSuccessResponseBody updateConferenceGeo(AccountDetails user, String uuid,
-      ConferenceUpdateGeoForm form) {
+      ConferenceUpdateGeoForm form) throws ResponseStatusException {
     if (user == null) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, RESPONSE_MESSAGE_LOGIN_REQUIRED);
     }
@@ -267,7 +268,7 @@ public class ConferenceService {
 
   @Transactional
   public RestSuccessResponseBody updateConferenceSchedule(AccountDetails user, String uuid,
-      ConferenceUpdateScheduleForm form) {
+      ConferenceUpdateScheduleForm form) throws ResponseStatusException {
     if (user == null) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, RESPONSE_MESSAGE_LOGIN_REQUIRED);
     }
@@ -290,7 +291,7 @@ public class ConferenceService {
 
   @Transactional
   public RestSuccessResponseBody updateConferenceInfo(AccountDetails user, String uuid,
-      ConferenceUpdateInfoForm form) {
+      ConferenceUpdateInfoForm form) throws ResponseStatusException {
     if (user == null) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, RESPONSE_MESSAGE_LOGIN_REQUIRED);
     }
@@ -312,7 +313,7 @@ public class ConferenceService {
 
   @Transactional
   public RestSuccessResponseBody updateConferenceOwners(AccountDetails user, String uuid,
-      ConferenceUpdateOwnersForm form) {
+      ConferenceUpdateOwnersForm form) throws ResponseStatusException {
     if (user == null) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, RESPONSE_MESSAGE_LOGIN_REQUIRED);
     }

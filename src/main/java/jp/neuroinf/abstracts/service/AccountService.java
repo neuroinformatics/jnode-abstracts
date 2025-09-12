@@ -60,7 +60,7 @@ public class AccountService implements UserDetailsService {
     return new AccountDetails(account);
   }
 
-  public AccountDto getCurrentUser(AccountDetails user) {
+  public AccountDto getCurrentUser(AccountDetails user) throws ResponseStatusException {
     if (user == null) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Login required");
     }
@@ -69,7 +69,7 @@ public class AccountService implements UserDetailsService {
     return AccountDto.of(account, isAdmin);
   }
 
-  public RestSuccessResponseBody exists(AccountDetails user, UsersExistsForm form) {
+  public RestSuccessResponseBody exists(AccountDetails user, UsersExistsForm form) throws ResponseStatusException {
     if (user == null) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Login required");
     }
@@ -80,7 +80,8 @@ public class AccountService implements UserDetailsService {
     return new RestSuccessResponseBody("found");
   }
 
-  public RestSuccessResponseBody requestPasswordReset(UsersRequestPasswordResetForm form) {
+  public RestSuccessResponseBody requestPasswordReset(UsersRequestPasswordResetForm form)
+      throws ResponseStatusException {
     final String email = form.getEmail();
     final Account account = this.accountRepository.findFirstByMail(email);
     if (account == null) {
@@ -97,7 +98,7 @@ public class AccountService implements UserDetailsService {
     return new RestSuccessResponseBody("success");
   }
 
-  public RestSuccessResponseBody resetPassword(UsersResetPasswordForm form) {
+  public RestSuccessResponseBody resetPassword(UsersResetPasswordForm form) throws ResponseStatusException {
     final String email = timestampSigner.unSign(form.getToken(), 86400); // 24hours
     if (email == null) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Token is invalid or already expired");
@@ -121,7 +122,8 @@ public class AccountService implements UserDetailsService {
     return new RestSuccessResponseBody("success");
   }
 
-  public RestSuccessResponseBody changePassword(AccountDetails user, String uuid, UsersChangePasswordForm form) {
+  public RestSuccessResponseBody changePassword(AccountDetails user, String uuid, UsersChangePasswordForm form)
+      throws ResponseStatusException {
     if (user == null) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Login required");
     }
@@ -142,7 +144,8 @@ public class AccountService implements UserDetailsService {
     return new RestSuccessResponseBody("success");
   }
 
-  public RestSuccessResponseBody changeEmail(AccountDetails user, String uuid, UsersChangeEmailForm form) {
+  public RestSuccessResponseBody changeEmail(AccountDetails user, String uuid, UsersChangeEmailForm form)
+      throws ResponseStatusException {
     if (user == null) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Login required");
     }
