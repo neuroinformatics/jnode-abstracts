@@ -11,8 +11,8 @@ import moment, { type Moment } from 'moment';
 import Datetime from 'react-datetime';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { ApiAsyncStatus } from '../../entities/api';
-import { type TopicEntity } from '../../entities/conference';
-import { type DashboardConferenceTabProps } from './DashboardConferenceTab';
+import type { TopicEntity } from '../../entities/conference';
+import type { DashboardConferenceTabProps } from './DashboardConferenceTab';
 import { getConferenceDetail, selectPageActionState, unsetPageActionState, updateConference } from './conferenceSlice';
 import { getBannerUrl, getLogoUuid, getThumbnailUuid } from './conferenceUtilities';
 

@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { useAppSelector } from '../../app/hooks';
 import HeaderTitle from '../../common/HeaderTitle';
 import JumbotronPanel from '../../common/JumbotronPanel';
-import { type ConferenceEntity } from '../../entities/conference';
+import type { ConferenceEntity } from '../../entities/conference';
 import { selectUserInfo } from '../user/userSlice';
 import ConferenceNotice from './ConferenceNotice';
 import { formatDuration, getLogoUrl } from './conferenceUtilities';

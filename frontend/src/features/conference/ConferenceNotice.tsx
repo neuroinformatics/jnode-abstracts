@@ -2,7 +2,7 @@ import React from 'react';
 
 import Markdown from 'react-markdown';
 import JumbotronPanel from '../../common/JumbotronPanel';
-import { type ConferenceEntity } from '../../entities/conference';
+import type { ConferenceEntity } from '../../entities/conference';
 
 interface Props {
   conference: ConferenceEntity;

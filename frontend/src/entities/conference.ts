@@ -1,4 +1,4 @@
-import { type UserSimpleEntity } from './user';
+import type { UserSimpleEntity } from './user';
 
 export interface BannerEntity {
   uuid: string;

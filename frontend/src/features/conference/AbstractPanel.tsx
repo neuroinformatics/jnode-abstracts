@@ -2,8 +2,8 @@ import React from 'react';
 
 import { MathJax } from 'better-react-mathjax';
 import { Button, Modal } from 'react-bootstrap';
-import { type AbstractSimpleEntity } from '../../entities/abstract';
-import { type ConferenceEntity } from '../../entities/conference';
+import type { AbstractSimpleEntity } from '../../entities/abstract';
+import type { ConferenceEntity } from '../../entities/conference';
 import {
   formatAbstractCitation,
   formatAbstractCopyright,

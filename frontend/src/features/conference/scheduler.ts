@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { type NormalizedState } from '../../common/normalizedState';
+import type { NormalizedState } from '../../common/normalizedState';
 
 export interface ScheduleJSON_EventEntity {
   title: string;

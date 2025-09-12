@@ -4,7 +4,7 @@ import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { ApiAsyncStatus } from '../../entities/api';
 import { showMessage } from '../common/commonSlice';
 import { selectPageActionState, unsetPageActionState, updateConferenceInfo } from './conferenceSlice';
-import { type DashboardConferenceTabProps } from './DashboardConferenceTab';
+import type { DashboardConferenceTabProps } from './DashboardConferenceTab';
 
 const DashboardConferenceTabInfo: React.FC<DashboardConferenceTabProps> = (props) => {
   const { conference } = props;

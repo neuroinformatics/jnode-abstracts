@@ -10,9 +10,9 @@ import {
   ApiUsersResetPassword,
 } from '../../api/userApi';
 import { getApiErrorMessage, getApiErrorStatusCode } from '../../api/utilities';
-import { type RootState } from '../../app/store';
+import type { RootState } from '../../app/store';
 import { type ApiActionState, ApiAsyncStatus, type ApiSuccessResponse, isApiPreparing } from '../../entities/api';
-import { type UserEntity } from '../../entities/user';
+import type { UserEntity } from '../../entities/user';
 
 interface UserState {
   userInfo: UserEntity | null;

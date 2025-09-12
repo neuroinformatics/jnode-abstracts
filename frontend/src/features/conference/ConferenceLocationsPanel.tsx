@@ -4,7 +4,7 @@ import type { Feature, FeatureCollection, GeoJsonObject } from 'geojson';
 import { type LatLngExpression, Layer, latLng } from 'leaflet';
 import { GeoJSON, MapContainer, TileLayer } from 'react-leaflet';
 import GeneralPanel from '../../common/GeneralPanel';
-import { type ConferenceEntity } from '../../entities/conference';
+import type { ConferenceEntity } from '../../entities/conference';
 
 import 'leaflet/dist/leaflet.css';
 

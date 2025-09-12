@@ -1,6 +1,6 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import { type RootState } from '../../app/store';
-import { type AlertPanelVariant } from '../../common/AlertPanel';
+import type { RootState } from '../../app/store';
+import type { AlertPanelVariant } from '../../common/AlertPanel';
 
 interface CommonMessageState {
   variant: AlertPanelVariant | null;

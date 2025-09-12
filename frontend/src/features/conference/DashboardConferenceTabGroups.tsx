@@ -7,7 +7,7 @@ import _ from 'lodash';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import AlertPanel from '../../common/AlertPanel';
 import { ApiAsyncStatus } from '../../entities/api';
-import { type AbstractGroupEntity } from '../../entities/conference';
+import type { AbstractGroupEntity } from '../../entities/conference';
 import { showMessage } from '../common/commonSlice';
 import {
   getConferenceDetail,
@@ -15,7 +15,7 @@ import {
   unsetPageActionState,
   updateConferenceAbstractGroups,
 } from './conferenceSlice';
-import { type DashboardConferenceTabProps } from './DashboardConferenceTab';
+import type { DashboardConferenceTabProps } from './DashboardConferenceTab';
 
 const DashboardConferenceTabGroups: React.FC<DashboardConferenceTabProps> = (props) => {
   const { conference } = props;

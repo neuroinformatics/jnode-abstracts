@@ -2,7 +2,7 @@ import React from 'react';
 
 import type { Feature, FeatureCollection, GeoJsonObject } from 'geojson';
 import GeneralPanel from '../../common/GeneralPanel';
-import { type ConferenceEntity } from '../../entities/conference';
+import type { ConferenceEntity } from '../../entities/conference';
 
 import 'leaflet/dist/leaflet.css';
 

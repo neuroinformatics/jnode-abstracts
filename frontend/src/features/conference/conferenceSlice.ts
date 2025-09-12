@@ -12,11 +12,11 @@ import {
   ApiConferenceUpdate,
 } from '../../api/conferenceApi ';
 import { getApiErrorMessage } from '../../api/utilities';
-import { type RootState } from '../../app/store';
-import { type NormalizedState } from '../../common/normalizedState';
-import { type AbstractSimpleEntity } from '../../entities/abstract';
+import type { RootState } from '../../app/store';
+import type { NormalizedState } from '../../common/normalizedState';
+import type { AbstractSimpleEntity } from '../../entities/abstract';
 import { type ApiActionState, ApiAsyncStatus, type ApiSuccessResponse } from '../../entities/api';
-import { type ConferenceEntity, type ConferenceSimpleEntity, type TopicEntity } from '../../entities/conference';
+import type { ConferenceEntity, ConferenceSimpleEntity, TopicEntity } from '../../entities/conference';
 
 export type ConferenceStateConferences = NormalizedState<ConferenceSimpleEntity, string>;
 export type ConferenceStateAbstracts = NormalizedState<AbstractSimpleEntity, string>;

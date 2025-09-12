@@ -7,7 +7,7 @@ import HeaderTitle from '../../common/HeaderTitle';
 import JumbotronPanel from '../../common/JumbotronPanel';
 import LoadingOverlay from '../../common/LoadingOverlay';
 import { isApiPreparing } from '../../entities/api';
-import { type ConferenceSimpleEntity } from '../../entities/conference';
+import type { ConferenceSimpleEntity } from '../../entities/conference';
 import { selectUserInfo } from '../user/userSlice';
 import { selectConferencesInfo, selectGetListState } from './conferenceSlice';
 import { formatDuration, getLogoUrl, getThumbnailUrl } from './conferenceUtilities';

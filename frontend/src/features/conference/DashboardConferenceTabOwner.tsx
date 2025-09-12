@@ -11,7 +11,7 @@ import {
   selectPageActionState as selectUserPageActionState,
   unsetPageActionState as unsetUserPageActionState,
 } from '../user/userSlice';
-import { type DashboardConferenceTabProps } from './DashboardConferenceTab';
+import type { DashboardConferenceTabProps } from './DashboardConferenceTab';
 import { selectPageActionState, unsetPageActionState, updateConferenceOwners } from './conferenceSlice';
 
 const DashboardConferenceTabOwner: React.FC<DashboardConferenceTabProps> = (props) => {

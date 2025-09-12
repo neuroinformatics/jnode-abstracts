@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import { useLocation, useNavigate } from 'react-router-dom';
 import GeneralPanel from '../../common/GeneralPanel';
 import HeaderTitle from '../../common/HeaderTitle';
-import { type ConferenceEntity } from '../../entities/conference';
+import type { ConferenceEntity } from '../../entities/conference';
 import ConferenceNotice from './ConferenceNotice';
 import { type TAB, TABS } from './DashboardConferenceTab';
 import DashboardConferenceTabGeneral from './DashboardConferenceTabGeneral';

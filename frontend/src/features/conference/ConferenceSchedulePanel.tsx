@@ -1,9 +1,9 @@
 import React from 'react';
 
 import GeneralPanel from '../../common/GeneralPanel';
-import { type ConferenceEntity } from '../../entities/conference';
+import type { ConferenceEntity } from '../../entities/conference';
 import ConferenceScheduler from './ConferenceSchedular';
-import { type ScheduleJSON_Entities } from './scheduler';
+import type { ScheduleJSON_Entities } from './scheduler';
 
 interface Props {
   conference: ConferenceEntity;

@@ -7,7 +7,7 @@ import ScheduleJsonSchema from '../../assets/schema/ScheduleJSON.json';
 import { ApiAsyncStatus } from '../../entities/api';
 import { showMessage } from '../common/commonSlice';
 import { selectPageActionState, unsetPageActionState, updateConferenceSchedule } from './conferenceSlice';
-import { type DashboardConferenceTabProps } from './DashboardConferenceTab';
+import type { DashboardConferenceTabProps } from './DashboardConferenceTab';
 
 const DashboardConferenceTabSchedule: React.FC<DashboardConferenceTabProps> = (props) => {
   const { conference } = props;
