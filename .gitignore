@@ -59,5 +59,4 @@ dist-ssr
 *.tsbuildinfo
 *.properties
 /src/main/resources/static/
-package-lock.json
 .metals
