@@ -3,7 +3,6 @@ import React from 'react';
 import { faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import classNames from 'classnames';
-import _ from 'lodash';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import AlertPanel from '../../common/AlertPanel';
 import { ApiAsyncStatus } from '../../entities/api';
@@ -24,7 +23,7 @@ const DashboardConferenceTabGroups: React.FC<DashboardConferenceTabProps> = (pro
   const pageActionState = useAppSelector(selectPageActionState);
 
   const [abstractGroups, setAbstractGroups] = React.useState<AbstractGroupEntity[]>(
-    _.cloneDeep(conference.abstractGroups),
+    structuredClone(conference.abstractGroups),
   );
   const [isChanged, setIsChanged] = React.useState<boolean>(false);
   const [wasValidated, setWasValidated] = React.useState<boolean>(false);
