@@ -283,4 +283,44 @@ class SubmissionApiTest {
         .andExpect(jsonPath("$.reasonForTalk").value("New results"));
   }
 
+  @Test
+  void changingThePresentationTypeKeepsTheNumber() throws Exception {
+    this.conference.setHasPresentationPrefs(true);
+    this.conferenceRepository.saveAndFlush(this.conference);
+    this.mockMvc.perform(put("/api/conferences/{uuid}/abstractGroups", this.conference.getUuid())
+        .param("abstractGroups[0].name", "Talks").param("abstractGroups[0].prefix", "1")
+        .param("abstractGroups[0].shortName", "T")
+        .param("abstractGroups[1].name", "Posters").param("abstractGroups[1].prefix", "2")
+        .param("abstractGroups[1].shortName", "P")
+        .with(login(this.chair)).with(csrf()))
+        .andExpect(status().isOk());
+    JsonNode groups = this.jsonMapper.readTree(this.mockMvc.perform(get("/api/conferences/{uuid}",
+        this.conference.getUuid())).andReturn().getResponse().getContentAsString()).get("abstractGroups");
+    String talk = groups.get(0).get("uuid").asString();
+    String poster = groups.get(1).get("uuid").asString();
+    String uuid = create(content("Title", "Text"));
+    this.mockMvc.perform(put("/api/abstracts/{uuid}/publication", uuid)
+        .param("abstractGroupUuid", poster).param("number", "15")
+        .with(login(this.chair)).with(csrf()))
+        .andExpect(status().isOk());
+    Map<String, Object> edited = new java.util.HashMap<>(content("Title", "Text"));
+    edited.put("abstractGroupUuid", talk);
+    this.mockMvc.perform(put("/api/abstracts/{uuid}", uuid)
+        .contentType(MediaType.APPLICATION_JSON).content(this.jsonMapper.writeValueAsString(edited))
+        .with(login(this.author)).with(csrf()))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.abstractGroupUuid").value(talk))
+        .andExpect(jsonPath("$.sortId").value((1 << 16) | 15));
+  }
+
+  @Test
+  void ownerMailsAreComparedIgnoringCase() throws Exception {
+    String uuid = create(content("Title", "Text"));
+    this.mockMvc.perform(put("/api/abstracts/{uuid}/owners", uuid)
+        .param("owners", this.author.getMail()).param("owners", this.author.getMail().toUpperCase())
+        .with(login(this.author)).with(csrf()))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.owners.length()").value(1));
+  }
+
 }

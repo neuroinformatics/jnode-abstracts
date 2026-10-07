@@ -20,11 +20,13 @@ const MyAbstractsPanel: React.FC = () => {
   const abstractsState = useAppSelector(selectGetOwnAbstractsState);
   const conferencesInfo = useAppSelector(selectConferencesInfo);
 
+  const userUuid = userInfo?.uuid ?? null;
+
   React.useEffect(() => {
-    if (userInfo != null) {
+    if (userUuid != null) {
       dispatch(getOwnAbstracts());
     }
-  }, [dispatch, userInfo]);
+  }, [dispatch, userUuid]);
 
   if (userInfo == null) {
     return isPreparingUserInfo ? null : <Navigate to="/login" />;

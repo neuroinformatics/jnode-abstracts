@@ -2,6 +2,7 @@ package jp.neuroinf.abstracts.service;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.springframework.dao.DataIntegrityViolationException;
@@ -35,6 +36,8 @@ import jp.neuroinf.abstracts.utility.PasswordGenerator.PasswordGeneratorBuilder;
 
 @Service
 public class AccountService implements UserDetailsService {
+
+  private static final String RESPONSE_MESSAGE_MAIL_TAKEN = "This email is already taken. Try another email.";
 
   private final AccountRepository accountRepository;
   private final PasswordEncoder passwordEncoder;
@@ -158,7 +161,7 @@ public class AccountService implements UserDetailsService {
     try {
       this.accountRepository.save(account);
     } catch (DataIntegrityViolationException e) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This email is already taken. Try another email.");
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, RESPONSE_MESSAGE_MAIL_TAKEN);
     }
     return new RestSuccessResponseBody("success");
   }
@@ -170,14 +173,15 @@ public class AccountService implements UserDetailsService {
   }
 
   /**
-   * Creates an active account with a generated password, and sends the password to the new user.
+   * Creates an active account with a generated password, and sends the password to the new user. Not transactional
+   * on purpose: the account is committed before the mail goes out, so that no mail is sent for an account that was
+   * not saved.
    */
-  @Transactional
   public AccountDto createAccount(AccountDetails user, UsersCreateForm form) throws ResponseStatusException {
     this.permissionService.requireAdmin(user);
     final String email = form.getEmail().trim();
     if (this.accountRepository.findFirstByMail(email) != null) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This email is already taken. Try another email.");
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, RESPONSE_MESSAGE_MAIL_TAKEN);
     }
     final String password = generatePassword();
     final Account account = new Account();
@@ -186,14 +190,22 @@ public class AccountService implements UserDetailsService {
     account.setFirstName(form.getFirstName().trim());
     account.setLastName(form.getLastName().trim());
     account.setIsActive(true);
-    final Account saved = this.accountRepository.saveAndFlush(account);
+    final Account saved;
+    try {
+      saved = this.accountRepository.saveAndFlush(account);
+    } catch (DataIntegrityViolationException e) {
+      // created by someone else since the check above
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, RESPONSE_MESSAGE_MAIL_TAKEN);
+    }
     final Map<String, Object> variables = new HashMap<>();
     variables.put("firstName", saved.getFirstName());
     variables.put("mail", saved.getMail());
     variables.put("password", password);
     variables.put("loginUrl", String.format("%s/login", this.appProperties.getUrl()));
     if (!this.emailTemplateSender.send(saved.getMail(), "Your account", "createAccount", variables)) {
-      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to send mail");
+      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+          "The account was created, but the mail with the password could not be sent."
+              + " Ask the user to reset the password with 'Forgot password'.");
     }
     return AccountDto.of(saved, this.permissionService.isAdmin(saved));
   }
@@ -220,6 +232,19 @@ public class AccountService implements UserDetailsService {
     final PasswordGeneratorBuilder builder = new PasswordGenerator.PasswordGeneratorBuilder();
     final PasswordGenerator generator = builder.useLower(true).useUpper(true).useDigit(true).usePunct(true).build();
     return generator.generate(16);
+  }
+
+  /**
+   * Finds the accounts of the given mail addresses, which are compared ignoring case like the database does.
+   */
+  public List<Account> findAccountsByMail(List<String> mails) throws ResponseStatusException {
+    final List<String> distinctMails = mails.stream().map(String::strip).map(m -> m.toLowerCase(Locale.ROOT))
+        .distinct().toList();
+    final List<Account> accounts = this.accountRepository.findByLowerCaseMailIn(distinctMails);
+    if (accounts.size() != distinctMails.size()) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Some users not found");
+    }
+    return accounts;
   }
 
 }

@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Value;
@@ -67,6 +68,7 @@ public class ConferenceUpdateForm {
   @NotNull
   final Boolean hasPresentationPrefs;
 
+  @Valid
   final List<TopicForm> topics;
 
   @NotNull

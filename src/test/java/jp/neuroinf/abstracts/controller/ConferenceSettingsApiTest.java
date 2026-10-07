@@ -128,6 +128,9 @@ class ConferenceSettingsApiTest {
     this.testData.conference("T" + this.shortName, null);
     this.mockMvc.perform(general("Taken", "T" + this.shortName).with(login(this.owner)).with(csrf()))
         .andExpect(status().isBadRequest());
+    // surrounding spaces do not get past the check
+    this.mockMvc.perform(general("Taken", " T" + this.shortName + " ").with(login(this.owner)).with(csrf()))
+        .andExpect(status().isBadRequest());
   }
 
   @Test
@@ -209,6 +212,15 @@ class ConferenceSettingsApiTest {
         .param("owners", other.getMail())
         .with(login(this.owner)).with(csrf()))
         .andExpect(status().isForbidden());
+  }
+
+  @Test
+  void abstractGroupPrefixesFitTheSortIds() throws Exception {
+    this.mockMvc.perform(put("/api/conferences/{uuid}/abstractGroups", this.conference.getUuid())
+        .param("abstractGroups[0].name", "Big").param("abstractGroups[0].prefix", String.valueOf(0x8000))
+        .param("abstractGroups[0].shortName", "B")
+        .with(login(this.owner)).with(csrf()))
+        .andExpect(status().isBadRequest());
   }
 
 }

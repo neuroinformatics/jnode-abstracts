@@ -1,17 +1,14 @@
 package jp.neuroinf.abstracts.service;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import jakarta.transaction.Transactional;
+import jp.neuroinf.abstracts.component.FileStorage;
 import jp.neuroinf.abstracts.core.AccountDetails;
 import jp.neuroinf.abstracts.core.AppProperties;
 import jp.neuroinf.abstracts.core.RestSuccessResponseBody;
@@ -34,7 +31,6 @@ import jp.neuroinf.abstracts.form.ConferenceUpdateGeoForm;
 import jp.neuroinf.abstracts.form.ConferenceUpdateInfoForm;
 import jp.neuroinf.abstracts.form.ConferenceUpdateOwnersForm;
 import jp.neuroinf.abstracts.form.ConferenceUpdateScheduleForm;
-import jp.neuroinf.abstracts.repository.AccountRepository;
 import jp.neuroinf.abstracts.repository.ConferenceRepository;
 
 @Service
@@ -47,19 +43,22 @@ public class ConferenceService {
   private static final int DEFAULT_ABSTRACT_MAX_LENGTH = 2000;
   private static final int DEFAULT_ABSTRACT_MAX_FIGURES = 1;
 
-  private final AccountRepository accountRepository;
+  private final AccountService accountService;
   private final ConferenceRepository conferenceRepository;
   private final PermissionService permissionService;
+  private final FileStorage fileStorage;
   private final AppProperties appProperties;
 
   public ConferenceService(
-      AccountRepository accountRepository,
+      AccountService accountService,
       ConferenceRepository conferenceRepository,
       PermissionService permissionService,
+      FileStorage fileStorage,
       AppProperties appProperties) {
-    this.accountRepository = accountRepository;
+    this.accountService = accountService;
     this.conferenceRepository = conferenceRepository;
     this.permissionService = permissionService;
+    this.fileStorage = fileStorage;
     this.appProperties = appProperties;
   }
 
@@ -143,8 +142,8 @@ public class ConferenceService {
         .forEach(f -> f.getAccount().getFavorites().remove(f));
     this.conferenceRepository.delete(conference);
     this.conferenceRepository.flush();
-    bannerUuids.forEach(bannerUuid -> deleteFile(this.appProperties.getPathBanners(), bannerUuid));
-    figureUuids.forEach(figureUuid -> deleteFile(this.appProperties.getPathFigures(), figureUuid));
+    bannerUuids.forEach(bannerUuid -> this.fileStorage.delete(this.appProperties.getPathBanners(), bannerUuid));
+    figureUuids.forEach(figureUuid -> this.fileStorage.delete(this.appProperties.getPathFigures(), figureUuid));
     return new RestSuccessResponseBody(RESPONSE_MESSAGE_SUCCESS);
   }
 
@@ -152,7 +151,8 @@ public class ConferenceService {
   public RestSuccessResponseBody updateConference(AccountDetails user, String uuid,
       ConferenceUpdateForm form) throws ResponseStatusException {
     final Conference conference = requireManagedConference(user, uuid);
-    final boolean isShortNameTaken = this.conferenceRepository.getConferencesByShortName(form.getShortName()).stream()
+    final String shortName = form.getShortName().trim();
+    final boolean isShortNameTaken = this.conferenceRepository.getConferencesByShortName(shortName).stream()
         .anyMatch(c -> !c.getUuid().equals(conference.getUuid()));
     if (isShortNameTaken) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This short name is already taken");
@@ -161,7 +161,7 @@ public class ConferenceService {
     conference.setIsPublished(form.getIsPublished());
     conference.setIsActive(form.getIsActive());
     conference.setName(form.getName());
-    conference.setShortName(form.getShortName());
+    conference.setShortName(shortName);
     conference.setConferenceGroup(form.getConferenceGroup());
     conference.setCite(form.getCite());
     conference.setStartDate(form.getStartDate());
@@ -193,7 +193,7 @@ public class ConferenceService {
     if (form.getLogoUuid() == null) {
       final Optional<Banner> banner = conference.getLogoBanner();
       if (banner.isPresent()) {
-        deleteFile(this.appProperties.getPathBanners(), banner.get().getUuid());
+        this.fileStorage.delete(this.appProperties.getPathBanners(), banner.get().getUuid());
         conference.getBanners().remove(banner.get());
       }
     }
@@ -206,7 +206,7 @@ public class ConferenceService {
     if (form.getThumbnailUuid() == null) {
       final Optional<Banner> banner = conference.getThumbnailBanner();
       if (banner.isPresent()) {
-        deleteFile(this.appProperties.getPathBanners(), banner.get().getUuid());
+        this.fileStorage.delete(this.appProperties.getPathBanners(), banner.get().getUuid());
         conference.getBanners().remove(banner.get());
       }
     }
@@ -218,11 +218,13 @@ public class ConferenceService {
     }
     this.conferenceRepository.saveAndFlush(conference);
     // register banner files, failing the request (and rolling back the banner rows) if a file cannot be written
+    final String pathBanners = this.appProperties.getPathBanners();
     if (form.getLogoFile() != null && !form.getLogoFile().isEmpty()) {
-      conference.getLogoBanner().ifPresent(banner -> writeBannerFile(banner, form.getLogoFile()));
+      conference.getLogoBanner().ifPresent(b -> this.fileStorage.write(pathBanners, b.getUuid(), form.getLogoFile()));
     }
     if (form.getThumbnailFile() != null && !form.getThumbnailFile().isEmpty()) {
-      conference.getThumbnailBanner().ifPresent(banner -> writeBannerFile(banner, form.getThumbnailFile()));
+      conference.getThumbnailBanner()
+          .ifPresent(b -> this.fileStorage.write(pathBanners, b.getUuid(), form.getThumbnailFile()));
     }
     return new RestSuccessResponseBody(RESPONSE_MESSAGE_SUCCESS);
   }
@@ -295,10 +297,7 @@ public class ConferenceService {
     final Account currentUser = this.permissionService.requireAccount(user);
     final Conference conference = requireConference(uuid);
     this.permissionService.requireConferenceManager(conference, currentUser);
-    final List<Account> accounts = this.accountRepository.findByMailIn(form.getOwners());
-    if (accounts.size() != form.getOwners().size()) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Some users not found");
-    }
+    final List<Account> accounts = this.accountService.findAccountsByMail(form.getOwners());
     if (!this.permissionService.isAdmin(currentUser)
         && accounts.stream().noneMatch(a -> a.getUuid().equals(currentUser.getUuid()))) {
       throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You cannot remove your own privilege");
@@ -328,25 +327,6 @@ public class ConferenceService {
     final Conference conference = requireConference(uuid);
     this.permissionService.requireConferenceManager(conference, currentUser);
     return conference;
-  }
-
-  private void writeBannerFile(Banner banner, MultipartFile file) throws ResponseStatusException {
-    final File directory = new File(this.appProperties.getPathBanners());
-    final File uploadFile = new File(directory, banner.getUuid());
-    try {
-      Files.createDirectories(directory.toPath());
-      file.transferTo(uploadFile.toPath());
-    } catch (IOException e) {
-      e.printStackTrace();
-      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to save the banner file");
-    }
-  }
-
-  private void deleteFile(String directory, String uuid) {
-    final File file = new File(directory, uuid);
-    if (file.exists() && !file.delete()) {
-      System.err.println("Failed to delete file: " + file.getPath());
-    }
   }
 
 }

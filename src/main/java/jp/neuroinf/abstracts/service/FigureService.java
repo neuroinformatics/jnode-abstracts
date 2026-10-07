@@ -1,11 +1,9 @@
 package jp.neuroinf.abstracts.service;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.Files;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -16,6 +14,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
+import jp.neuroinf.abstracts.component.FileStorage;
 import jp.neuroinf.abstracts.core.AccountDetails;
 import jp.neuroinf.abstracts.core.AppException;
 import jp.neuroinf.abstracts.core.AppProperties;
@@ -37,13 +36,15 @@ public class FigureService {
   private final FigureRepository figureRepository;
   private final AbstractService abstractService;
   private final PermissionService permissionService;
+  private final FileStorage fileStorage;
   private final AppProperties appProperties;
 
   public FigureService(FigureRepository figureRepository, AbstractService abstractService,
-      PermissionService permissionService, AppProperties appProperties) {
+      PermissionService permissionService, FileStorage fileStorage, AppProperties appProperties) {
     this.figureRepository = figureRepository;
     this.abstractService = abstractService;
     this.permissionService = permissionService;
+    this.fileStorage = fileStorage;
     this.appProperties = appProperties;
   }
 
@@ -99,14 +100,7 @@ public class FigureService {
     abstract_.getFigures().add(figure);
     this.figureRepository.saveAndFlush(figure);
     // write the file last, failing the request (and rolling back the figure row) if it cannot be written
-    final File directory = new File(this.appProperties.getPathFigures());
-    try {
-      Files.createDirectories(directory.toPath());
-      file.transferTo(new File(directory, figure.getUuid()).toPath());
-    } catch (IOException e) {
-      e.printStackTrace();
-      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to save the figure file");
-    }
+    this.fileStorage.write(this.appProperties.getPathFigures(), figure.getUuid(), file);
     return AbstractDto.of(abstract_);
   }
 
@@ -130,10 +124,7 @@ public class FigureService {
     this.abstractService.requireContentEditor(abstract_, account);
     abstract_.getFigures().remove(figure);
     this.figureRepository.flush();
-    final File file = new File(this.appProperties.getPathFigures(), uuid);
-    if (file.exists() && !file.delete()) {
-      System.err.println("Failed to delete file: " + file.getPath());
-    }
+    this.fileStorage.delete(this.appProperties.getPathFigures(), uuid);
     return AbstractDto.of(abstract_);
   }
 

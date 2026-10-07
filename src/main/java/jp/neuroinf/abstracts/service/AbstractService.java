@@ -1,6 +1,5 @@
 package jp.neuroinf.abstracts.service;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -13,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import jakarta.transaction.Transactional;
+import jp.neuroinf.abstracts.component.FileStorage;
 import jp.neuroinf.abstracts.core.AccountDetails;
 import jp.neuroinf.abstracts.core.AppProperties;
 import jp.neuroinf.abstracts.core.RestSuccessResponseBody;
@@ -35,7 +35,6 @@ import jp.neuroinf.abstracts.form.AbstractUpdateOwnersForm;
 import jp.neuroinf.abstracts.form.AbstractUpdatePublicationForm;
 import jp.neuroinf.abstracts.form.AbstractUpdateStateForm;
 import jp.neuroinf.abstracts.repository.AbstractRepository;
-import jp.neuroinf.abstracts.repository.AccountRepository;
 import jp.neuroinf.abstracts.repository.ConferenceRepository;
 
 @Service
@@ -45,17 +44,20 @@ public class AbstractService {
   private static final String RESPONSE_MESSAGE_NO_ABSTRACT_DATA = "no abstract data found";
 
   private final AbstractRepository abstractRepository;
-  private final AccountRepository accountRepository;
+  private final AccountService accountService;
   private final ConferenceRepository conferenceRepository;
   private final PermissionService permissionService;
+  private final FileStorage fileStorage;
   private final AppProperties appProperties;
 
-  public AbstractService(AbstractRepository abstractRepository, AccountRepository accountRepository,
-      ConferenceRepository conferenceRepository, PermissionService permissionService, AppProperties appProperties) {
+  public AbstractService(AbstractRepository abstractRepository, AccountService accountService,
+      ConferenceRepository conferenceRepository, PermissionService permissionService, FileStorage fileStorage,
+      AppProperties appProperties) {
     this.abstractRepository = abstractRepository;
-    this.accountRepository = accountRepository;
+    this.accountService = accountService;
     this.conferenceRepository = conferenceRepository;
     this.permissionService = permissionService;
+    this.fileStorage = fileStorage;
     this.appProperties = appProperties;
   }
 
@@ -148,12 +150,7 @@ public class AbstractService {
     abstract_.getConference().getAbstracts().remove(abstract_);
     this.abstractRepository.delete(abstract_);
     this.abstractRepository.flush();
-    figureUuids.forEach(figureUuid -> {
-      final File file = new File(this.appProperties.getPathFigures(), figureUuid);
-      if (file.exists() && !file.delete()) {
-        System.err.println("Failed to delete file: " + file.getPath());
-      }
-    });
+    figureUuids.forEach(figureUuid -> this.fileStorage.delete(this.appProperties.getPathFigures(), figureUuid));
     return new RestSuccessResponseBody(RESPONSE_MESSAGE_SUCCESS);
   }
 
@@ -168,17 +165,14 @@ public class AbstractService {
     if (!this.permissionService.isAbstractEditor(abstract_, account)) {
       throw new ResponseStatusException(HttpStatus.FORBIDDEN, PermissionService.RESPONSE_MESSAGE_NO_PRIVILEGES);
     }
-    final List<String> mails = form.getOwners().stream().map(String::trim).distinct().toList();
-    final List<Account> accounts = this.accountRepository.findByMailIn(mails);
-    if (accounts.size() != mails.size()) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Some users not found");
-    }
+    final List<Account> accounts = this.accountService.findAccountsByMail(form.getOwners());
     if (!this.permissionService.isConferenceManager(abstract_.getConference(), account)
         && accounts.stream().noneMatch(a -> a.getUuid().equals(account.getUuid()))) {
       throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You cannot remove your own privilege");
     }
     // keep the rows of the remaining owners, as they are identified by the owner
-    abstract_.getAbstractOwners().removeIf(o -> accounts.stream().noneMatch(a -> a.getUuid().equals(o.getOwner().getUuid())));
+    abstract_.getAbstractOwners()
+        .removeIf(o -> accounts.stream().noneMatch(a -> a.getUuid().equals(o.getOwner().getUuid())));
     accounts.stream().filter(a -> !abstract_.isOwner(a)).forEach(a -> {
       final AbstractOwners owner = new AbstractOwners();
       owner.setAbstract_(abstract_);
@@ -236,9 +230,7 @@ public class AbstractService {
     this.permissionService.requireConferenceManager(conference, account);
     final AbstractGroup abstractGroup = findAbstractGroup(conference, form.getAbstractGroupUuid());
     assignAbstractGroup(abstract_, abstractGroup);
-    // sort ids hold the group prefix in the upper 16 bits and the number in the lower 16 bits
-    final int prefix = abstractGroup != null ? abstractGroup.getPrefix() : 0;
-    abstract_.setSortId((prefix << 16) | form.getNumber());
+    abstract_.setSortId(toSortId(abstractGroup, form.getNumber()));
     abstract_.setDoi(trimToNull(form.getDoi()));
     this.abstractRepository.flush();
     return AbstractDto.of(abstract_);
@@ -405,6 +397,17 @@ public class AbstractService {
       abstractGroup.getAbstractAbstractGroups().add(assigned);
       abstract_.setAbstractAbstractGroup(assigned);
     }
+    // keep the number, moving it to the prefix of the new group
+    final int number = abstract_.getSortId() != null ? abstract_.getSortId() & 0xffff : 0;
+    abstract_.setSortId(toSortId(abstractGroup, number));
+  }
+
+  /**
+   * Sort ids hold the group prefix in the upper 16 bits and the number in the lower 16 bits.
+   */
+  private static int toSortId(AbstractGroup abstractGroup, int number) {
+    final int prefix = abstractGroup != null ? abstractGroup.getPrefix() : 0;
+    return (prefix << 16) | number;
   }
 
   private StateLog newStateLog(Abstract abstract_, AbstractState state, Account editor, String note) {

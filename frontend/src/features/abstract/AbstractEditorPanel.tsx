@@ -25,16 +25,18 @@ const AbstractEditorPanel: React.FC = () => {
   const detailState = useAppSelector(selectGetDetailState);
   const conferenceInfo = useAppSelector(selectConferenceInfo);
   const conferenceDetailState = useAppSelector(selectGetConferenceDetailState);
+  // depend on the uuid only, as reloading the abstract would discard unsaved edits
+  const userUuid = userInfo?.uuid ?? null;
   const conferenceUuid = abstractInfo != null && abstractInfo.uuid === uuid ? abstractInfo.conferenceUuid : null;
 
   React.useEffect(() => {
-    if (uuid != null && userInfo != null) {
+    if (uuid != null && userUuid != null) {
       dispatch(getAbstractDetail(uuid));
     }
     return () => {
       dispatch(unsetAbstractDetail());
     };
-  }, [dispatch, uuid, userInfo]);
+  }, [dispatch, uuid, userUuid]);
 
   React.useEffect(() => {
     if (conferenceUuid != null) {

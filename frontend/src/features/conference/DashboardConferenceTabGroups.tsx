@@ -20,6 +20,9 @@ type EditableAbstractGroup = AbstractGroupEntity & { key: string };
 
 let newGroupKeySeq = 0;
 
+// prefixes are stored in the upper 16 bits of the abstract sort ids, which must stay positive
+const PREFIX_MAX = 0x7fff;
+
 const DashboardConferenceTabGroups: React.FC<DashboardConferenceTabProps> = (props) => {
   const { conference } = props;
 
@@ -177,7 +180,7 @@ const DashboardConferenceTabGroups: React.FC<DashboardConferenceTabProps> = (pro
                   )}
                   type="number"
                   min={0}
-                  maxLength={255}
+                  max={PREFIX_MAX}
                   value={g.prefix}
                   required
                   onChange={(e) => onChangePrefix(idx, e)}
@@ -226,7 +229,7 @@ const DashboardConferenceTabGroups: React.FC<DashboardConferenceTabProps> = (pro
                 className="form-control"
                 type="number"
                 min={0}
-                maxLength={255}
+                max={PREFIX_MAX}
                 value={prefix}
                 required
                 onChange={onChangeNewPrefix}
