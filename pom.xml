@@ -14,7 +14,7 @@
 	<version>1.0.0</version>
 	<name>abstracts</name>
 	<description>J-Node Abstract System</description>
-	<url />
+	<url>https://github.com/neuroinformatics/jnode-abstracts</url>
 	<licenses>
 		<license>
 			<name>MIT License</name>
@@ -25,10 +25,10 @@
 		<developer />
 	</developers>
 	<scm>
-		<connection />
-		<developerConnection />
+		<connection>scm:git:https://github.com/neuroinformatics/jnode-abstracts.git</connection>
+		<developerConnection>scm:git:git@github.com:neuroinformatics/jnode-abstracts.git</developerConnection>
 		<tag />
-		<url />
+		<url>https://github.com/neuroinformatics/jnode-abstracts</url>
 	</scm>
 	<properties>
 		<java.version>17</java.version>

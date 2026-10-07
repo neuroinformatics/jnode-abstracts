@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://git.ni.riken.jp/niu/abstracts/raw/branch/main/frontend/src/assets/schema/GeoJSON.json",
+  "$id": "https://raw.githubusercontent.com/neuroinformatics/jnode-abstracts/main/frontend/src/assets/schema/GeoJSON.json",
   "title": "GeoJSON",
   "$defs": {
     "_coordinates": {
