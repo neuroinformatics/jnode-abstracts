@@ -81,7 +81,10 @@ public class SecurityConfig
     RestErrorResponseBody body = new RestErrorResponseBody();
     body.setTimestamp(ZonedDateTime.now());
     body.setCode(status.value());
-    body.setMessage(status.getReasonPhrase());
+    // the provider wraps exceptions thrown by the user details service other than UsernameNotFoundException
+    final boolean isRestricted = exception instanceof LoginRestrictedException
+        || exception.getCause() instanceof LoginRestrictedException;
+    body.setMessage(isRestricted ? LoginRestrictedException.MESSAGE : status.getReasonPhrase());
     body.setPath(LOGIN_API_URL);
     response.setStatus(status.value());
     httpMessageConverter.write(body, MediaType.APPLICATION_JSON, outputMessage);

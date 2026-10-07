@@ -50,7 +50,9 @@ export const login = createAsyncThunk<UserEntity, { username: string; password: 
       return user;
     } catch (e: unknown) {
       if (getApiErrorStatusCode(e) === 401) {
-        return thunkApi.rejectWithValue('Invalid credential');
+        // keep reasons the server gives, e.g. that only site admins can log in now
+        const message = await getApiErrorMessage(e);
+        return thunkApi.rejectWithValue(message !== 'Unauthorized' ? message : 'Invalid credential');
       }
       const message = await getApiErrorMessage(e);
       return thunkApi.rejectWithValue(message);

@@ -6,12 +6,14 @@ import { Container, Nav, Navbar, NavDropdown } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import { useLocation } from 'react-router-dom';
 import { useAppSelector } from '../app/hooks';
+import { selectConfigInfo } from '../features/common/commonSlice';
 import { selectConferenceInfo } from '../features/conference/conferenceSlice';
 import { selectUserInfo } from '../features/user/userSlice';
 
 const HeaderPanel: React.FC = () => {
   const userInfo = useAppSelector(selectUserInfo);
   const conferenceInfo = useAppSelector(selectConferenceInfo);
+  const configInfo = useAppSelector(selectConfigInfo);
   const { pathname } = useLocation();
 
   const ACTIVES: { [key: string]: string } = {
@@ -127,11 +129,14 @@ const HeaderPanel: React.FC = () => {
                 </LinkContainer>
               </NavDropdown>
             ) : (
-              <Nav.Item>
-                <LinkContainer to="/login">
-                  <Nav.Link>Login</Nav.Link>
-                </LinkContainer>
-              </Nav.Item>
+              // site admins still log in at /login while the site is read-only
+              !configInfo.readOnly && (
+                <Nav.Item>
+                  <LinkContainer to="/login">
+                    <Nav.Link>Login</Nav.Link>
+                  </LinkContainer>
+                </Nav.Item>
+              )
             )}
           </Nav>
         </Navbar.Collapse>

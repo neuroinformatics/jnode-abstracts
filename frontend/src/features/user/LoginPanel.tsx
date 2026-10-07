@@ -3,15 +3,17 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
+import AlertPanel from '../../common/AlertPanel';
 import GeneralPanel from '../../common/GeneralPanel';
 import LoadingOverlay from '../../common/LoadingOverlay';
 import { ApiAsyncStatus } from '../../entities/api';
-import { hideMessage, showMessage } from '../common/commonSlice';
+import { hideMessage, selectConfigInfo, showMessage } from '../common/commonSlice';
 import { login, selectPageActionState, selectUserInfo, unsetPageActionState } from './userSlice';
 
 const LoginPanel: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const configInfo = useAppSelector(selectConfigInfo);
   const userInfo = useAppSelector(selectUserInfo);
   const pageActionState = useAppSelector(selectPageActionState);
 
@@ -49,6 +51,9 @@ const LoginPanel: React.FC = () => {
 
   return (
     <GeneralPanel title={title} size={7}>
+      {configInfo.readOnly && (
+        <AlertPanel variant="info">Login is currently restricted to site administrators.</AlertPanel>
+      )}
       {pageActionState.status === ApiAsyncStatus.loading && <LoadingOverlay message="Signing in.." />}
       <fieldset>
         <form onSubmit={onSubmitLogin}>

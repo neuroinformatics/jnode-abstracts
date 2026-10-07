@@ -20,6 +20,7 @@ import jp.neuroinf.abstracts.component.EmailTemplateSender;
 import jp.neuroinf.abstracts.component.TimestampSigner;
 import jp.neuroinf.abstracts.core.AccountDetails;
 import jp.neuroinf.abstracts.core.AppProperties;
+import jp.neuroinf.abstracts.core.LoginRestrictedException;
 import jp.neuroinf.abstracts.core.RestSuccessResponseBody;
 import jp.neuroinf.abstracts.dto.AccountDto;
 import jp.neuroinf.abstracts.entity.Account;
@@ -63,6 +64,10 @@ public class AccountService implements UserDetailsService {
 
   @Override
   public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+    // checked before looking up the account, so that the answer does not tell whether the account exists
+    if (this.appProperties.getReadOnly() && !this.appProperties.getAdmins().contains(email)) {
+      throw new LoginRestrictedException();
+    }
     Account account = this.accountRepository.findFirstByMail(email);
     if (account == null) {
       throw new UsernameNotFoundException("User not found");
@@ -87,6 +92,7 @@ public class AccountService implements UserDetailsService {
   public RestSuccessResponseBody requestPasswordReset(UsersRequestPasswordResetForm form)
       throws ResponseStatusException {
     final String email = form.getEmail();
+    requireLoginAllowed(email);
     final Account account = this.accountRepository.findFirstByMail(email);
     if (account == null) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Account with this email does not exist");
@@ -107,6 +113,7 @@ public class AccountService implements UserDetailsService {
     if (email == null) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Token is invalid or already expired");
     }
+    requireLoginAllowed(email);
     final Account account = this.accountRepository.findFirstByMail(email);
     if (account == null) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Account with this email does not exist.");
@@ -231,6 +238,15 @@ public class AccountService implements UserDetailsService {
     account.setIsActive(form.getIsActive());
     final Account saved = this.accountRepository.saveAndFlush(account);
     return AccountDto.of(saved, this.permissionService.isAdmin(saved));
+  }
+
+  /**
+   * Password resets are refused to users who cannot log in while the site is read-only.
+   */
+  private void requireLoginAllowed(String email) throws ResponseStatusException {
+    if (this.appProperties.getReadOnly() && !this.appProperties.getAdmins().contains(email)) {
+      throw new ResponseStatusException(HttpStatus.FORBIDDEN, LoginRestrictedException.MESSAGE);
+    }
   }
 
   private String generatePassword() {

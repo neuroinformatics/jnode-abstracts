@@ -6,6 +6,7 @@ import { useAppSelector } from '../../app/hooks';
 import HeaderTitle from '../../common/HeaderTitle';
 import JumbotronPanel from '../../common/JumbotronPanel';
 import type { ConferenceEntity } from '../../entities/conference';
+import { selectConfigInfo } from '../common/commonSlice';
 import { selectUserInfo } from '../user/userSlice';
 import ConferenceNotice from './ConferenceNotice';
 import { formatDuration, getLogoUrl } from './conferenceUtilities';
@@ -19,6 +20,9 @@ const ConferencePanel: React.FC<Props> = (props) => {
   const userInfo = useAppSelector(selectUserInfo);
 
   const isAdmin = userInfo?.isAdmin ?? false;
+  const configInfo = useAppSelector(selectConfigInfo);
+  // only site admins can log in and submit while the site is read-only
+  const isSubmissionOpen = conference.isOpen && (!configInfo.readOnly || isAdmin);
   const logo = getLogoUrl(conference);
 
   return (
@@ -38,7 +42,7 @@ const ConferencePanel: React.FC<Props> = (props) => {
           <Markdown>{conference.description}</Markdown>
         </div>
         <p className="mb-3 fs-5">{formatDuration(conference)}</p>
-        {conference.isOpen ? (
+        {isSubmissionOpen ? (
           <div className="mb-3">
             <p className="fs-5">
               Submission is <strong className="text-success">open</strong>!

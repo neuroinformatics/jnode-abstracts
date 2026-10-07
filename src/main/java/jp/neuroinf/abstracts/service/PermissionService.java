@@ -33,11 +33,14 @@ public class PermissionService {
    * Loads the latest account entity of the logged in user.
    *
    * @return the account, or null if not logged in, or the account no longer exists or was deactivated since the
-   *     login (an existing session then loses its access at once)
+   *     login, or only site admins may log in now (an existing session then loses its access at once)
    */
   public Account findAccount(AccountDetails user) {
     final Account account = user != null ? this.accountRepository.findFirstByUuid(user.getUuid()) : null;
-    return account != null && Boolean.TRUE.equals(account.getIsActive()) ? account : null;
+    if (account == null || !Boolean.TRUE.equals(account.getIsActive())) {
+      return null;
+    }
+    return !this.appProperties.getReadOnly() || isAdmin(account) ? account : null;
   }
 
   public Account requireAccount(AccountDetails user) throws ResponseStatusException {

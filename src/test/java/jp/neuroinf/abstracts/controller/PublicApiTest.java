@@ -74,6 +74,13 @@ class PublicApiTest {
   }
 
   @Test
+  void configTellsTheNormalMode() throws Exception {
+    this.mockMvc.perform(get("/api/config"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.readOnly").value(false));
+  }
+
+  @Test
   void conferenceDetailMarksOwners() throws Exception {
     Account owner = this.testData.account("chair@example.com");
     Conference conference = this.testData.conference("DETAIL", owner);

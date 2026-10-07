@@ -2,10 +2,11 @@ import classNames from 'classnames';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
+import AlertPanel from '../../common/AlertPanel';
 import GeneralPanel from '../../common/GeneralPanel';
 import LoadingOverlay from '../../common/LoadingOverlay';
 import { ApiAsyncStatus } from '../../entities/api';
-import { showMessage } from '../common/commonSlice';
+import { selectConfigInfo, showMessage } from '../common/commonSlice';
 import {
   requestPasswordReset,
   selectIsPreparingUserInfo,
@@ -17,6 +18,7 @@ import {
 const ForgotPasswordPanel: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const configInfo = useAppSelector(selectConfigInfo);
   const userInfo = useAppSelector(selectUserInfo);
   const isPreparingUserInfo = useAppSelector(selectIsPreparingUserInfo);
   const pageActionState = useAppSelector(selectPageActionState);
@@ -70,6 +72,9 @@ const ForgotPasswordPanel: React.FC = () => {
 
   return (
     <GeneralPanel title={title} size={7}>
+      {configInfo.readOnly && (
+        <AlertPanel variant="info">Login is currently restricted to site administrators.</AlertPanel>
+      )}
       {isPreparingUserInfo && <LoadingOverlay message="Loading..." />}
       {pageActionState.status === ApiAsyncStatus.loading && <LoadingOverlay message="Requesting..." />}
       <fieldset>
