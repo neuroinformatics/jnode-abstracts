@@ -12,22 +12,25 @@ import jakarta.servlet.http.HttpServletResponse;
 import jp.neuroinf.abstracts.core.AccountDetails;
 import jp.neuroinf.abstracts.dto.FigureDto;
 import jp.neuroinf.abstracts.entity.Account;
+import jp.neuroinf.abstracts.service.AccountService;
 import jp.neuroinf.abstracts.service.FigureService;
 
 @RestController
 @RequestMapping("/api/figures")
 public class RestApiFiguresController {
 
+    private final AccountService accountService;
     private final FigureService figureService;
 
-    public RestApiFiguresController(FigureService abstractService) {
+    public RestApiFiguresController(AccountService accountService, FigureService abstractService) {
+        this.accountService = accountService;
         this.figureService = abstractService;
     }
 
     @GetMapping("/{uuid}")
     public FigureDto retrieveFigure(@AuthenticationPrincipal AccountDetails user, @PathVariable String uuid)
             throws ResponseStatusException {
-        Account account = user != null ? user.getAccount() : null;
+        Account account = this.accountService.findAccount(user);
         FigureDto figure = this.figureService.getFigure(account, uuid);
         if (figure == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "no figure data found");
@@ -39,7 +42,7 @@ public class RestApiFiguresController {
     public void imageFigure(@AuthenticationPrincipal AccountDetails user, @PathVariable String uuid,
             HttpServletResponse response)
             throws ResponseStatusException {
-        Account account = user != null ? user.getAccount() : null;
+        Account account = this.accountService.findAccount(user);
         try {
             this.figureService.downloadFigureImage(account, uuid, response);
         } catch (Exception e) {

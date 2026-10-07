@@ -55,14 +55,14 @@ public class ConferenceService {
 
   @Transactional
   public List<ConferenceSimpleDto> getConferenceList(AccountDetails user) {
-    Account account = user != null ? user.getAccount() : null;
+    Account account = findAccount(user);
     List<Conference> conferences = this.conferenceRepository.getConferences();
     return conferences.stream().map(c -> ConferenceSimpleDto.of(c, account)).toList();
   }
 
   @Transactional
   public ConferenceDto getConference(AccountDetails user, String uuid) throws ResponseStatusException {
-    Account account = user != null ? user.getAccount() : null;
+    Account account = findAccount(user);
     Conference conference = this.conferenceRepository.findFirstByUuid(uuid);
     if (conference == null) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, RESPONSE_MESSAGE_LOGIN_REQUIRED);
@@ -73,7 +73,7 @@ public class ConferenceService {
   @Transactional
   public List<AbstractSimpleDto> getConferenceAbstracts(AccountDetails user, String uuid)
       throws ResponseStatusException {
-    Account account = user != null ? user.getAccount() : null;
+    Account account = findAccount(user);
     Conference conference = this.conferenceRepository.findFirstByUuid(uuid);
     if (conference == null) {
       return null;
@@ -93,7 +93,7 @@ public class ConferenceService {
     if (user == null) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, RESPONSE_MESSAGE_LOGIN_REQUIRED);
     }
-    final Account currentUser = user.getAccount();
+    final Account currentUser = requireAccount(user);
     final Conference conference = this.conferenceRepository.findFirstByUuid(uuid);
     if (conference == null) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, RESPONSE_MESSAGE_NO_CONFERENCE_DATA);
@@ -208,7 +208,7 @@ public class ConferenceService {
     if (user == null) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, RESPONSE_MESSAGE_LOGIN_REQUIRED);
     }
-    final Account currentUser = user.getAccount();
+    final Account currentUser = requireAccount(user);
     final Conference conference = this.conferenceRepository.findFirstByUuid(uuid);
     if (conference == null) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, RESPONSE_MESSAGE_NO_CONFERENCE_DATA);
@@ -249,7 +249,7 @@ public class ConferenceService {
     if (user == null) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, RESPONSE_MESSAGE_LOGIN_REQUIRED);
     }
-    final Account currentUser = user.getAccount();
+    final Account currentUser = requireAccount(user);
     final Conference conference = this.conferenceRepository.findFirstByUuid(uuid);
     if (conference == null) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, RESPONSE_MESSAGE_NO_CONFERENCE_DATA);
@@ -272,7 +272,7 @@ public class ConferenceService {
     if (user == null) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, RESPONSE_MESSAGE_LOGIN_REQUIRED);
     }
-    final Account currentUser = user.getAccount();
+    final Account currentUser = requireAccount(user);
     final Conference conference = this.conferenceRepository.findFirstByUuid(uuid);
     if (conference == null) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, RESPONSE_MESSAGE_NO_CONFERENCE_DATA);
@@ -295,7 +295,7 @@ public class ConferenceService {
     if (user == null) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, RESPONSE_MESSAGE_LOGIN_REQUIRED);
     }
-    final Account currentUser = user.getAccount();
+    final Account currentUser = requireAccount(user);
     final Conference conference = this.conferenceRepository.findFirstByUuid(uuid);
     if (conference == null) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, RESPONSE_MESSAGE_NO_CONFERENCE_DATA);
@@ -317,7 +317,7 @@ public class ConferenceService {
     if (user == null) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, RESPONSE_MESSAGE_LOGIN_REQUIRED);
     }
-    final Account currentUser = user.getAccount();
+    final Account currentUser = requireAccount(user);
     final Conference conference = this.conferenceRepository.findFirstByUuid(uuid);
     if (conference == null) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, RESPONSE_MESSAGE_NO_CONFERENCE_DATA);
@@ -346,6 +346,18 @@ public class ConferenceService {
     conference.getConferenceOwners().addAll(owners);
     this.conferenceRepository.save(conference);
     return new RestSuccessResponseBody(RESPONSE_MESSAGE_SUCCESS);
+  }
+
+  private Account findAccount(AccountDetails user) {
+    return user != null ? this.accountRepository.findFirstByUuid(user.getUuid()) : null;
+  }
+
+  private Account requireAccount(AccountDetails user) throws ResponseStatusException {
+    Account account = findAccount(user);
+    if (account == null) {
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, RESPONSE_MESSAGE_LOGIN_REQUIRED);
+    }
+    return account;
   }
 
   private boolean isAdmin(Account account) {

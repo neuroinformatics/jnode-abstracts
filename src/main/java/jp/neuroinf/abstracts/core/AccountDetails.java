@@ -1,5 +1,6 @@
 package jp.neuroinf.abstracts.core;
 
+import java.io.Serial;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -9,16 +10,32 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import jp.neuroinf.abstracts.entity.Account;
 
+/*
+ * Holds only the values needed for authentication, since it is stored in the HTTP session.
+ * Load the latest Account entity by its uuid when the account data is needed.
+ */
 public class AccountDetails implements UserDetails {
 
-  private Account account;
+  @Serial
+  private static final long serialVersionUID = 1L;
+
+  private final String uuid;
+
+  private final String mail;
+
+  private final String password;
+
+  private final boolean isActive;
 
   public AccountDetails(Account account) {
-    this.account = account;
+    this.uuid = account.getUuid();
+    this.mail = account.getMail();
+    this.password = account.getPassword();
+    this.isActive = account.getIsActive();
   }
 
-  public Account getAccount() {
-    return this.account;
+  public String getUuid() {
+    return this.uuid;
   }
 
   @Override
@@ -28,12 +45,12 @@ public class AccountDetails implements UserDetails {
 
   @Override
   public String getPassword() {
-    return this.account.getPassword();
+    return this.password;
   }
 
   @Override
   public String getUsername() {
-    return this.account.getMail();
+    return this.mail;
   }
 
   @Override
@@ -53,7 +70,7 @@ public class AccountDetails implements UserDetails {
 
   @Override
   public boolean isEnabled() {
-    return this.account.getIsActive();
+    return this.isActive;
   }
 
 }

@@ -60,11 +60,28 @@ public class AccountService implements UserDetailsService {
     return new AccountDetails(account);
   }
 
+  /**
+   * Loads the latest account entity of the logged in user.
+   *
+   * @return the account, or null if not logged in or the account no longer exists
+   */
+  public Account findAccount(AccountDetails user) {
+    return user != null ? this.accountRepository.findFirstByUuid(user.getUuid()) : null;
+  }
+
+  private Account requireAccount(AccountDetails user) throws ResponseStatusException {
+    Account account = findAccount(user);
+    if (account == null) {
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Login required");
+    }
+    return account;
+  }
+
   public AccountDto getCurrentUser(AccountDetails user) throws ResponseStatusException {
     if (user == null) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Login required");
     }
-    Account account = user.getAccount();
+    Account account = requireAccount(user);
     boolean isAdmin = this.appProperties.getAdmins().contains(account.getMail());
     return AccountDto.of(account, isAdmin);
   }
@@ -127,7 +144,7 @@ public class AccountService implements UserDetailsService {
     if (user == null) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Login required");
     }
-    Account currentUser = user.getAccount();
+    Account currentUser = requireAccount(user);
     boolean isAdmin = this.appProperties.getAdmins().contains(currentUser.getMail());
     Account account = this.accountRepository.findFirstByUuid(uuid);
     if (account == null) {
@@ -149,7 +166,7 @@ public class AccountService implements UserDetailsService {
     if (user == null) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Login required");
     }
-    Account currentUser = user.getAccount();
+    Account currentUser = requireAccount(user);
     boolean isAdmin = this.appProperties.getAdmins().contains(currentUser.getMail());
     Account account = this.accountRepository.findFirstByUuid(uuid);
     if (account == null) {
