@@ -152,7 +152,6 @@ const ConferenceScheduler: React.FC<Props> = (props) => {
         scheduler.addEvent(ev);
       });
       remove.forEach((id) => {
-        // @ts-expect-error disable ts(2554) error
         scheduler.deleteEvent(id, true);
       });
       onHideEventModal();
@@ -169,7 +168,6 @@ const ConferenceScheduler: React.FC<Props> = (props) => {
         scheduler.addEvent(ev);
       });
       remove.forEach((id) => {
-        // @ts-expect-error disable ts(2554) error
         scheduler.deleteEvent(id, true);
       });
       onHideEventModal();
