@@ -7,8 +7,13 @@
     },
     {
       "name": "app.admins",
-      "type": "java.lang.String",
+      "type": "java.util.List<java.lang.String>",
       "description": "A comma-separated list of administrator email addresses."
+    },
+    {
+      "name": "app.read-only",
+      "type": "java.lang.Boolean",
+      "description": "Restricts login to the administrators, so that everyone else only reads the published information."
     },
     {
       "name": "app.path.banners",
@@ -22,7 +27,7 @@
     },
     {
       "name": "app.mail.mock",
-      "type": "java.lang.String",
+      "type": "java.lang.Boolean",
       "description": "Enables or disables mock email sending for testing purposes."
     },
     {
