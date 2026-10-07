@@ -11,7 +11,15 @@ import MainPanel from './main/MainPanel';
 
 let isFirst = true;
 
+// MathJax is served by this site (see scripts/copy-mathjax.mjs) instead of a CDN
+const MATHJAX_SRC = '/mathjax/tex-mml-chtml.js';
+
 const MATHJAX_CONFIG = {
+  loader: {
+    // the safe extension drops dangerous links and styles, e.g. \href{javascript:...} in abstracts
+    load: ['ui/safe'],
+    paths: { fonts: '/mathjax/fonts' },
+  },
   tex: {
     inlineMath: [
       ['$', '$'],
@@ -45,7 +53,7 @@ const App: React.FC = () => {
 
   return (
     <div className="app container">
-      <MathJaxContext config={MATHJAX_CONFIG}>
+      <MathJaxContext config={MATHJAX_CONFIG} src={MATHJAX_SRC}>
         <HeaderPanel />
         <MainPanel />
         <FooterPanel />
