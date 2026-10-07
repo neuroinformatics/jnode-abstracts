@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import org.springframework.http.server.ServletServerHttpResponse;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -24,6 +24,7 @@ import org.springframework.security.web.authentication.logout.LogoutSuccessHandl
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import tools.jackson.databind.json.JsonMapper;
 
 @Configuration
 @EnableWebSecurity
@@ -34,10 +35,10 @@ public class SecurityConfig
   private static final String LOGOUT_API_URL = "/api/logout";
   private static final String LOGIN_PAGE_URL = "/login";
 
-  private final MappingJackson2HttpMessageConverter httpMessageConverter;
+  private final JacksonJsonHttpMessageConverter httpMessageConverter;
 
-  public SecurityConfig(MappingJackson2HttpMessageConverter httpMessageConverter) {
-    this.httpMessageConverter = httpMessageConverter;
+  public SecurityConfig(JsonMapper jsonMapper) {
+    this.httpMessageConverter = new JacksonJsonHttpMessageConverter(jsonMapper);
   }
 
   @Bean
