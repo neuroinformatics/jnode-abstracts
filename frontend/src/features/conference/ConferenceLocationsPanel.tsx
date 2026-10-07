@@ -41,8 +41,15 @@ const ConferenceLocationsPanel: React.FC<Props> = (props) => {
     if (feature.properties != null) {
       const { name, description } = feature.properties;
       if (name != null) {
-        const text = `<b>${name}</b>${description != null ? `<br />${description}` : ''}`;
-        layer.bindPopup(text);
+        // build the popup as elements, as the texts come from the conference data and must not be read as HTML
+        const popup = document.createElement('div');
+        const title = document.createElement('b');
+        title.textContent = String(name);
+        popup.append(title);
+        if (description != null) {
+          popup.append(document.createElement('br'), String(description));
+        }
+        layer.bindPopup(popup);
       }
     }
   };
