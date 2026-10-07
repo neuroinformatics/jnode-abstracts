@@ -2,6 +2,7 @@
   "name": "abstracts",
   "private": true,
   "version": "1.0.0",
+  "license": "MIT",
   "type": "module",
   "scripts": {
     "predev": "node scripts/copy-mathjax.mjs",

@@ -1,8 +1,9 @@
 # J-Node Abstract System
 
 A web application to publish conference information and to collect, review and publish conference abstracts. It is
-run by the INCF Japan Node and replaces GCA-Web, the abstract system of the German Neuroinformatics Node, whose data it
-took over.
+run by the INCF Japan Node and succeeds [GCA-Web](https://github.com/G-Node/GCA-Web), the conference application of the
+German Neuroinformatics Node (G-Node), which is no longer maintained. It is a rewrite in Spring Boot and React that
+follows the design of GCA-Web and took over its data.
 
 - Public pages show the conferences with their schedules, locations, floor plans and accepted abstracts.
 - Authors write abstracts with authors, affiliations, figures and references, and submit them for review.
@@ -148,3 +149,13 @@ frontend/src
   entities/     types of the API data
 scripts/        build helpers, e.g. copying MathJax so that the site serves it itself
 ```
+
+## Acknowledgements
+
+This system is based on the design of [GCA-Web](https://github.com/G-Node/GCA-Web) by the German Neuroinformatics Node
+(G-Node), including its data model and review workflow. We thank the G-Node for developing GCA-Web and making it
+available under an open source license.
+
+## License
+
+This project is licensed under the MIT License, see [LICENSE](LICENSE).
