@@ -1,4 +1,3 @@
-import ky from 'ky';
 import type { AbstractSimpleEntity } from '../entities/abstract';
 import type { ApiSuccessResponse } from '../entities/api';
 import type {
@@ -7,6 +6,7 @@ import type {
   ConferenceSimpleEntity,
   TopicEntity,
 } from '../entities/conference';
+import api from './client';
 
 export const ApiConferenceList = async (
   shortName: string | null,
@@ -17,19 +17,19 @@ export const ApiConferenceList = async (
   if (shortName != null) {
     searchParams.set('shortName', shortName);
   }
-  const response = await ky.get<ConferenceSimpleEntity[]>('/api/conferences', { searchParams, signal }).json();
+  const response = await api.get<ConferenceSimpleEntity[]>('/api/conferences', { searchParams, signal }).json();
   return response;
 };
 
 export const ApiConferenceRetrieve = async (uuid: string, signal: AbortSignal): Promise<ConferenceEntity> => {
   // status code: 200
-  const response = await ky.get<ConferenceEntity>(`/api/conferences/${uuid}`, { signal }).json();
+  const response = await api.get<ConferenceEntity>(`/api/conferences/${uuid}`, { signal }).json();
   return response;
 };
 
 export const ApiConferenceAbstractList = async (uuid: string, signal: AbortSignal): Promise<AbstractSimpleEntity[]> => {
   // status code: 200
-  const response = await ky.get<AbstractSimpleEntity[]>(`/api/conferences/${uuid}/abstracts`, { signal }).json();
+  const response = await api.get<AbstractSimpleEntity[]>(`/api/conferences/${uuid}/abstracts`, { signal }).json();
   return response;
 };
 
@@ -117,7 +117,7 @@ export const ApiConferenceUpdate = async (
   });
   formData.append('abstractMaxLength', String(abstractMaxLength));
   formData.append('abstractMaxFigures', String(abstractMaxFigures));
-  const response = await ky.put<ApiSuccessResponse>(`/api/conferences/${uuid}`, { body: formData, signal }).json();
+  const response = await api.put<ApiSuccessResponse>(`/api/conferences/${uuid}`, { body: formData, signal }).json();
   return response;
 };
 
@@ -140,7 +140,7 @@ export const ApiConferenceAbstractGroupsUpdate = async (
     formData.append(`abstractGroups[${idx}].prefix`, String(abstractGroup.prefix));
     formData.append(`abstractGroups[${idx}].shortName`, abstractGroup.shortName);
   });
-  const response = await ky
+  const response = await api
     .put<ApiSuccessResponse>(`/api/conferences/${uuid}/abstractGroups`, { body: formData, signal })
     .json();
   return response;
@@ -154,7 +154,7 @@ export const ApiConferenceGeoUpdate = async (
   // status code: 200
   const formData = new FormData();
   formData.append('geo', geo);
-  const response = await ky.put<ApiSuccessResponse>(`/api/conferences/${uuid}/geo`, { body: formData, signal }).json();
+  const response = await api.put<ApiSuccessResponse>(`/api/conferences/${uuid}/geo`, { body: formData, signal }).json();
   return response;
 };
 
@@ -166,7 +166,7 @@ export const ApiConferenceScheduleUpdate = async (
   // status code: 200
   const formData = new FormData();
   formData.append('schedule', schedule);
-  const response = await ky
+  const response = await api
     .put<ApiSuccessResponse>(`/api/conferences/${uuid}/schedule`, { body: formData, signal })
     .json();
   return response;
@@ -180,7 +180,9 @@ export const ApiConferenceInfoUpdate = async (
   // status code: 200
   const formData = new FormData();
   formData.append('info', info);
-  const response = await ky.put<ApiSuccessResponse>(`/api/conferences/${uuid}/info`, { body: formData, signal }).json();
+  const response = await api
+    .put<ApiSuccessResponse>(`/api/conferences/${uuid}/info`, { body: formData, signal })
+    .json();
   return response;
 };
 
@@ -194,7 +196,7 @@ export const ApiConferenceOwnersUpdate = async (
   owners.forEach((owner) => {
     formData.append('owners', owner);
   });
-  const response = await ky
+  const response = await api
     .put<ApiSuccessResponse>(`/api/conferences/${uuid}/owners`, { body: formData, signal })
     .json();
   return response;
