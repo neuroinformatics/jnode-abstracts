@@ -228,7 +228,8 @@ const DashboardAccountsPanel: React.FC = () => {
                 <td>
                   {account.firstName} {account.lastName}
                 </td>
-                <td className="text-nowrap">{dayjs(account.ctime).format('YYYY-MM-DD')}</td>
+                {/* timestamps are sent in UTC without an offset, as the server runs in UTC */}
+                <td className="text-nowrap">{dayjs(`${account.ctime}Z`).format('YYYY-MM-DD')}</td>
                 <td>
                   {account.isAdmin && (
                     <Badge bg="primary" className="me-1">
