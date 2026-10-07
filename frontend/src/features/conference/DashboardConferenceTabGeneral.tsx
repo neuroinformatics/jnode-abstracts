@@ -5,23 +5,25 @@ import { CSS } from '@dnd-kit/utilities';
 import { faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import classNames from 'classnames';
-import moment, { type Moment } from 'moment';
 import React from 'react';
-import DatetimeModule from 'react-datetime';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { ApiAsyncStatus } from '../../entities/api';
 import type { TopicEntity } from '../../entities/conference';
+import { showMessage } from '../common/commonSlice';
 import { getConferenceDetail, selectPageActionState, unsetPageActionState, updateConference } from './conferenceSlice';
 import { getBannerUrl, getLogoUuid, getThumbnailUuid } from './conferenceUtilities';
 import type { DashboardConferenceTabProps } from './DashboardConferenceTab';
-
-import 'react-datetime/css/react-datetime.css';
-import { showMessage } from '../common/commonSlice';
 import styles from './DashboardConferenceTabGeneral.module.scss';
 
-// react-datetime is a CommonJS module exporting the component as `exports.default`,
-// and Vite 8 imports the whole `module.exports` object as the default import.
-const Datetime = (DatetimeModule as unknown as { default?: typeof DatetimeModule }).default ?? DatetimeModule;
+// split ISO8601 local date time (YYYY-MM-DDTHH:mm:ss) into date and time parts
+const splitDateTime = (value: string): { date: string; time: string } => {
+  const [date = '', time = ''] = value.split('T');
+  return { date, time: time !== '' ? time : '00:00:00' };
+};
+
+// combine an edited date with the time part of the original value, since only the date is editable
+const joinDateTime = (date: string, original: string): string =>
+  date !== '' ? `${date}T${splitDateTime(original).time}` : '';
 
 interface TopicItem extends TopicEntity {
   id: string;
@@ -88,15 +90,9 @@ const DashboardConferenceTabGeneral: React.FC<DashboardConferenceTabProps> = (pr
   const [shortName, setShortName] = React.useState<string>(conference.shortName);
   const [conferenceGroup, setConferenceGroup] = React.useState<string>(conference.conferenceGroup ?? '');
   const [cite, setCite] = React.useState<string>(conference.cite ?? '');
-  const [startDate, setStartDate] = React.useState<Moment | string>(
-    conference.startDate === '' ? '' : moment(conference.startDate),
-  );
-  const [endDate, setEndDate] = React.useState<Moment | string>(
-    conference.endDate === '' ? '' : moment(conference.endDate),
-  );
-  const [deadline, setDeadline] = React.useState<Moment | string>(
-    conference.deadline === '' ? '' : moment(conference.deadline),
-  );
+  const [startDate, setStartDate] = React.useState<string>(splitDateTime(conference.startDate).date);
+  const [endDate, setEndDate] = React.useState<string>(splitDateTime(conference.endDate).date);
+  const [deadline, setDeadline] = React.useState<string>(splitDateTime(conference.deadline).date);
   const [logoUuid, setLogoUuid] = React.useState<string | null>(getLogoUuid(conference));
   const [logoFile, setLogoFile] = React.useState<File | null>(null);
   const [logoLink, setLogoLink] = React.useState<string>(conference.logo ?? '');
@@ -144,9 +140,9 @@ const DashboardConferenceTabGeneral: React.FC<DashboardConferenceTabProps> = (pr
           shortName,
           conferenceGroup,
           cite,
-          startDate: moment.isMoment(startDate) ? startDate.format('YYYY-MM-DD[T]HH:mm:SS') : '',
-          endDate: moment.isMoment(endDate) ? endDate.format('YYYY-MM-DD[T]HH:mm:SS') : '',
-          deadline: moment.isMoment(deadline) ? deadline.format('YYYY-MM-DD[T]HH:mm:SS') : '',
+          startDate: joinDateTime(startDate, conference.startDate),
+          endDate: joinDateTime(endDate, conference.endDate),
+          deadline: joinDateTime(deadline, conference.deadline),
           logoUuid,
           logoFile,
           logoLink,
@@ -191,6 +187,9 @@ const DashboardConferenceTabGeneral: React.FC<DashboardConferenceTabProps> = (pr
       thumbnailLink,
       thumbnailUuid,
       topics,
+      conference.startDate,
+      conference.endDate,
+      conference.deadline,
     ],
   );
 
@@ -315,12 +314,12 @@ const DashboardConferenceTabGeneral: React.FC<DashboardConferenceTabProps> = (pr
           Start
         </label>
         <div className="col-sm-10">
-          <Datetime
-            dateFormat="YYYY-MM-DD"
-            timeFormat={false}
-            inputProps={{ id: 'start', placeholder: 'Start date' }}
+          <input
+            id="start"
+            className="form-control"
+            type="date"
             value={startDate}
-            onChange={(value) => setStartDate(value)}
+            onChange={(e) => setStartDate(e.target.value)}
           />
         </div>
       </div>
@@ -330,12 +329,12 @@ const DashboardConferenceTabGeneral: React.FC<DashboardConferenceTabProps> = (pr
           End
         </label>
         <div className="col-sm-10">
-          <Datetime
-            dateFormat="YYYY-MM-DD"
-            timeFormat={false}
-            inputProps={{ id: 'end', placeholder: 'End date' }}
+          <input
+            id="end"
+            className="form-control"
+            type="date"
             value={endDate}
-            onChange={(value) => setEndDate(value)}
+            onChange={(e) => setEndDate(e.target.value)}
           />
         </div>
       </div>
@@ -345,12 +344,12 @@ const DashboardConferenceTabGeneral: React.FC<DashboardConferenceTabProps> = (pr
           Deadline
         </label>
         <div className="col-sm-10">
-          <Datetime
-            dateFormat="YYYY-MM-DD"
-            timeFormat={false}
-            inputProps={{ id: 'deadline', placeholder: 'Abstract submission deadline' }}
+          <input
+            id="deadline"
+            className="form-control"
+            type="date"
             value={deadline}
-            onChange={(value) => setDeadline(value)}
+            onChange={(e) => setDeadline(e.target.value)}
           />
         </div>
       </div>
