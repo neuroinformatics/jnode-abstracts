@@ -15,6 +15,7 @@ import jakarta.validation.Valid;
 import jp.neuroinf.abstracts.core.AccountDetails;
 import jp.neuroinf.abstracts.core.RestSuccessResponseBody;
 import jp.neuroinf.abstracts.dto.AbstractDto;
+import jp.neuroinf.abstracts.dto.AbstractSimpleDto;
 import jp.neuroinf.abstracts.dto.AccountDto;
 import jp.neuroinf.abstracts.form.UsersChangeEmailForm;
 import jp.neuroinf.abstracts.form.UsersChangePasswordForm;
@@ -25,6 +26,7 @@ import jp.neuroinf.abstracts.form.UsersResetPasswordForm;
 import jp.neuroinf.abstracts.form.UsersUpdateForm;
 import jp.neuroinf.abstracts.service.AbstractService;
 import jp.neuroinf.abstracts.service.AccountService;
+import jp.neuroinf.abstracts.service.FavoriteService;
 
 @RestController
 @RequestMapping("/api/users")
@@ -32,10 +34,13 @@ public class RestApiUsersController {
 
     private final AccountService accountService;
     private final AbstractService abstractService;
+    private final FavoriteService favoriteService;
 
-    public RestApiUsersController(AccountService accountService, AbstractService abstractService) {
+    public RestApiUsersController(AccountService accountService, AbstractService abstractService,
+            FavoriteService favoriteService) {
         this.accountService = accountService;
         this.abstractService = abstractService;
+        this.favoriteService = favoriteService;
     }
 
     @GetMapping("")
@@ -58,6 +63,12 @@ public class RestApiUsersController {
     public List<AbstractDto> listCurrentUserAbstracts(@AuthenticationPrincipal AccountDetails user)
             throws ResponseStatusException {
         return this.abstractService.getOwnAbstracts(user);
+    }
+
+    @GetMapping("/current/favorites")
+    public List<AbstractSimpleDto> listCurrentUserFavorites(@AuthenticationPrincipal AccountDetails user)
+            throws ResponseStatusException {
+        return this.favoriteService.getFavorites(user);
     }
 
     @GetMapping("/exists")

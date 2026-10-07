@@ -21,6 +21,7 @@ import jp.neuroinf.abstracts.form.AbstractUpdatePublicationForm;
 import jp.neuroinf.abstracts.form.AbstractUpdateStateForm;
 import jp.neuroinf.abstracts.form.FigureUploadForm;
 import jp.neuroinf.abstracts.service.AbstractService;
+import jp.neuroinf.abstracts.service.FavoriteService;
 import jp.neuroinf.abstracts.service.FigureService;
 
 @RestController
@@ -29,10 +30,13 @@ public class RestApiAbstractsController {
 
     private final AbstractService abstractService;
     private final FigureService figureService;
+    private final FavoriteService favoriteService;
 
-    public RestApiAbstractsController(AbstractService abstractService, FigureService figureService) {
+    public RestApiAbstractsController(AbstractService abstractService, FigureService figureService,
+            FavoriteService favoriteService) {
         this.abstractService = abstractService;
         this.figureService = figureService;
+        this.favoriteService = favoriteService;
     }
 
     @GetMapping("/{uuid}")
@@ -64,6 +68,18 @@ public class RestApiAbstractsController {
     public AbstractDto uploadAbstractFigure(@AuthenticationPrincipal AccountDetails user,
             @PathVariable("uuid") String uuid, @Valid FigureUploadForm form) throws ResponseStatusException {
         return this.figureService.uploadFigure(user, uuid, form);
+    }
+
+    @PutMapping("/{uuid}/favorite")
+    public RestSuccessResponseBody addAbstractFavorite(@AuthenticationPrincipal AccountDetails user,
+            @PathVariable("uuid") String uuid) throws ResponseStatusException {
+        return this.favoriteService.addFavorite(user, uuid);
+    }
+
+    @DeleteMapping("/{uuid}/favorite")
+    public RestSuccessResponseBody removeAbstractFavorite(@AuthenticationPrincipal AccountDetails user,
+            @PathVariable("uuid") String uuid) throws ResponseStatusException {
+        return this.favoriteService.removeFavorite(user, uuid);
     }
 
     @PutMapping("/{uuid}/state")
