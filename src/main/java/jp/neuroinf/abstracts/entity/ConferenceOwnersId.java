@@ -1,20 +1,25 @@
 package jp.neuroinf.abstracts.entity;
 
+import java.io.Serial;
 import java.io.Serializable;
 
-import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+// composite primary key of ConferenceOwners, holding the primary keys of the referenced entities
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Embeddable
 public class ConferenceOwnersId implements Serializable {
 
-  private Conference conference;
+  @Serial
+  private static final long serialVersionUID = 1L;
 
-  private Account owner;
+  // primary key (uuid) of Conference
+  private String conference;
+
+  // primary key (uuid) of Account
+  private String owner;
 
 }

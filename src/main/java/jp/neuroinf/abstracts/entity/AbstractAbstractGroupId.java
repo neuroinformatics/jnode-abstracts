@@ -1,20 +1,25 @@
 package jp.neuroinf.abstracts.entity;
 
+import java.io.Serial;
 import java.io.Serializable;
 
-import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+// composite primary key of AbstractAbstractGroup, holding the primary keys of the referenced entities
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Embeddable
 public class AbstractAbstractGroupId implements Serializable {
 
-  private Abstract abstract_;
+  @Serial
+  private static final long serialVersionUID = 1L;
 
-  private AbstractGroup abstractGroup;
+  // primary key (uuid) of Abstract
+  private String abstract_;
+
+  // primary key (uuid) of AbstractGroup
+  private String abstractGroup;
 
 }
