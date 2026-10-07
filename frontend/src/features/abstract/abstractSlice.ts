@@ -10,6 +10,9 @@ import {
   ApiAbstractRetrieve,
   ApiAbstractStateUpdate,
   ApiAbstractUpdate,
+  ApiFavoriteAdd,
+  ApiFavoriteList,
+  ApiFavoriteRemove,
   ApiFigureDelete,
   ApiFigureUpdate,
 } from '../../api/abstractApi';
@@ -17,18 +20,21 @@ import { ApiConferenceAllAbstractList } from '../../api/conferenceApi ';
 import { getApiErrorMessage } from '../../api/utilities';
 import type { RootState } from '../../app/store';
 import type { NormalizedState } from '../../common/normalizedState';
-import type { AbstractEntity, StateLogState } from '../../entities/abstract';
+import type { AbstractEntity, AbstractSimpleEntity, StateLogState } from '../../entities/abstract';
 import { type ApiActionState, ApiAsyncStatus, type ApiSuccessResponse } from '../../entities/api';
 
 export type AbstractStateAbstracts = NormalizedState<AbstractEntity, string>;
+export type AbstractStateFavorites = NormalizedState<AbstractSimpleEntity, string>;
 
 interface AbstractState {
   abstractInfo: AbstractEntity | null;
   managedAbstractsInfo: AbstractStateAbstracts;
   ownAbstractsInfo: AbstractStateAbstracts;
+  favoriteAbstractsInfo: AbstractStateFavorites;
   getDetailState: ApiActionState;
   getManagedAbstractsState: ApiActionState;
   getOwnAbstractsState: ApiActionState;
+  getFavoritesState: ApiActionState;
   pageActionState: ApiActionState;
 }
 
@@ -36,9 +42,11 @@ const initialState: Readonly<AbstractState> = {
   abstractInfo: null,
   managedAbstractsInfo: { byId: {}, allIds: [] },
   ownAbstractsInfo: { byId: {}, allIds: [] },
+  favoriteAbstractsInfo: { byId: {}, allIds: [] },
   getDetailState: { type: null, error: null, status: ApiAsyncStatus.initializing },
   getManagedAbstractsState: { type: null, error: null, status: ApiAsyncStatus.initializing },
   getOwnAbstractsState: { type: null, error: null, status: ApiAsyncStatus.initializing },
+  getFavoritesState: { type: null, error: null, status: ApiAsyncStatus.initializing },
   pageActionState: { type: null, error: null, status: ApiAsyncStatus.initializing },
 };
 
@@ -186,6 +194,47 @@ export const deleteFigure = createAsyncThunk<AbstractEntity, string, { rejectVal
   },
 );
 
+export const getFavorites = createAsyncThunk<AbstractSimpleEntity[], void, { rejectValue: string }>(
+  'abstract/favorite/list',
+  async (_, thunkApi) => {
+    try {
+      const abstracts = await ApiFavoriteList(thunkApi.signal);
+      return abstracts;
+    } catch (e: unknown) {
+      const message = await getApiErrorMessage(e);
+      return thunkApi.rejectWithValue(message);
+    }
+  },
+);
+
+export const addFavorite = createAsyncThunk<ApiSuccessResponse, AbstractSimpleEntity, { rejectValue: string }>(
+  'abstract/favorite/add',
+  async (params, thunkApi) => {
+    const abstract = params;
+    try {
+      const result = await ApiFavoriteAdd(abstract.uuid, thunkApi.signal);
+      return result;
+    } catch (e: unknown) {
+      const message = await getApiErrorMessage(e);
+      return thunkApi.rejectWithValue(message);
+    }
+  },
+);
+
+export const removeFavorite = createAsyncThunk<ApiSuccessResponse, string, { rejectValue: string }>(
+  'abstract/favorite/remove',
+  async (params, thunkApi) => {
+    const uuid = params;
+    try {
+      const result = await ApiFavoriteRemove(uuid, thunkApi.signal);
+      return result;
+    } catch (e: unknown) {
+      const message = await getApiErrorMessage(e);
+      return thunkApi.rejectWithValue(message);
+    }
+  },
+);
+
 export const updateAbstractState = createAsyncThunk<
   AbstractEntity,
   { uuid: string; state: StateLogState; note: string },
@@ -265,6 +314,11 @@ export const abstractSlice = createSlice({
     unsetPageActionState: (state) => {
       StateFuncPageActionInitialize(state);
     },
+    unsetFavorites: (state) => {
+      state.favoriteAbstractsInfo = { byId: {}, allIds: [] };
+      state.getFavoritesState.error = null;
+      state.getFavoritesState.status = ApiAsyncStatus.initializing;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -298,6 +352,37 @@ export const abstractSlice = createSlice({
         const error = action.payload ?? '';
         state.getManagedAbstractsState.error = error;
         state.getManagedAbstractsState.status = ApiAsyncStatus.failed;
+      })
+      .addCase(getFavorites.pending, (state) => {
+        state.getFavoritesState.status = ApiAsyncStatus.loading;
+      })
+      .addCase(getFavorites.fulfilled, (state, action) => {
+        const abstracts = action.payload;
+        state.getFavoritesState.error = null;
+        state.getFavoritesState.status = ApiAsyncStatus.idle;
+        state.favoriteAbstractsInfo = { allIds: [], byId: {} };
+        abstracts.forEach((abstract) => {
+          state.favoriteAbstractsInfo.allIds.push(abstract.uuid);
+          state.favoriteAbstractsInfo.byId[abstract.uuid] = abstract;
+        });
+      })
+      .addCase(getFavorites.rejected, (state, action) => {
+        const error = action.payload ?? '';
+        state.getFavoritesState.error = error;
+        state.getFavoritesState.status = ApiAsyncStatus.failed;
+      })
+      // favorites change without the page action state, so that toggling them does not block the page
+      .addCase(addFavorite.fulfilled, (state, action) => {
+        const abstract = action.meta.arg;
+        if (!state.favoriteAbstractsInfo.allIds.includes(abstract.uuid)) {
+          state.favoriteAbstractsInfo.allIds.push(abstract.uuid);
+          state.favoriteAbstractsInfo.byId[abstract.uuid] = abstract;
+        }
+      })
+      .addCase(removeFavorite.fulfilled, (state, action) => {
+        const uuid = action.meta.arg;
+        state.favoriteAbstractsInfo.allIds = state.favoriteAbstractsInfo.allIds.filter((id) => id !== uuid);
+        delete state.favoriteAbstractsInfo.byId[uuid];
       })
       .addCase(getOwnAbstracts.pending, (state) => {
         state.getOwnAbstractsState.status = ApiAsyncStatus.loading;
@@ -412,13 +497,16 @@ export const abstractSlice = createSlice({
   },
 });
 
-export const { unsetAbstractDetail, unsetManagedAbstracts, unsetPageActionState } = abstractSlice.actions;
+export const { unsetAbstractDetail, unsetManagedAbstracts, unsetPageActionState, unsetFavorites } =
+  abstractSlice.actions;
 
 export const selectAbstractInfo = (state: RootState) => state.abstract.abstractInfo;
 export const selectManagedAbstractsInfo = (state: RootState) => state.abstract.managedAbstractsInfo;
 export const selectGetDetailState = (state: RootState) => state.abstract.getDetailState;
 export const selectGetManagedAbstractsState = (state: RootState) => state.abstract.getManagedAbstractsState;
 export const selectOwnAbstractsInfo = (state: RootState) => state.abstract.ownAbstractsInfo;
+export const selectFavoriteAbstractsInfo = (state: RootState) => state.abstract.favoriteAbstractsInfo;
+export const selectGetFavoritesState = (state: RootState) => state.abstract.getFavoritesState;
 export const selectGetOwnAbstractsState = (state: RootState) => state.abstract.getOwnAbstractsState;
 export const selectPageActionState = (state: RootState) => state.abstract.pageActionState;
 

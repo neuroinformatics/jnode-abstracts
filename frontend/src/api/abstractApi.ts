@@ -1,4 +1,4 @@
-import type { AbstractEntity, StateLogState } from '../entities/abstract';
+import type { AbstractEntity, AbstractSimpleEntity, StateLogState } from '../entities/abstract';
 import type { ApiSuccessResponse } from '../entities/api';
 import api from './client';
 
@@ -140,5 +140,23 @@ export const ApiFigureUpdate = async (uuid: string, caption: string, signal: Abo
 export const ApiFigureDelete = async (uuid: string, signal: AbortSignal): Promise<AbstractEntity> => {
   // status code: 200
   const response = await api.delete<AbstractEntity>(`/api/figures/${uuid}`, { signal }).json();
+  return response;
+};
+
+export const ApiFavoriteList = async (signal: AbortSignal): Promise<AbstractSimpleEntity[]> => {
+  // status code: 200
+  const response = await api.get<AbstractSimpleEntity[]>('/api/users/current/favorites', { signal }).json();
+  return response;
+};
+
+export const ApiFavoriteAdd = async (uuid: string, signal: AbortSignal): Promise<ApiSuccessResponse> => {
+  // status code: 200
+  const response = await api.put<ApiSuccessResponse>(`/api/abstracts/${uuid}/favorite`, { signal }).json();
+  return response;
+};
+
+export const ApiFavoriteRemove = async (uuid: string, signal: AbortSignal): Promise<ApiSuccessResponse> => {
+  // status code: 200
+  const response = await api.delete<ApiSuccessResponse>(`/api/abstracts/${uuid}/favorite`, { signal }).json();
   return response;
 };

@@ -10,6 +10,7 @@ import PageNotFound from '../../common/PageNotFound';
 import type { AbstractSimpleEntity } from '../../entities/abstract';
 import { isApiPreparing } from '../../entities/api';
 import type { ConferenceEntity } from '../../entities/conference';
+import FavoriteButton from '../abstract/FavoriteButton';
 import AbstractPanel from './AbstractPanel';
 import { getConferenceAbstracts, selectAbstractsInfo, selectGetAbstractsState } from './conferenceSlice';
 import { formatAuthorCitation, getAbstractId, getAbstractUrl } from './conferenceUtilities';
@@ -172,6 +173,7 @@ const AbstractListPanel: React.FC<Props> = (props) => {
                         abstract={abstractsInfo.byId[hashAbstractUuid]}
                         abstractUuids={abstractUuids}
                       />
+                      <FavoriteButton abstract={abstractsInfo.byId[hashAbstractUuid]} className="float-end fs-4" />
                       <AbstractPanel conference={conference} abstract={abstractsInfo.byId[hashAbstractUuid]} />
                     </>
                   ) : (
@@ -192,7 +194,12 @@ const AbstractListPanel: React.FC<Props> = (props) => {
                           return (
                             <Link key={abstractUuid} className="list-group-item" to={abstractUrl}>
                               <div className="abstract">
-                                <div className="sortId">{abstractId}</div>
+                                <div className="sortId">
+                                  {abstractId}
+                                  <div>
+                                    <FavoriteButton abstract={abstract} />
+                                  </div>
+                                </div>
                                 <div className="box">
                                   <h5 className="my-1">
                                     <KeywordHighlight keyword={keyword}>{abstract.title}</KeywordHighlight>

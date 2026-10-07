@@ -4,6 +4,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import PageNotFound from '../common/PageNotFound';
 import AbstractEditorPanel from '../features/abstract/AbstractEditorPanel';
 import AbstractViewPanel from '../features/abstract/AbstractViewPanel';
+import FavoriteAbstractsPanel from '../features/abstract/FavoriteAbstractsPanel';
 import MyAbstractsPanel from '../features/abstract/MyAbstractsPanel';
 import DashboardAccountsPanel from '../features/account/DashboardAccountsPanel';
 import MessageBar from '../features/common/MessageBar';
@@ -39,6 +40,7 @@ const MainPanel: React.FC = () => {
         <Route path="abstracts/:uuid" element={<AbstractViewPanel />} />
         <Route path="myabstracts" element={<MyAbstractsPanel />} />
         <Route path="myabstracts/:uuid/edit" element={<AbstractEditorPanel />} />
+        <Route path="favouriteabstracts" element={<FavoriteAbstractsPanel />} />
         <Route path="dashboard/conference" element={<DashboardConferenceCreatePanel />} />
         <Route path="dashboard/conference/:uuid/*" element={<DashboardConferenceRouterPanel />} />
         <Route path="dashboard/accounts" element={<DashboardAccountsPanel />} />

@@ -14,6 +14,7 @@ import {
 } from '../conference/conferenceSlice';
 import AbstractStateLogPanel from './AbstractStateLogPanel';
 import { getAbstractDetail, selectAbstractInfo, selectGetDetailState, unsetAbstractDetail } from './abstractSlice';
+import FavoriteButton from './FavoriteButton';
 
 const AbstractViewPanel: React.FC = () => {
   const { uuid } = useParams();
@@ -56,6 +57,9 @@ const AbstractViewPanel: React.FC = () => {
     <div className="abstract-view">
       <GeneralPanel title={conferenceInfo.name} titleLinkTo={`/conference/${conferenceInfo.shortName}`}>
         <AbstractStateLogPanel abstract={abstractInfo} />
+        {conferenceInfo.isPublished && abstractInfo.state === 'Accepted' && (
+          <FavoriteButton abstract={abstractInfo} className="float-end fs-4" />
+        )}
         <AbstractPanel conference={conferenceInfo} abstract={abstractInfo} />
       </GeneralPanel>
     </div>
