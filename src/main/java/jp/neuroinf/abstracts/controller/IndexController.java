@@ -8,18 +8,14 @@ public class IndexController {
 
   private static final String FORWARD_INDEX = "forward:/index.html";
 
-  @GetMapping("/[^\\.]+")
+  // single segment paths without a dot (e.g. /login), as files like /favicon.ico are served as they are
+  @GetMapping("/{path:[^\\.]+}")
   public String index() {
     return FORWARD_INDEX;
   }
 
-  @GetMapping("/conference/**")
-  public String conferenceIndex() {
-    return FORWARD_INDEX;
-  }
-
-  @GetMapping("/dashboard/**")
-  public String dashboardIndex() {
+  @GetMapping({ "/conference/**", "/dashboard/**", "/myabstracts/**", "/abstracts/**" })
+  public String applicationIndex() {
     return FORWARD_INDEX;
   }
 

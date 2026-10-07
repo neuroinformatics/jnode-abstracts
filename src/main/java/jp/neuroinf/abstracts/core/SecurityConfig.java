@@ -82,7 +82,7 @@ public class SecurityConfig
     body.setTimestamp(ZonedDateTime.now());
     body.setCode(status.value());
     body.setMessage(status.getReasonPhrase());
-    body.setPath(LOGOUT_API_URL);
+    body.setPath(LOGIN_API_URL);
     response.setStatus(status.value());
     httpMessageConverter.write(body, MediaType.APPLICATION_JSON, outputMessage);
   }

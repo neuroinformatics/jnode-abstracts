@@ -30,7 +30,7 @@ public class BannerService {
   @Transactional
   public BannerDto getBanner(String uuid) {
     Banner banner = this.bannerRepository.findFirstByUuid(uuid);
-    return BannerDto.of(banner);
+    return banner != null ? BannerDto.of(banner) : null;
   }
 
   @Transactional

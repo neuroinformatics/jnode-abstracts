@@ -157,10 +157,15 @@ public class AccountService implements UserDetailsService {
     if (!this.passwordEncoder.matches(form.getPassword(), account.getPassword()) && !isAdmin) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password mismatched");
     }
+    final Account owner = this.accountRepository.findFirstByMail(form.getEmail());
+    if (owner != null && !owner.getUuid().equals(account.getUuid())) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, RESPONSE_MESSAGE_MAIL_TAKEN);
+    }
     account.setMail(form.getEmail());
     try {
-      this.accountRepository.save(account);
+      this.accountRepository.saveAndFlush(account);
     } catch (DataIntegrityViolationException e) {
+      // taken by someone else since the check above
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, RESPONSE_MESSAGE_MAIL_TAKEN);
     }
     return new RestSuccessResponseBody("success");

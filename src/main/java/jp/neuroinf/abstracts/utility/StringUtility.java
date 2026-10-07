@@ -38,7 +38,7 @@ public class StringUtility {
   }
 
   public static String toString(byte[] value) {
-    return new String(value);
+    return new String(value, StandardCharsets.UTF_8);
   }
 
 }

@@ -30,7 +30,13 @@ public class TimestampSigner {
   }
 
   public String unSign(String token, long duration) {
-    String signedValue = StringUtility.b64decode(token);
+    String signedValue;
+    try {
+      signedValue = StringUtility.b64decode(token);
+    } catch (IllegalArgumentException e) {
+      // not base64, e.g. a link broken in a mail
+      return null;
+    }
     String[] valueSignature = StringUtility.rSplit(SEPARATOR, signedValue);
     if (valueSignature.length != 2) {
       return null;
