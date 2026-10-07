@@ -38,7 +38,7 @@ const DashboardConferenceTabGroups: React.FC<DashboardConferenceTabProps> = (pro
   React.useEffect(() => {
     if (pageActionState.type === 'abstractGroups') {
       if (pageActionState.status === ApiAsyncStatus.idle) {
-        const message = 'Info successfully updated.';
+        const message = 'Groups successfully updated.';
         dispatch(showMessage({ variant: 'success', message }));
         dispatch(getConferenceDetail(conference.uuid));
         dispatch(unsetPageActionState());

@@ -10,7 +10,13 @@ import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { ApiAsyncStatus } from '../../entities/api';
 import type { TopicEntity } from '../../entities/conference';
 import { showMessage } from '../common/commonSlice';
-import { getConferenceDetail, selectPageActionState, unsetPageActionState, updateConference } from './conferenceSlice';
+import {
+  getConferenceDetail,
+  getConferenceList,
+  selectPageActionState,
+  unsetPageActionState,
+  updateConference,
+} from './conferenceSlice';
 import { getBannerUrl, getLogoUuid, getThumbnailUuid } from './conferenceUtilities';
 import type { DashboardConferenceTabProps } from './DashboardConferenceTab';
 import styles from './DashboardConferenceTabGeneral.module.scss';
@@ -116,8 +122,10 @@ const DashboardConferenceTabGeneral: React.FC<DashboardConferenceTabProps> = (pr
   React.useEffect(() => {
     if (pageActionState.type === 'general') {
       if (pageActionState.status === ApiAsyncStatus.idle) {
-        const message = 'Info successfully updated.';
+        const message = 'Settings successfully updated.';
         dispatch(showMessage({ variant: 'success', message }));
+        // the conference pages look up the short name in the list, which may have changed
+        dispatch(getConferenceList());
         dispatch(getConferenceDetail(conference.uuid));
         dispatch(unsetPageActionState());
       } else if (pageActionState.status === ApiAsyncStatus.failed) {

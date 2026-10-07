@@ -6,7 +6,12 @@ import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import GeoJsonSchema from '../../assets/schema/GeoJSON.json';
 import { ApiAsyncStatus } from '../../entities/api';
 import { showMessage } from '../common/commonSlice';
-import { selectPageActionState, unsetPageActionState, updateConferenceGeo } from './conferenceSlice';
+import {
+  getConferenceDetail,
+  selectPageActionState,
+  unsetPageActionState,
+  updateConferenceGeo,
+} from './conferenceSlice';
 import type { DashboardConferenceTabProps } from './DashboardConferenceTab';
 
 const validateSchema = addFormats(new Ajv()).compile(GeoJsonSchema);
@@ -34,13 +39,14 @@ const DashboardConferenceTabMaps: React.FC<DashboardConferenceTabProps> = (props
       if (pageActionState.status === ApiAsyncStatus.idle) {
         const message = 'Maps successfully updated.';
         dispatch(showMessage({ variant: 'success', message }));
+        dispatch(getConferenceDetail(conference.uuid));
         dispatch(unsetPageActionState());
       } else if (pageActionState.status === ApiAsyncStatus.failed) {
         dispatch(showMessage({ variant: 'danger', message: pageActionState.error ?? '' }));
         dispatch(unsetPageActionState());
       }
     }
-  }, [dispatch, pageActionState.error, pageActionState.status, pageActionState.type]);
+  }, [conference.uuid, dispatch, pageActionState.error, pageActionState.status, pageActionState.type]);
 
   const onChangeMaps: React.ChangeEventHandler<HTMLTextAreaElement> = (e) => {
     setMaps(e.target.value);

@@ -6,7 +6,12 @@ import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import ScheduleJsonSchema from '../../assets/schema/ScheduleJSON.json';
 import { ApiAsyncStatus } from '../../entities/api';
 import { showMessage } from '../common/commonSlice';
-import { selectPageActionState, unsetPageActionState, updateConferenceSchedule } from './conferenceSlice';
+import {
+  getConferenceDetail,
+  selectPageActionState,
+  unsetPageActionState,
+  updateConferenceSchedule,
+} from './conferenceSlice';
 import type { DashboardConferenceTabProps } from './DashboardConferenceTab';
 
 const validateSchema = addFormats(new Ajv()).compile(ScheduleJsonSchema);
@@ -34,13 +39,14 @@ const DashboardConferenceTabSchedule: React.FC<DashboardConferenceTabProps> = (p
       if (pageActionState.status === ApiAsyncStatus.idle) {
         const message = 'Schedule successfully updated.';
         dispatch(showMessage({ variant: 'success', message }));
+        dispatch(getConferenceDetail(conference.uuid));
         dispatch(unsetPageActionState());
       } else if (pageActionState.status === ApiAsyncStatus.failed) {
         dispatch(showMessage({ variant: 'danger', message: pageActionState.error ?? '' }));
         dispatch(unsetPageActionState());
       }
     }
-  }, [dispatch, pageActionState.error, pageActionState.status, pageActionState.type]);
+  }, [conference.uuid, dispatch, pageActionState.error, pageActionState.status, pageActionState.type]);
 
   const onChangeSchedule: React.ChangeEventHandler<HTMLTextAreaElement> = (e) => {
     setSchedule(e.target.value);

@@ -6,7 +6,12 @@ import LoadingOverlay from '../../common/LoadingOverlay';
 import { ApiAsyncStatus } from '../../entities/api';
 import { showMessage } from '../common/commonSlice';
 import { exists, unsetPageActionState as unsetUserPageActionState } from '../user/userSlice';
-import { selectPageActionState, unsetPageActionState, updateConferenceOwners } from './conferenceSlice';
+import {
+  getConferenceDetail,
+  selectPageActionState,
+  unsetPageActionState,
+  updateConferenceOwners,
+} from './conferenceSlice';
 import type { DashboardConferenceTabProps } from './DashboardConferenceTab';
 
 const DashboardConferenceTabOwner: React.FC<DashboardConferenceTabProps> = (props) => {
@@ -25,13 +30,14 @@ const DashboardConferenceTabOwner: React.FC<DashboardConferenceTabProps> = (prop
       if (pageActionState.status === ApiAsyncStatus.idle) {
         const message = 'Owners successfully updated.';
         dispatch(showMessage({ variant: 'success', message }));
+        dispatch(getConferenceDetail(conference.uuid));
         dispatch(unsetPageActionState());
       } else if (pageActionState.status === ApiAsyncStatus.failed) {
         dispatch(showMessage({ variant: 'danger', message: pageActionState.error ?? '' }));
         dispatch(unsetPageActionState());
       }
     }
-  }, [dispatch, pageActionState.error, pageActionState.status, pageActionState.type]);
+  }, [conference.uuid, dispatch, pageActionState.error, pageActionState.status, pageActionState.type]);
 
   const onChangeEmail: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     setEmail(e.target.value.trim());
