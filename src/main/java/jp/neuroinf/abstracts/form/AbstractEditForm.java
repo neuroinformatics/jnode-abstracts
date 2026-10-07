@@ -40,16 +40,13 @@ public class AbstractEditForm {
   private String abstractGroupUuid;
 
   @NotNull
-  @Valid
-  private List<AuthorForm> authors = new ArrayList<>();
+  private List<@Valid AuthorForm> authors = new ArrayList<>();
 
   @NotNull
-  @Valid
-  private List<AffiliationForm> affiliations = new ArrayList<>();
+  private List<@Valid AffiliationForm> affiliations = new ArrayList<>();
 
   @NotNull
-  @Valid
-  private List<ReferenceForm> references = new ArrayList<>();
+  private List<@Valid ReferenceForm> references = new ArrayList<>();
 
   @Data
   public static class AuthorForm {

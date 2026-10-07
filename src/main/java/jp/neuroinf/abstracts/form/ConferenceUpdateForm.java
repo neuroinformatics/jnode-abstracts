@@ -68,8 +68,7 @@ public class ConferenceUpdateForm {
   @NotNull
   final Boolean hasPresentationPrefs;
 
-  @Valid
-  final List<TopicForm> topics;
+  final List<@Valid TopicForm> topics;
 
   @NotNull
   final Integer abstractMaxLength;

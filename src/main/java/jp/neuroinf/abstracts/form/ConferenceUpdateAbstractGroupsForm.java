@@ -11,8 +11,7 @@ import lombok.Value;
 @Value
 public class ConferenceUpdateAbstractGroupsForm {
 
-  @Valid
-  private List<AbstractGroupForm> abstractGroups;
+  private List<@Valid AbstractGroupForm> abstractGroups;
 
   @Value
   public class AbstractGroupForm {
