@@ -77,7 +77,7 @@ const LoginPanel: React.FC = () => {
             />
           </div>
           <div className="mb-3">
-            <Link to="/forgotpassword">Forgot password?</Link> or <Link to="/signup">Create a new account</Link>
+            <Link to="/forgotpassword">Forgot password?</Link>
           </div>
           <div className="mb-3">
             <div className="d-grid">

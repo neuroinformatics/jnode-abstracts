@@ -15,7 +15,6 @@ const HeaderPanel: React.FC = () => {
   const { pathname } = useLocation();
 
   const ACTIVES: { [key: string]: string } = {
-    '/signup': 'Sing up',
     '/forgotpassword': 'Forgot Password',
     '/email': 'Change Email',
     '/password': 'Change Password',
