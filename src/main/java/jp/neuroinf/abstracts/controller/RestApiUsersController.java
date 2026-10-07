@@ -14,6 +14,7 @@ import org.springframework.web.server.ResponseStatusException;
 import jakarta.validation.Valid;
 import jp.neuroinf.abstracts.core.AccountDetails;
 import jp.neuroinf.abstracts.core.RestSuccessResponseBody;
+import jp.neuroinf.abstracts.dto.AbstractDto;
 import jp.neuroinf.abstracts.dto.AccountDto;
 import jp.neuroinf.abstracts.form.UsersChangeEmailForm;
 import jp.neuroinf.abstracts.form.UsersChangePasswordForm;
@@ -22,6 +23,7 @@ import jp.neuroinf.abstracts.form.UsersExistsForm;
 import jp.neuroinf.abstracts.form.UsersRequestPasswordResetForm;
 import jp.neuroinf.abstracts.form.UsersResetPasswordForm;
 import jp.neuroinf.abstracts.form.UsersUpdateForm;
+import jp.neuroinf.abstracts.service.AbstractService;
 import jp.neuroinf.abstracts.service.AccountService;
 
 @RestController
@@ -29,9 +31,11 @@ import jp.neuroinf.abstracts.service.AccountService;
 public class RestApiUsersController {
 
     private final AccountService accountService;
+    private final AbstractService abstractService;
 
-    public RestApiUsersController(AccountService accountService) {
+    public RestApiUsersController(AccountService accountService, AbstractService abstractService) {
         this.accountService = accountService;
+        this.abstractService = abstractService;
     }
 
     @GetMapping("")
@@ -48,6 +52,12 @@ public class RestApiUsersController {
     @GetMapping("/current")
     public AccountDto getCurrentUser(@AuthenticationPrincipal AccountDetails user) throws ResponseStatusException {
         return this.accountService.getCurrentUser(user);
+    }
+
+    @GetMapping("/current/abstracts")
+    public List<AbstractDto> listCurrentUserAbstracts(@AuthenticationPrincipal AccountDetails user)
+            throws ResponseStatusException {
+        return this.abstractService.getOwnAbstracts(user);
     }
 
     @GetMapping("/exists")

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
@@ -19,6 +20,7 @@ import jp.neuroinf.abstracts.dto.AbstractDto;
 import jp.neuroinf.abstracts.dto.AbstractSimpleDto;
 import jp.neuroinf.abstracts.dto.ConferenceDto;
 import jp.neuroinf.abstracts.dto.ConferenceSimpleDto;
+import jp.neuroinf.abstracts.form.AbstractEditForm;
 import jp.neuroinf.abstracts.form.ConferenceCreateForm;
 import jp.neuroinf.abstracts.form.ConferenceUpdateAbstractGroupsForm;
 import jp.neuroinf.abstracts.form.ConferenceUpdateForm;
@@ -26,6 +28,7 @@ import jp.neuroinf.abstracts.form.ConferenceUpdateGeoForm;
 import jp.neuroinf.abstracts.form.ConferenceUpdateInfoForm;
 import jp.neuroinf.abstracts.form.ConferenceUpdateOwnersForm;
 import jp.neuroinf.abstracts.form.ConferenceUpdateScheduleForm;
+import jp.neuroinf.abstracts.service.AbstractService;
 import jp.neuroinf.abstracts.service.ConferenceService;
 
 @RestController
@@ -33,9 +36,11 @@ import jp.neuroinf.abstracts.service.ConferenceService;
 public class RestApiConferencesController {
 
     private final ConferenceService conferenceService;
+    private final AbstractService abstractService;
 
-    public RestApiConferencesController(ConferenceService conferenceService) {
+    public RestApiConferencesController(ConferenceService conferenceService, AbstractService abstractService) {
         this.conferenceService = conferenceService;
+        this.abstractService = abstractService;
     }
 
     @GetMapping("")
@@ -61,6 +66,12 @@ public class RestApiConferencesController {
             @PathVariable String uuid)
             throws ResponseStatusException {
         return this.conferenceService.getConferenceAbstracts(user, uuid);
+    }
+
+    @PostMapping("/{uuid}/abstracts")
+    public AbstractDto createConferenceAbstract(@AuthenticationPrincipal AccountDetails user,
+            @PathVariable String uuid, @Valid @RequestBody AbstractEditForm form) throws ResponseStatusException {
+        return this.abstractService.createAbstract(user, uuid, form);
     }
 
     @GetMapping("/{uuid}/allAbstracts")

@@ -14,6 +14,7 @@ import jp.neuroinf.abstracts.entity.AbstractGroup;
 import jp.neuroinf.abstracts.entity.AbstractOwners;
 import jp.neuroinf.abstracts.entity.AbstractState;
 import jp.neuroinf.abstracts.entity.Account;
+import jp.neuroinf.abstracts.entity.Author;
 import jp.neuroinf.abstracts.entity.Conference;
 import jp.neuroinf.abstracts.entity.ConferenceOwners;
 import jp.neuroinf.abstracts.repository.AbstractRepository;
@@ -100,6 +101,12 @@ public class TestData {
     abstract_.setSortId(0);
     abstract_.setState(state.getValue());
     abstract_.setConference(conference);
+    Author author = new Author();
+    author.setFirstName("Alice");
+    author.setLastName("Author");
+    author.setPosition(0);
+    author.setAbstract_(abstract_);
+    abstract_.getAuthors().add(author);
     if (owner != null) {
       AbstractOwners abstractOwner = new AbstractOwners();
       abstractOwner.setAbstract_(abstract_);

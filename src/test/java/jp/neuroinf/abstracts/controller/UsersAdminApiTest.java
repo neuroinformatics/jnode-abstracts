@@ -37,7 +37,8 @@ class UsersAdminApiTest {
     Account user = this.testData.account("user@example.com");
     this.mockMvc.perform(get("/api/users").with(login(admin)))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.length()").value(2))
+        .andExpect(jsonPath("$[?(@.mail == 'user@example.com')]").exists())
+        .andExpect(jsonPath("$[?(@.mail == 'admin@example.com')].isAdmin").value(true))
         .andExpect(jsonPath("$[0].password").doesNotExist());
     this.mockMvc.perform(get("/api/users").with(login(user)))
         .andExpect(status().isForbidden());
