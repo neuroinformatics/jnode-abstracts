@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import classNames from 'classnames';
 import moment, { type Moment } from 'moment';
 import React from 'react';
-import Datetime from 'react-datetime';
+import DatetimeModule from 'react-datetime';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { ApiAsyncStatus } from '../../entities/api';
 import type { TopicEntity } from '../../entities/conference';
@@ -18,6 +18,10 @@ import type { DashboardConferenceTabProps } from './DashboardConferenceTab';
 import 'react-datetime/css/react-datetime.css';
 import { showMessage } from '../common/commonSlice';
 import styles from './DashboardConferenceTabGeneral.module.scss';
+
+// react-datetime is a CommonJS module exporting the component as `exports.default`,
+// and Vite 8 imports the whole `module.exports` object as the default import.
+const Datetime = (DatetimeModule as unknown as { default?: typeof DatetimeModule }).default ?? DatetimeModule;
 
 interface TopicItem extends TopicEntity {
   id: string;
