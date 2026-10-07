@@ -186,4 +186,19 @@ class UsersApiTest {
         .andExpect(status().isForbidden());
   }
 
+  @Test
+  void adminAddressesCannotBeTakenByChangingTheEmail() throws Exception {
+    // no account has the admin address yet
+    Account account = this.testData.account("user@example.com");
+    for (String email : new String[]{TestData.ADMIN_MAIL, TestData.ADMIN_MAIL.toUpperCase()}) {
+      this.mockMvc.perform(put("/api/users/{uuid}/email", account.getUuid())
+          .param("email", email).param("password", "password")
+          .with(login(account)).with(csrf()))
+          .andExpect(status().isBadRequest());
+    }
+    this.mockMvc.perform(get("/api/users/current").with(login(account)))
+        .andExpect(jsonPath("$.mail").value("user@example.com"))
+        .andExpect(jsonPath("$.isAdmin").value(false));
+  }
+
 }

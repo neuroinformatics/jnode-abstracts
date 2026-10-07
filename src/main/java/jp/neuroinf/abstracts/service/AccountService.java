@@ -168,6 +168,10 @@ public class AccountService implements UserDetailsService {
     if (owner != null && !owner.getUuid().equals(account.getUuid())) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, RESPONSE_MESSAGE_MAIL_TAKEN);
     }
+    // site admins are identified by their mail, so only admins may give an account an admin address
+    if (!isAdmin && isAdminMail(form.getEmail())) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, RESPONSE_MESSAGE_MAIL_TAKEN);
+    }
     account.setMail(form.getEmail());
     try {
       this.accountRepository.saveAndFlush(account);
@@ -247,6 +251,10 @@ public class AccountService implements UserDetailsService {
     if (this.appProperties.getReadOnly() && !this.appProperties.getAdmins().contains(email)) {
       throw new ResponseStatusException(HttpStatus.FORBIDDEN, LoginRestrictedException.MESSAGE);
     }
+  }
+
+  private boolean isAdminMail(String email) {
+    return this.appProperties.getAdmins().stream().anyMatch(a -> a.equalsIgnoreCase(email.strip()));
   }
 
   private String generatePassword() {

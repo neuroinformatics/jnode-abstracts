@@ -16,7 +16,8 @@ public class AppProperties {
   @Value("${app.url:http://localhost:8080}")
   private String url;
 
-  @Value("${app.admins:admin@example.com}")
+  // no default, as whoever registered a default address would become an admin
+  @Value("${app.admins:}")
   private List<String> admins;
 
   // only site admins can log in, so that everyone else just reads the published information
