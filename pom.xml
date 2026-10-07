@@ -11,7 +11,7 @@
 	</parent>
 	<groupId>jp.neuroinf</groupId>
 	<artifactId>abstracts</artifactId>
-	<version>0.0.2-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<name>abstracts</name>
 	<description>J-Node Abstract System</description>
 	<url />
