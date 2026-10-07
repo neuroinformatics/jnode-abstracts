@@ -77,4 +77,19 @@ class UsersAdminApiTest {
         .andExpect(status().isBadRequest());
   }
 
+  @Test
+  void deactivatedAccountLosesAccessInExistingSession() throws Exception {
+    Account admin = this.testData.admin();
+    Account user = this.testData.account("user@example.com");
+    this.mockMvc.perform(get("/api/users/current").with(login(user)))
+        .andExpect(status().isOk());
+    this.mockMvc.perform(put("/api/users/{uuid}", user.getUuid())
+        .param("firstName", "First").param("lastName", "user").param("isActive", "false")
+        .with(login(admin)).with(csrf()))
+        .andExpect(status().isOk());
+    // the principal of the session was created before the deactivation
+    this.mockMvc.perform(get("/api/users/current").with(login(user)))
+        .andExpect(status().isUnauthorized());
+  }
+
 }

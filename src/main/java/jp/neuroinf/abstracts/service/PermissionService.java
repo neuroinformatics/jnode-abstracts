@@ -32,10 +32,12 @@ public class PermissionService {
   /**
    * Loads the latest account entity of the logged in user.
    *
-   * @return the account, or null if not logged in or the account no longer exists
+   * @return the account, or null if not logged in, or the account no longer exists or was deactivated since the
+   *     login (an existing session then loses its access at once)
    */
   public Account findAccount(AccountDetails user) {
-    return user != null ? this.accountRepository.findFirstByUuid(user.getUuid()) : null;
+    final Account account = user != null ? this.accountRepository.findFirstByUuid(user.getUuid()) : null;
+    return account != null && Boolean.TRUE.equals(account.getIsActive()) ? account : null;
   }
 
   public Account requireAccount(AccountDetails user) throws ResponseStatusException {
