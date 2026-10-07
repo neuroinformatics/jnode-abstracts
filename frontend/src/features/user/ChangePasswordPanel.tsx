@@ -97,10 +97,11 @@ const ChangePasswordPanel: React.FC = () => {
       <fieldset>
         <form onSubmit={onSubmitSave} autoComplete="off">
           <div className="mb-3">
-            <label className="form-label">
+            <label htmlFor="old-password" className="form-label">
               Current Password <span className="text-danger">*</span>
             </label>
             <input
+              id="old-password"
               className="form-control"
               type="password"
               value={oldPassword}
@@ -111,10 +112,11 @@ const ChangePasswordPanel: React.FC = () => {
             />
           </div>
           <div className="mb-3">
-            <label className="form-label">
+            <label htmlFor="new-password" className="form-label">
               New Password <span className="text-danger">*</span>
             </label>
             <input
+              id="new-password"
               className={classNames('form-control', { 'is-invalid': invalidPassword })}
               type="password"
               value={newPassword}
@@ -128,10 +130,11 @@ const ChangePasswordPanel: React.FC = () => {
             </div>
           </div>
           <div className="mb-5">
-            <label className="form-label">
+            <label htmlFor="confirm-password" className="form-label">
               Confirm New Password <span className="text-danger">*</span>
             </label>
             <input
+              id="confirm-password"
               className={classNames('form-control', { 'is-invalid': mismatchPassword })}
               type="password"
               value={confirmPassword}

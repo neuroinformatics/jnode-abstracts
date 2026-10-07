@@ -213,7 +213,7 @@ const DashboardConferenceTabGroups: React.FC<DashboardConferenceTabProps> = (pro
                 />
               </td>
               <td>
-                <button className="btn btn-danger btn-sm text-nowrap" onClick={() => onClickRemove(idx)}>
+                <button type="button" className="btn btn-danger btn-sm text-nowrap" onClick={() => onClickRemove(idx)}>
                   <FontAwesomeIcon icon={faTrash} /> Remove
                 </button>
               </td>

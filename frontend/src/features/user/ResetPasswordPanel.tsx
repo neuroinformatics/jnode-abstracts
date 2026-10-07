@@ -77,9 +77,9 @@ const ResetPasswordPanel: React.FC = () => {
           <fieldset>
             <form onSubmit={onSubmitReset} autoComplete="off">
               <div className="mb-3">
-                <label className="form-label">
+                <p className="mb-0">
                   Hello <b>{email}</b>, do you really want to reset your password?
-                </label>
+                </p>
               </div>
               <div className="mb-3">
                 <div className="d-grid">
@@ -89,7 +89,7 @@ const ResetPasswordPanel: React.FC = () => {
                 </div>
               </div>
               <div className="mb-3">
-                <label className="form-label">If you did not request this, please ignore this message.</label>
+                <p className="mb-0">If you did not request this, please ignore this message.</p>
               </div>
             </form>
           </fieldset>

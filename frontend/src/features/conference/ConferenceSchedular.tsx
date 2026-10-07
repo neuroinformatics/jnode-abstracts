@@ -143,7 +143,7 @@ const ConferenceScheduler: React.FC<Props> = (props) => {
     setEventModalState({ show: false, id: '', parentId: null });
   }, []);
 
-  const onClickCollapseEvent = React.useCallback<React.MouseEventHandler<HTMLSpanElement>>(
+  const onClickCollapseEvent = React.useCallback<React.MouseEventHandler<HTMLButtonElement>>(
     (ev) => {
       const id = ev.currentTarget.getAttribute('data-id') ?? '';
       const { append, remove } = model.collapseEvent(id);
@@ -160,7 +160,7 @@ const ConferenceScheduler: React.FC<Props> = (props) => {
     [model, onHideEventModal],
   );
 
-  const onClickExpandEvent = React.useCallback<React.MouseEventHandler<HTMLSpanElement>>(
+  const onClickExpandEvent = React.useCallback<React.MouseEventHandler<HTMLButtonElement>>(
     (ev) => {
       const id = ev.currentTarget.getAttribute('data-id') ?? '';
       const { append, remove } = model.expandEvent(id);
@@ -190,22 +190,40 @@ const ConferenceScheduler: React.FC<Props> = (props) => {
     const type = subtype.substring(subtype.length - 1) as ScheduleEventType;
     return (
       <div key={id} className={`conference-scheduler-event event-${subtype}`}>
-        <div className="conference-scheduler-header" onClick={() => onShowEventModal(id, null)}>
+        <button
+          type="button"
+          className="conference-scheduler-header btn-plain"
+          onClick={() => onShowEventModal(id, null)}
+        >
           <span className={`badge badge-${type}`}>{typeLabels[type]}</span>
-          <h4>{scheduler.templates.event_text(ev.start_date, ev.end_date, ev)}</h4>
+          <span className="title">{scheduler.templates.event_text(ev.start_date, ev.end_date, ev)}</span>
           <span className="time">{scheduler.templates.event_header(ev.start_date, ev.end_date, ev)}</span>
-        </div>
+        </button>
         <div className="conference-scheduler-body">
           <div className="conference-scheduler-modification">
             {model.canCollapse(id) && (
-              <span title="Collapse" data-id={id} onClick={onClickCollapseEvent}>
+              <button
+                type="button"
+                className="btn-plain"
+                title="Collapse"
+                aria-label="Collapse"
+                data-id={id}
+                onClick={onClickCollapseEvent}
+              >
                 <FontAwesomeIcon icon={faMinus} />
-              </span>
+              </button>
             )}
             {model.canExpand(id) && (
-              <span title="Expand" data-id={id} onClick={onClickExpandEvent}>
+              <button
+                type="button"
+                className="btn-plain"
+                title="Expand"
+                aria-label="Expand"
+                data-id={id}
+                onClick={onClickExpandEvent}
+              >
                 <FontAwesomeIcon icon={faPlus} />
-              </span>
+              </button>
             )}
           </div>
           {(type === 's' || type === 't') && (
@@ -213,19 +231,20 @@ const ConferenceScheduler: React.FC<Props> = (props) => {
               {ev.childrenIds.map((childId) => {
                 const child = model.getEventById(childId);
                 return (
-                  <div
+                  <button
+                    type="button"
                     key={childId}
-                    className="d-flex align-items-center justify-content-between"
+                    className="d-flex align-items-center justify-content-between btn-plain w-100"
                     onClick={() => onShowEventModal(childId, id)}
                   >
-                    <div>
+                    <span>
                       <strong>{child.text}</strong>
-                    </div>
-                    <div>
-                      <div>{dayjs(child.start_date).format('HH:mm')}</div>
-                      <div>{dayjs(child.end_date).format('HH:mm')}</div>
-                    </div>
-                  </div>
+                    </span>
+                    <span>
+                      <span className="d-block">{dayjs(child.start_date).format('HH:mm')}</span>
+                      <span className="d-block">{dayjs(child.end_date).format('HH:mm')}</span>
+                    </span>
+                  </button>
                 );
               })}
             </div>
@@ -354,20 +373,33 @@ const ConferenceScheduler: React.FC<Props> = (props) => {
   return (
     <div className="scheduler">
       <div className="conference-scheduler-navbar btn-toolbar justify-content-between" role="toolbar">
-        <div className="btn-group" role="group">
-          <button className="btn btn-outline-secondary" disabled={isStartDate} onClick={onClickGoToFirstDate}>
+        <fieldset className="btn-group">
+          <button
+            type="button"
+            className="btn btn-outline-secondary"
+            aria-label="First day"
+            disabled={isStartDate}
+            onClick={onClickGoToFirstDate}
+          >
             <FontAwesomeIcon icon={faBackwardStep} />
           </button>
-          <button className="btn btn-outline-secondary" disabled={isStartDate} onClick={onClickGoToPrevDate}>
+          <button
+            type="button"
+            className="btn btn-outline-secondary"
+            aria-label="Previous day"
+            disabled={isStartDate}
+            onClick={onClickGoToPrevDate}
+          >
             <FontAwesomeIcon icon={faChevronLeft} />
           </button>
-        </div>
-        <div className="btn-group conference-scheduler-navbar-days" role="group">
+        </fieldset>
+        <fieldset className="btn-group conference-scheduler-navbar-days">
           {model.eventDates.map((date) => {
             const key = ScheduleUtility.makeDateKey(date);
             const isActive = ScheduleUtility.isSameDate(date, currentDate);
             return (
               <button
+                type="button"
                 key={key}
                 className={classNames('btn btn-outline-secondary', isActive && 'active')}
                 data-date={key}
@@ -377,15 +409,27 @@ const ConferenceScheduler: React.FC<Props> = (props) => {
               </button>
             );
           })}
-        </div>
-        <div className="btn-group" role="group">
-          <button className="btn btn-outline-secondary" disabled={isEndDate} onClick={onClickGoToNextDate}>
+        </fieldset>
+        <fieldset className="btn-group">
+          <button
+            type="button"
+            className="btn btn-outline-secondary"
+            aria-label="Next day"
+            disabled={isEndDate}
+            onClick={onClickGoToNextDate}
+          >
             <FontAwesomeIcon icon={faChevronRight} />
           </button>
-          <button className="btn btn-outline-secondary" disabled={isEndDate} onClick={onClickGoToLastDate}>
+          <button
+            type="button"
+            className="btn btn-outline-secondary"
+            aria-label="Last day"
+            disabled={isEndDate}
+            onClick={onClickGoToLastDate}
+          >
             <FontAwesomeIcon icon={faForwardStep} />
           </button>
-        </div>
+        </fieldset>
       </div>
       <div ref={container} style={{ height: height }}></div>
       {eventContainers.map((entry) => {

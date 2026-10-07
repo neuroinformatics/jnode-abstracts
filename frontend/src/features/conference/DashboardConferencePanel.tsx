@@ -41,6 +41,7 @@ const DashboardConferencePanel: React.FC<Props> = (props) => {
           {tabs.map((t) => (
             <li key={t.key} className="nav-item">
               <button
+                type="button"
                 className={classNames('nav-link', { active: tab === t.key })}
                 onClick={() => navigate(`#${t.key}`)}
               >

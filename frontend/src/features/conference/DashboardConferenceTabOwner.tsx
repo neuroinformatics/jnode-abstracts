@@ -83,7 +83,12 @@ const DashboardConferenceTabOwner: React.FC<DashboardConferenceTabProps> = (prop
         {owners.map((owner, idx) => (
           <li className="my-1" key={owner}>
             <strong>{owner}</strong>{' '}
-            <button className="btn btn-sm btn-danger" onClick={() => onClickRemove(idx)}>
+            <button
+              type="button"
+              className="btn btn-sm btn-danger"
+              aria-label={`Remove ${owner}`}
+              onClick={() => onClickRemove(idx)}
+            >
               <FontAwesomeIcon icon={faXmark} />
             </button>
           </li>
@@ -106,7 +111,7 @@ const DashboardConferenceTabOwner: React.FC<DashboardConferenceTabProps> = (prop
           </div>
           <div className="col-auto">
             <form id="owner" onSubmit={onSubmitAdd}>
-              <button className="btn btn-primary text-nowrap">
+              <button type="submit" className="btn btn-primary text-nowrap">
                 <FontAwesomeIcon icon={faPlus} /> Add
               </button>
             </form>

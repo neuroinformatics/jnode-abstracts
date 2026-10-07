@@ -75,8 +75,11 @@ const ForgotPasswordPanel: React.FC = () => {
       <fieldset>
         <form onSubmit={onSubmitReset} autoComplete="off">
           <div className="mb-5">
-            <label className="form-label">Enter email address </label>
+            <label htmlFor="email" className="form-label">
+              Enter email address{' '}
+            </label>
             <input
+              id="email"
               className={classNames('form-control', { 'is-invalid': invalidEmail })}
               type="email"
               value={email}

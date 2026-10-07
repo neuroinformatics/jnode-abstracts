@@ -68,14 +68,16 @@ const AbstractPanel: React.FC<Props> = (props) => {
           {abstract.figures.map((figure, idx) => (
             <div key={figure.uuid} className="figure col-sm-7">
               <div className="mb-2">
-                <img
-                  className="img-fluid"
-                  src={getFigureUrl(figure)}
-                  alt={figure.caption}
+                <button
+                  type="button"
+                  className="btn-plain d-block w-100"
+                  aria-label={`Enlarge figure ${idx + 1}`}
                   onClick={() => {
                     onShowFigureModal(idx);
                   }}
-                />
+                >
+                  <img className="img-fluid" src={getFigureUrl(figure)} alt={figure.caption} />
+                </button>
               </div>
               <div className="caption">{`Figure ${idx + 1}: ${figure.caption}`}</div>
             </div>

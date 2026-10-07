@@ -90,10 +90,11 @@ const ChangeEmailPanel: React.FC = () => {
       <fieldset>
         <form onSubmit={onSubmitSave} autoComplete="off">
           <div className="mb-3">
-            <label className="form-label">
+            <label htmlFor="new-email" className="form-label">
               New E-Mail Address <span className="text-danger">*</span>
             </label>
             <input
+              id="new-email"
               className={classNames('form-control', { 'is-invalid': invalidEmail })}
               type="email"
               value={newEmail}
@@ -105,10 +106,11 @@ const ChangeEmailPanel: React.FC = () => {
             <div className="invalid-feedback">Please enter the valid e-mail address string.</div>
           </div>
           <div className="mb-3">
-            <label className="form-label">
+            <label htmlFor="confirm-email" className="form-label">
               Confirm E-Mail Address <span className="text-danger">*</span>
             </label>
             <input
+              id="confirm-email"
               className={classNames('form-control', { 'is-invalid': mismatchEmail })}
               type="email"
               value={confirmEmail}
@@ -120,10 +122,11 @@ const ChangeEmailPanel: React.FC = () => {
             <div className="invalid-feedback">Please make sure new e-mail address match.</div>
           </div>
           <div className="mb-5">
-            <label className="form-label">
+            <label htmlFor="password" className="form-label">
               Current Password <span className="text-danger">*</span>
             </label>
             <input
+              id="password"
               className="form-control"
               type="password"
               value={password}

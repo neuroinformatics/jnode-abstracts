@@ -25,11 +25,7 @@ const LinkOrSpan: React.FC<Props> = (props) => {
       </a>
     );
   }
-  return (
-    <span className={className} aria-label={ariaLabel}>
-      {children}
-    </span>
-  );
+  return <span className={className}>{children}</span>;
 };
 
 export default LinkOrSpan;

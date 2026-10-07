@@ -61,9 +61,14 @@ const TopicSortableItem: React.FC<TopicSortableItemProps> = (props) => {
           >
             {item.topic}
           </span>
-          <a className={styles.topicRemoveBtn} onClick={() => onClickDelete(item)}>
+          <button
+            type="button"
+            className={`${styles.topicRemoveBtn} btn-plain`}
+            aria-label="Remove topic"
+            onClick={() => onClickDelete(item)}
+          >
             <FontAwesomeIcon icon={faTrash} />
-          </a>
+          </button>
         </div>
       </div>
     </div>
@@ -360,7 +365,11 @@ const DashboardConferenceTabGeneral: React.FC<DashboardConferenceTabProps> = (pr
               <div className="banner-box">
                 <img className="conference-logo img-fluid rounded" src={getBannerUrl(logoUuid)} alt="Conference Logo" />
               </div>
-              <button className="btn-banner-remove btn btn-secondary btn-sm" onClick={() => setLogoUuid(null)}>
+              <button
+                type="button"
+                className="btn-banner-remove btn btn-secondary btn-sm"
+                onClick={() => setLogoUuid(null)}
+              >
                 Remove
               </button>
             </div>
@@ -405,7 +414,11 @@ const DashboardConferenceTabGeneral: React.FC<DashboardConferenceTabProps> = (pr
         <div className="col-sm-10">
           {thumbnailUuid != null ? (
             <div>
-              <button className="btn-banner-remove btn btn-secondary btn-sm" onClick={() => setThumbnailUuid(null)}>
+              <button
+                type="button"
+                className="btn-banner-remove btn btn-secondary btn-sm"
+                onClick={() => setThumbnailUuid(null)}
+              >
                 Remove
               </button>
               <div className="banner-box">
@@ -535,7 +548,7 @@ const DashboardConferenceTabGeneral: React.FC<DashboardConferenceTabProps> = (pr
       </div>
 
       <div className="row">
-        <label className="col-sm-2 col-form-label">Topics</label>
+        <div className="col-sm-2 col-form-label">Topics</div>
         <div className="col-sm-10">
           <DndContext
             collisionDetection={closestCenter}
@@ -584,7 +597,8 @@ const DashboardConferenceTabGeneral: React.FC<DashboardConferenceTabProps> = (pr
               />
             </div>
             <div className="col-sm-6 align-self-center">
-              <a
+              <button
+                type="button"
                 className="btn btn-primary btn-sm"
                 onClick={() => {
                   const topic = addTopic.trim();
@@ -599,7 +613,7 @@ const DashboardConferenceTabGeneral: React.FC<DashboardConferenceTabProps> = (pr
                 }}
               >
                 <FontAwesomeIcon icon={faPlus} /> Add Topic
-              </a>
+              </button>
             </div>
           </div>
         </div>

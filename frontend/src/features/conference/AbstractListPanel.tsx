@@ -1,6 +1,6 @@
 import classNames from 'classnames';
 import React from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import GeneralPanel from '../../common/GeneralPanel';
 import KeywordHighlight from '../../common/KeywordHighlight';
@@ -25,13 +25,14 @@ const TabNavigationBar: React.FC<TabNavigationBarProps> = (props) => {
   return (
     <ul className="nav nav-tabs mb-4 d-print-none">
       <li className="nav-item">
-        <button className={classNames('nav-link', { active: tab === '' })} onClick={() => onClickTab('')}>
+        <button type="button" className={classNames('nav-link', { active: tab === '' })} onClick={() => onClickTab('')}>
           All
         </button>
       </li>
       {conference.abstractGroups.map((abstractGroup) => (
         <li key={abstractGroup.uuid} className="nav-item">
           <button
+            type="button"
             className={classNames('nav-link', { active: tab === abstractGroup.uuid })}
             onClick={() => onClickTab(abstractGroup.uuid ?? '')}
           >
@@ -189,7 +190,7 @@ const AbstractListPanel: React.FC<Props> = (props) => {
                           const abstractId = getAbstractId(conference, abstract);
                           const abstractUrl = getAbstractUrl(conference, abstract);
                           return (
-                            <div key={abstractUuid} className="list-group-item" onClick={() => navigate(abstractUrl)}>
+                            <Link key={abstractUuid} className="list-group-item" to={abstractUrl}>
                               <div className="abstract">
                                 <div className="sortId">{abstractId}</div>
                                 <div className="box">
@@ -209,7 +210,7 @@ const AbstractListPanel: React.FC<Props> = (props) => {
                                   </div>
                                 </div>
                               </div>
-                            </div>
+                            </Link>
                           );
                         })}
                       </div>

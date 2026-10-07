@@ -45,8 +45,13 @@ const ConferencePanel: React.FC<Props> = (props) => {
             </p>
             <p>In order to submit an abstract please press the appropriate button below. or manage</p>
             <p>
-              <a className="btn btn-success">Submit new Abstract</a> or manage{' '}
-              <a className="btn btn-primary">Your Abstracts</a>
+              <button type="button" className="btn btn-success" disabled>
+                Submit new Abstract
+              </button>{' '}
+              or manage{' '}
+              <button type="button" className="btn btn-primary" disabled>
+                Your Abstracts
+              </button>
             </p>
           </div>
         ) : (

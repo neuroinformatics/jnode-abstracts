@@ -17,7 +17,7 @@ const AboutPanel: React.FC = () => {
           </p>
         </div>
         <div className="col-md-4">
-          <img className="img-fluid" src={JNodeLogo}></img>
+          <img className="img-fluid" src={JNodeLogo} alt="J-Node logo" />
         </div>
       </div>
     </GeneralPage>
