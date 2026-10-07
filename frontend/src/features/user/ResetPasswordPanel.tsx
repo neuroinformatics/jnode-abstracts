@@ -1,3 +1,4 @@
+import classNames from 'classnames';
 import React from 'react';
 
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -14,6 +15,7 @@ import {
   selectUserInfo,
   unsetPageActionState,
 } from './userSlice';
+import { isValidPassword } from './userUtilities';
 
 const ResetPasswordPanel: React.FC = () => {
   const navigate = useNavigate();
@@ -23,6 +25,8 @@ const ResetPasswordPanel: React.FC = () => {
   const pageActionState = useAppSelector(selectPageActionState);
 
   const [searchParams] = useSearchParams();
+  const [newPassword, setNewPassword] = React.useState<string>('');
+  const [confirmPassword, setConfirmPassword] = React.useState<string>('');
 
   const token = searchParams.get('token') ?? '';
   const a = atob(token);
@@ -43,8 +47,7 @@ const ResetPasswordPanel: React.FC = () => {
 
   React.useEffect(() => {
     if (pageActionState.status === ApiAsyncStatus.idle) {
-      const message =
-        "Password was reset and sent to you by email. If you don't get it in a few moments, please check your spam folder.";
+      const message = 'Password was changed. Please log in with the new password.';
       dispatch(showMessage({ variant: 'success', message }));
       navigate('/login');
     } else if (pageActionState.status === ApiAsyncStatus.failed) {
@@ -54,14 +57,17 @@ const ResetPasswordPanel: React.FC = () => {
 
   const title = 'Reset Password';
 
+  const mismatchPassword = newPassword !== confirmPassword;
+  const invalidPassword = newPassword.length > 0 && !isValidPassword(newPassword);
+
   const onSubmitReset = React.useCallback<React.FormEventHandler<HTMLFormElement>>(
     (e) => {
       e.preventDefault();
-      if (!invalidEmail && userInfo == null) {
-        dispatch(resetPassword({ token }));
+      if (!invalidEmail && !invalidPassword && !mismatchPassword && userInfo == null) {
+        dispatch(resetPassword({ token, newPassword }));
       }
     },
-    [dispatch, token, invalidEmail, userInfo],
+    [dispatch, token, newPassword, invalidEmail, invalidPassword, mismatchPassword, userInfo],
   );
 
   return (
@@ -77,13 +83,47 @@ const ResetPasswordPanel: React.FC = () => {
           <form onSubmit={onSubmitReset} autoComplete="off">
             <div className="mb-3">
               <p className="mb-0">
-                Hello <b>{email}</b>, do you really want to reset your password?
+                Hello <b>{email}</b>, please choose a new password.
               </p>
+            </div>
+            <div className="mb-3">
+              <label htmlFor="new-password" className="form-label">
+                New Password <span className="text-danger">*</span>
+              </label>
+              <input
+                id="new-password"
+                className={classNames('form-control', { 'is-invalid': invalidPassword })}
+                type="password"
+                value={newPassword}
+                placeholder="Enter New Password"
+                required
+                onChange={(e) => setNewPassword(e.target.value)}
+                autoComplete="new-password"
+              />
+              <div className="invalid-feedback">
+                Please enter at least 10 characters, needs at least one number and one symbol.
+              </div>
+            </div>
+            <div className="mb-4">
+              <label htmlFor="confirm-password" className="form-label">
+                Confirm New Password <span className="text-danger">*</span>
+              </label>
+              <input
+                id="confirm-password"
+                className={classNames('form-control', { 'is-invalid': mismatchPassword })}
+                type="password"
+                value={confirmPassword}
+                placeholder="Confirm New Password"
+                required
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                autoComplete="new-password"
+              />
+              <div className="invalid-feedback">Please make sure your passwords match.</div>
             </div>
             <div className="mb-3">
               <div className="d-grid">
                 <button className="btn btn-primary btn-lg" type="submit">
-                  Reset and send new password
+                  Set new password
                 </button>
               </div>
             </div>

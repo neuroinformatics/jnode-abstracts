@@ -13,6 +13,7 @@ import {
   selectUserInfo,
   unsetPageActionState,
 } from './userSlice';
+import { isValidPassword } from './userUtilities';
 
 const ChangePasswordPanel: React.FC = () => {
   const navigate = useNavigate();
@@ -47,12 +48,7 @@ const ChangePasswordPanel: React.FC = () => {
   }, [dispatch, pageActionState]);
 
   const mismatchPassword = newPassword !== confirmPassword;
-  const invalidPassword =
-    newPassword.length > 0 &&
-    (newPassword.length < 10 ||
-      !/[a-z]/i.test(newPassword) ||
-      !/\d/.test(newPassword) ||
-      !/[.,/<>?!@#$%^&*()=`_+|~{};':"\-\\[\]]/.test(newPassword));
+  const invalidPassword = newPassword.length > 0 && !isValidPassword(newPassword);
   const canUpdatePassword = mismatchPassword || invalidPassword;
 
   const title = 'Change Password';

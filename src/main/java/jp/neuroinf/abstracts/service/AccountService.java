@@ -1,5 +1,8 @@
 package jp.neuroinf.abstracts.service;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -35,12 +38,16 @@ import jp.neuroinf.abstracts.form.UsersResetPasswordForm;
 import jp.neuroinf.abstracts.form.UsersUpdateForm;
 import jp.neuroinf.abstracts.repository.AccountRepository;
 import jp.neuroinf.abstracts.utility.PasswordGenerator;
+import jp.neuroinf.abstracts.utility.StringUtility;
 import jp.neuroinf.abstracts.utility.PasswordGenerator.PasswordGeneratorBuilder;
 
 @Service
 public class AccountService implements UserDetailsService {
 
   private static final String RESPONSE_MESSAGE_MAIL_TAKEN = "This email is already taken. Try another email.";
+  private static final String RESPONSE_MESSAGE_INVALID_TOKEN = "Token is invalid or already expired";
+  private static final String RESET_TOKEN_SEPARATOR = ":";
+  private static final long RESET_TOKEN_DURATION_SECONDS = 86400; // 24 hours
 
   private final AccountRepository accountRepository;
   private final PasswordEncoder passwordEncoder;
@@ -97,45 +104,47 @@ public class AccountService implements UserDetailsService {
     return new RestSuccessResponseBody("found");
   }
 
+  /**
+   * Mails a link to set a new password. The answer is the same whether the account exists or not, so that it does
+   * not tell which addresses have accounts.
+   */
   public RestSuccessResponseBody requestPasswordReset(UsersRequestPasswordResetForm form)
       throws ResponseStatusException {
     final String email = form.getEmail();
     requireLoginAllowed(email);
     final Account account = this.accountRepository.findFirstByMail(email);
-    if (account == null) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Account with this email does not exist");
-    }
-    final String token = this.timestampSigner.sign(email);
-    final Map<String, Object> variables = new HashMap<>();
-    variables.put("firstName", account.getFirstName());
-    variables.put("resetUrl", String.format("%s/resetpassword?token=%s", this.appProperties.getUrl(), token));
-    if (!this.emailTemplateSender.send(account.getMail(), "Request to reset password", "requestPasswordReset",
-        variables)) {
-      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to send mail");
+    if (account != null) {
+      final String token = this.timestampSigner.sign(email + RESET_TOKEN_SEPARATOR + passwordFingerprint(account));
+      final Map<String, Object> variables = new HashMap<>();
+      variables.put("firstName", account.getFirstName());
+      variables.put("resetUrl", String.format("%s/resetpassword?token=%s", this.appProperties.getUrl(), token));
+      if (!this.emailTemplateSender.send(account.getMail(), "Request to reset password", "requestPasswordReset",
+          variables)) {
+        throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to send mail");
+      }
     }
     return new RestSuccessResponseBody("success");
   }
 
+  /**
+   * Sets the new password chosen by the user. The token holds a fingerprint of the password, so that it can be used
+   * only until the password changes.
+   */
   public RestSuccessResponseBody resetPassword(UsersResetPasswordForm form) throws ResponseStatusException {
-    final String email = timestampSigner.unSign(form.getToken(), 86400); // 24hours
-    if (email == null) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Token is invalid or already expired");
+    final String message = this.timestampSigner.unSign(form.getToken(), RESET_TOKEN_DURATION_SECONDS);
+    final String[] emailFingerprint = message != null
+        ? StringUtility.rSplit(RESET_TOKEN_SEPARATOR, message)
+        : new String[0];
+    if (emailFingerprint.length != 2) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, RESPONSE_MESSAGE_INVALID_TOKEN);
     }
-    requireLoginAllowed(email);
-    final Account account = this.accountRepository.findFirstByMail(email);
-    if (account == null) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Account with this email does not exist.");
+    requireLoginAllowed(emailFingerprint[0]);
+    final Account account = this.accountRepository.findFirstByMail(emailFingerprint[0]);
+    if (account == null || !passwordFingerprint(account).equals(emailFingerprint[1])) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, RESPONSE_MESSAGE_INVALID_TOKEN);
     }
-    final String password = generatePassword();
-    account.setPassword(this.passwordEncoder.encode(password));
+    account.setPassword(this.passwordEncoder.encode(form.getNewPassword()));
     this.accountRepository.save(account);
-    final Map<String, Object> variables = new HashMap<>();
-    variables.put("firstName", account.getFirstName());
-    variables.put("password", password);
-    variables.put("loginUrl", String.format("%s/login", this.appProperties.getUrl()));
-    if (!this.emailTemplateSender.send(account.getMail(), "Reset password", "resetPassword", variables)) {
-      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to send mail");
-    }
     return new RestSuccessResponseBody("success");
   }
 
@@ -267,6 +276,18 @@ public class AccountService implements UserDetailsService {
   public AccountDetails findAccountDetails(String uuid) {
     final Account account = this.accountRepository.findFirstByUuid(uuid);
     return account != null ? new AccountDetails(account) : null;
+  }
+
+  /**
+   * A value derived from the password hash, which changes whenever the password is set, as the hash is salted.
+   */
+  private static String passwordFingerprint(Account account) {
+    try {
+      final byte[] digest = MessageDigest.getInstance("SHA-256").digest(StringUtility.toBytes(account.getPassword()));
+      return Base64.getUrlEncoder().withoutPadding().encodeToString(digest).substring(0, 16);
+    } catch (NoSuchAlgorithmException e) {
+      throw new IllegalStateException(e);
+    }
   }
 
   private boolean isAdminMail(String email) {

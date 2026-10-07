@@ -45,10 +45,15 @@ export const ApiUsersRequestPasswordReset = async (email: string, signal: AbortS
   return response;
 };
 
-export const ApiUsersResetPassword = async (token: string, signal: AbortSignal): Promise<ApiSuccessResponse> => {
+export const ApiUsersResetPassword = async (
+  token: string,
+  newPassword: string,
+  signal: AbortSignal,
+): Promise<ApiSuccessResponse> => {
   // status code: 200
   const formData = new FormData();
   formData.append('token', token);
+  formData.append('newPassword', newPassword);
   const response = await api.post<ApiSuccessResponse>(`/api/users/password/reset`, { body: formData, signal }).json();
   return response;
 };

@@ -96,7 +96,8 @@ class ReadOnlyModeTest {
     this.mockMvc.perform(post("/api/users/password/reset/request").param("email", "user@example.com").with(csrf()))
         .andExpect(status().isForbidden());
     this.mockMvc.perform(post("/api/users/password/reset")
-        .param("token", this.timestampSigner.sign("user@example.com")).with(csrf()))
+        .param("token", this.timestampSigner.sign("user@example.com:fingerprint"))
+        .param("newPassword", "new-password-123").with(csrf()))
         .andExpect(status().isForbidden());
     this.mockMvc.perform(post("/api/users/password/reset/request").param("email", TestData.ADMIN_MAIL).with(csrf()))
         .andExpect(status().isOk());

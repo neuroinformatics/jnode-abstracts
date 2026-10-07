@@ -40,7 +40,7 @@ const ForgotPasswordPanel: React.FC = () => {
   React.useEffect(() => {
     if (pageActionState.status === ApiAsyncStatus.idle) {
       const message =
-        "A URL to reset your password has been sent to you by email. If you don't get it in a few moments, please check your spam folder.";
+        "If an account exists for this address, a URL to reset your password has been sent to it. If you don't get it in a few moments, please check your spam folder.";
       dispatch(showMessage({ variant: 'success', message }));
     } else if (pageActionState.status === ApiAsyncStatus.failed) {
       dispatch(showMessage({ variant: 'danger', message: pageActionState.error ?? '' }));

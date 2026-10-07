@@ -100,18 +100,19 @@ export const requestPasswordReset = createAsyncThunk<ApiSuccessResponse, { email
   },
 );
 
-export const resetPassword = createAsyncThunk<ApiSuccessResponse, { token: string }, { rejectValue: string }>(
-  'user/resetPassword',
-  async (params, thunkApi) => {
-    const { token } = params;
-    try {
-      return await ApiUsersResetPassword(token, thunkApi.signal);
-    } catch (e: unknown) {
-      const message = await getApiErrorMessage(e);
-      return thunkApi.rejectWithValue(message);
-    }
-  },
-);
+export const resetPassword = createAsyncThunk<
+  ApiSuccessResponse,
+  { token: string; newPassword: string },
+  { rejectValue: string }
+>('user/resetPassword', async (params, thunkApi) => {
+  const { token, newPassword } = params;
+  try {
+    return await ApiUsersResetPassword(token, newPassword, thunkApi.signal);
+  } catch (e: unknown) {
+    const message = await getApiErrorMessage(e);
+    return thunkApi.rejectWithValue(message);
+  }
+});
 
 export const changePassword = createAsyncThunk<
   ApiSuccessResponse,
