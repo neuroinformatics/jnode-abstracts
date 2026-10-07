@@ -3,6 +3,8 @@ import {
   ApiConferenceAbstractGroupsUpdate,
   type ApiConferenceAbstractGroupsUpdateParams,
   ApiConferenceAbstractList,
+  ApiConferenceCreate,
+  ApiConferenceDelete,
   ApiConferenceGeoUpdate,
   ApiConferenceInfoUpdate,
   ApiConferenceList,
@@ -75,6 +77,35 @@ export const getConferenceAbstracts = createAsyncThunk<AbstractSimpleEntity[], s
     try {
       const abstracts = await ApiConferenceAbstractList(uuid, thunkApi.signal);
       return abstracts;
+    } catch (e: unknown) {
+      const message = await getApiErrorMessage(e);
+      return thunkApi.rejectWithValue(message);
+    }
+  },
+);
+
+export const createConference = createAsyncThunk<
+  ConferenceSimpleEntity,
+  { name: string; shortName: string; startDate: string; endDate: string; deadline: string },
+  { rejectValue: string }
+>('conference/create', async (params, thunkApi) => {
+  const { name, shortName, startDate, endDate, deadline } = params;
+  try {
+    const result = await ApiConferenceCreate(name, shortName, startDate, endDate, deadline, thunkApi.signal);
+    return result;
+  } catch (e: unknown) {
+    const message = await getApiErrorMessage(e);
+    return thunkApi.rejectWithValue(message);
+  }
+});
+
+export const deleteConference = createAsyncThunk<ApiSuccessResponse, string, { rejectValue: string }>(
+  'conference/delete',
+  async (params, thunkApi) => {
+    const uuid = params;
+    try {
+      const result = await ApiConferenceDelete(uuid, thunkApi.signal);
+      return result;
     } catch (e: unknown) {
       const message = await getApiErrorMessage(e);
       return thunkApi.rejectWithValue(message);
@@ -334,6 +365,24 @@ export const conferenceSlice = createSlice({
         const error = action.payload ?? '';
         state.getAbstractsState.error = error;
         state.getAbstractsState.status = ApiAsyncStatus.failed;
+      })
+      .addCase(createConference.pending, (state) => {
+        StateFuncPageActionPending(state, 'create');
+      })
+      .addCase(createConference.fulfilled, (state) => {
+        StateFuncPageActionFulfilled(state);
+      })
+      .addCase(createConference.rejected, (state, action) => {
+        StateFuncPageActionRejected(state, action.payload);
+      })
+      .addCase(deleteConference.pending, (state) => {
+        StateFuncPageActionPending(state, 'delete');
+      })
+      .addCase(deleteConference.fulfilled, (state) => {
+        StateFuncPageActionFulfilled(state);
+      })
+      .addCase(deleteConference.rejected, (state, action) => {
+        StateFuncPageActionRejected(state, action.payload);
       })
       .addCase(updateConference.pending, (state) => {
         StateFuncPageActionPending(state, 'general');

@@ -1,4 +1,4 @@
-import type { AbstractSimpleEntity } from '../entities/abstract';
+import type { AbstractEntity, AbstractSimpleEntity } from '../entities/abstract';
 import type { ApiSuccessResponse } from '../entities/api';
 import type {
   AbstractGroupEntity,
@@ -30,6 +30,37 @@ export const ApiConferenceRetrieve = async (uuid: string, signal: AbortSignal): 
 export const ApiConferenceAbstractList = async (uuid: string, signal: AbortSignal): Promise<AbstractSimpleEntity[]> => {
   // status code: 200
   const response = await api.get<AbstractSimpleEntity[]>(`/api/conferences/${uuid}/abstracts`, { signal }).json();
+  return response;
+};
+
+export const ApiConferenceAllAbstractList = async (uuid: string, signal: AbortSignal): Promise<AbstractEntity[]> => {
+  // status code: 200
+  const response = await api.get<AbstractEntity[]>(`/api/conferences/${uuid}/allAbstracts`, { signal }).json();
+  return response;
+};
+
+export const ApiConferenceCreate = async (
+  name: string,
+  shortName: string,
+  startDate: string,
+  endDate: string,
+  deadline: string,
+  signal: AbortSignal,
+): Promise<ConferenceSimpleEntity> => {
+  // status code: 200
+  const formData = new FormData();
+  formData.append('name', name);
+  formData.append('shortName', shortName);
+  formData.append('startDate', startDate);
+  formData.append('endDate', endDate);
+  formData.append('deadline', deadline);
+  const response = await api.post<ConferenceSimpleEntity>('/api/conferences', { body: formData, signal }).json();
+  return response;
+};
+
+export const ApiConferenceDelete = async (uuid: string, signal: AbortSignal): Promise<ApiSuccessResponse> => {
+  // status code: 200
+  const response = await api.delete<ApiSuccessResponse>(`/api/conferences/${uuid}`, { signal }).json();
   return response;
 };
 

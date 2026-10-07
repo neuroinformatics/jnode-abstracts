@@ -4,7 +4,6 @@ export interface UserSimpleEntity {
 }
 
 export interface UserEntity extends UserSimpleEntity {
-  password: string;
   firstName: string;
   lastName: string;
   isActive: boolean;

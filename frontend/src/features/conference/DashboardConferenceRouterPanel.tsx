@@ -6,6 +6,7 @@ import ForbiddenAccess from '../../common/ForbiddenAccess';
 import LoadingOverlay from '../../common/LoadingOverlay';
 import PageNotFound from '../../common/PageNotFound';
 import { isApiFailed, isApiPreparing } from '../../entities/api';
+import DashboardAbstractsPanel from '../abstract/DashboardAbstractsPanel';
 import { selectUserInfo } from '../user/userSlice';
 import {
   getConferenceDetail,
@@ -52,7 +53,7 @@ const DashboardConferenceRouterPanel: React.FC = () => {
   return (
     <Routes>
       <Route path="/" element={<DashboardConferencePanel conference={conferenceInfo} />} />
-      {/* <Route path="/abstracts" element={<AbstractListPanel conference={conferenceInfo} />} /> */}
+      <Route path="/abstracts" element={<DashboardAbstractsPanel conference={conferenceInfo} />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

@@ -80,3 +80,40 @@ export const ApiUsersChangeEmail = async (
   const response = await api.put<ApiSuccessResponse>(`/api/users/${uuid}/email`, { body: formData, signal }).json();
   return response;
 };
+
+export const ApiUsersList = async (signal: AbortSignal): Promise<UserEntity[]> => {
+  // status code: 200
+  const response = await api.get<UserEntity[]>('/api/users', { signal }).json();
+  return response;
+};
+
+export const ApiUsersCreate = async (
+  email: string,
+  firstName: string,
+  lastName: string,
+  signal: AbortSignal,
+): Promise<UserEntity> => {
+  // status code: 200
+  const formData = new FormData();
+  formData.append('email', email);
+  formData.append('firstName', firstName);
+  formData.append('lastName', lastName);
+  const response = await api.post<UserEntity>('/api/users', { body: formData, signal }).json();
+  return response;
+};
+
+export const ApiUsersUpdate = async (
+  uuid: string,
+  firstName: string,
+  lastName: string,
+  isActive: boolean,
+  signal: AbortSignal,
+): Promise<UserEntity> => {
+  // status code: 200
+  const formData = new FormData();
+  formData.append('firstName', firstName);
+  formData.append('lastName', lastName);
+  formData.append('isActive', isActive ? '1' : '0');
+  const response = await api.put<UserEntity>(`/api/users/${uuid}`, { body: formData, signal }).json();
+  return response;
+};

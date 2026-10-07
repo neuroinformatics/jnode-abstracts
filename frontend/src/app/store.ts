@@ -1,4 +1,6 @@
 import { type Action, configureStore, createListenerMiddleware, isAnyOf, type ThunkAction } from '@reduxjs/toolkit';
+import abstractReducer from '../features/abstract/abstractSlice';
+import accountReducer from '../features/account/accountSlice';
 import commonReducer from '../features/common/commonSlice';
 import conferenceReducer, { getConferenceList } from '../features/conference/conferenceSlice';
 import userReducer, { login, logout, restore } from '../features/user/userSlice';
@@ -15,6 +17,8 @@ listenerMiddleware.startListening({
 
 export const store = configureStore({
   reducer: {
+    abstract: abstractReducer,
+    account: accountReducer,
     common: commonReducer,
     conference: conferenceReducer,
     user: userReducer,

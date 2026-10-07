@@ -1,11 +1,14 @@
 import classNames from 'classnames';
 import type React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useAppSelector } from '../../app/hooks';
 import GeneralPanel from '../../common/GeneralPanel';
 import HeaderTitle from '../../common/HeaderTitle';
 import type { ConferenceEntity } from '../../entities/conference';
+import { selectUserInfo } from '../user/userSlice';
 import ConferenceNotice from './ConferenceNotice';
-import { type TAB, TABS } from './DashboardConferenceTab';
+import type { TAB } from './DashboardConferenceTab';
+import DashboardConferenceTabDelete from './DashboardConferenceTabDelete';
 import DashboardConferenceTabGeneral from './DashboardConferenceTabGeneral';
 import DashboardConferenceTabGroups from './DashboardConferenceTabGroups';
 import DashboardConferenceTabInfo from './DashboardConferenceTabInfo';
@@ -21,7 +24,8 @@ const DashboardConferencePanel: React.FC<Props> = (props) => {
   const { conference } = props;
   const location = useLocation();
   const navigate = useNavigate();
-  const tab = TABS.find((tab) => `#${tab}` === location.hash) ?? 'general';
+  const userInfo = useAppSelector(selectUserInfo);
+  const isAdmin = userInfo?.isAdmin ?? false;
 
   const tabs: { key: TAB; label: string; element: React.ReactNode }[] = [
     { key: 'general', label: 'General', element: <DashboardConferenceTabGeneral conference={conference} /> },
@@ -30,7 +34,11 @@ const DashboardConferencePanel: React.FC<Props> = (props) => {
     { key: 'schedule', label: 'Schedule', element: <DashboardConferenceTabSchedule conference={conference} /> },
     { key: 'info', label: 'Info text', element: <DashboardConferenceTabInfo conference={conference} /> },
     { key: 'owner', label: 'Owner', element: <DashboardConferenceTabOwner conference={conference} /> },
+    ...(isAdmin
+      ? [{ key: 'delete' as const, label: 'Delete', element: <DashboardConferenceTabDelete conference={conference} /> }]
+      : []),
   ];
+  const tab = tabs.find((t) => `#${t.key}` === location.hash)?.key ?? 'general';
 
   return (
     <div className="conference">
