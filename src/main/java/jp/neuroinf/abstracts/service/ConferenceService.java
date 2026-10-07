@@ -1,13 +1,14 @@
 package jp.neuroinf.abstracts.service;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import jakarta.transaction.Transactional;
@@ -151,6 +152,11 @@ public class ConferenceService {
   public RestSuccessResponseBody updateConference(AccountDetails user, String uuid,
       ConferenceUpdateForm form) throws ResponseStatusException {
     final Conference conference = requireManagedConference(user, uuid);
+    final boolean isShortNameTaken = this.conferenceRepository.getConferencesByShortName(form.getShortName()).stream()
+        .anyMatch(c -> !c.getUuid().equals(conference.getUuid()));
+    if (isShortNameTaken) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This short name is already taken");
+    }
     conference.setIsOpen(form.getIsOpen());
     conference.setIsPublished(form.getIsPublished());
     conference.setIsActive(form.getIsActive());
@@ -210,35 +216,13 @@ public class ConferenceService {
       banner.setConference(conference);
       conference.getBanners().add(banner);
     }
-    this.conferenceRepository.save(conference);
-    // register banner files
+    this.conferenceRepository.saveAndFlush(conference);
+    // register banner files, failing the request (and rolling back the banner rows) if a file cannot be written
     if (form.getLogoFile() != null && !form.getLogoFile().isEmpty()) {
-      final Optional<Banner> banner = conference.getLogoBanner();
-      if (banner.isPresent()) {
-        final File uploadFile = new File(this.appProperties.getPathBanners(), banner.get().getUuid());
-        try {
-          final byte[] bytes = form.getLogoFile().getBytes();
-          try (BufferedOutputStream uploadFileStream = new BufferedOutputStream(new FileOutputStream(uploadFile))) {
-            uploadFileStream.write(bytes);
-          }
-        } catch (Exception e) {
-          e.printStackTrace();
-        }
-      }
+      conference.getLogoBanner().ifPresent(banner -> writeBannerFile(banner, form.getLogoFile()));
     }
     if (form.getThumbnailFile() != null && !form.getThumbnailFile().isEmpty()) {
-      final Optional<Banner> banner = conference.getThumbnailBanner();
-      if (banner.isPresent()) {
-        final File uploadFile = new File(this.appProperties.getPathBanners(), banner.get().getUuid());
-        try {
-          final byte[] bytes = form.getThumbnailFile().getBytes();
-          try (BufferedOutputStream uploadFileStream = new BufferedOutputStream(new FileOutputStream(uploadFile))) {
-            uploadFileStream.write(bytes);
-          }
-        } catch (Exception e) {
-          e.printStackTrace();
-        }
-      }
+      conference.getThumbnailBanner().ifPresent(banner -> writeBannerFile(banner, form.getThumbnailFile()));
     }
     return new RestSuccessResponseBody(RESPONSE_MESSAGE_SUCCESS);
   }
@@ -247,8 +231,12 @@ public class ConferenceService {
   public RestSuccessResponseBody updateConferenceAbstractGroups(AccountDetails user, String uuid,
       ConferenceUpdateAbstractGroupsForm form) throws ResponseStatusException {
     final Conference conference = requireManagedConference(user, uuid);
+    // an empty list is sent as no parameters at all
+    final List<ConferenceUpdateAbstractGroupsForm.AbstractGroupForm> abstractGroupForms = form.getAbstractGroups() != null
+        ? form.getAbstractGroups()
+        : List.of();
     conference.getAbstractGroups().stream()
-        .filter(a -> form.getAbstractGroups().stream().noneMatch(f -> a.getUuid().equals(f.getUuid())))
+        .filter(a -> abstractGroupForms.stream().noneMatch(f -> a.getUuid().equals(f.getUuid())))
         .forEach(a -> {
           if (a.hasAbstracts()) {
             // deletion of groups in use is prohibited
@@ -257,7 +245,7 @@ public class ConferenceService {
           }
         });
     conference.getAbstractGroups().clear();
-    final List<AbstractGroup> abstractGroups = form.getAbstractGroups().stream().map(f -> {
+    final List<AbstractGroup> abstractGroups = abstractGroupForms.stream().map(f -> {
       final AbstractGroup ret = new AbstractGroup();
       ret.setUuid(f.getUuid());
       ret.setPrefix(f.getPrefix());
@@ -340,6 +328,18 @@ public class ConferenceService {
     final Conference conference = requireConference(uuid);
     this.permissionService.requireConferenceManager(conference, currentUser);
     return conference;
+  }
+
+  private void writeBannerFile(Banner banner, MultipartFile file) throws ResponseStatusException {
+    final File directory = new File(this.appProperties.getPathBanners());
+    final File uploadFile = new File(directory, banner.getUuid());
+    try {
+      Files.createDirectories(directory.toPath());
+      file.transferTo(uploadFile.toPath());
+    } catch (IOException e) {
+      e.printStackTrace();
+      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to save the banner file");
+    }
   }
 
   private void deleteFile(String directory, String uuid) {
