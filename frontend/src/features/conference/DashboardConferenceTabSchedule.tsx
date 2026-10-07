@@ -1,4 +1,5 @@
 import Ajv from 'ajv';
+import addFormats from 'ajv-formats';
 import classNames from 'classnames';
 import React from 'react';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
@@ -8,10 +9,11 @@ import { showMessage } from '../common/commonSlice';
 import { selectPageActionState, unsetPageActionState, updateConferenceSchedule } from './conferenceSlice';
 import type { DashboardConferenceTabProps } from './DashboardConferenceTab';
 
+const validateSchema = addFormats(new Ajv()).compile(ScheduleJsonSchema);
+
 const validateJson = (text: string): boolean => {
   try {
-    const ajv = new Ajv();
-    return !!ajv.validate(ScheduleJsonSchema, JSON.parse(text));
+    return validateSchema(JSON.parse(text));
   } catch {
     return false;
   }
