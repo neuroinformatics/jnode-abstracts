@@ -10,11 +10,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import org.springframework.http.server.ServletServerHttpResponse;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
@@ -50,8 +54,20 @@ public class SecurityConfig
   }
 
   @Bean
-  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    http.csrf((csrf) -> csrf.spa())
+  public AuthenticationManager authenticationManager(UserDetailsService userDetailsService,
+      PasswordEncoder passwordEncoder, AppProperties appProperties) {
+    final DaoAuthenticationProvider passwordProvider = new DaoAuthenticationProvider(userDetailsService);
+    passwordProvider.setPasswordEncoder(passwordEncoder);
+    // the login policy decides before the password is checked
+    return new ProviderManager(new LoginPolicyAuthenticationProvider(appProperties, this.loginAttemptLimiter),
+        passwordProvider);
+  }
+
+  @Bean
+  public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager authenticationManager)
+      throws Exception {
+    http.authenticationManager(authenticationManager)
+        .csrf((csrf) -> csrf.spa())
         .authorizeHttpRequests((authorize) -> authorize
             .anyRequest().permitAll())
         .formLogin((login) -> login
@@ -81,13 +97,11 @@ public class SecurityConfig
   public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
       AuthenticationException exception) throws IOException, ServletException {
     HttpOutputMessage outputMessage = new ServletServerHttpResponse(response);
-    // the provider wraps exceptions thrown by the user details service other than UsernameNotFoundException
-    final Throwable cause = exception.getCause() != null ? exception.getCause() : exception;
     HttpStatus status = HttpStatus.UNAUTHORIZED;
     String message = status.getReasonPhrase();
-    if (cause instanceof LoginRestrictedException) {
+    if (exception instanceof LoginRestrictedException) {
       message = LoginRestrictedException.MESSAGE;
-    } else if (cause instanceof LoginBlockedException) {
+    } else if (exception instanceof LoginBlockedException) {
       status = HttpStatus.TOO_MANY_REQUESTS;
       message = LoginBlockedException.MESSAGE;
     } else {
