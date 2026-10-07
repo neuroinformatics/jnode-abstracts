@@ -181,6 +181,24 @@
 				</executions>
 			</plugin>
 			<plugin>
+				<groupId>com.diffplug.spotless</groupId>
+				<artifactId>spotless-maven-plugin</artifactId>
+				<version>3.10.3</version>
+				<configuration>
+					<!-- the index does not notice changes of eclipse-formatter.xml -->
+					<upToDateChecking>
+						<enabled>false</enabled>
+					</upToDateChecking>
+					<java>
+						<eclipse>
+							<file>${project.basedir}/eclipse-formatter.xml</file>
+						</eclipse>
+						<trimTrailingWhitespace />
+						<endWithNewline />
+					</java>
+				</configuration>
+			</plugin>
+			<plugin>
 				<groupId>com.github.eirslett</groupId>
 				<artifactId>frontend-maven-plugin</artifactId>
 				<version>2.0.2</version>

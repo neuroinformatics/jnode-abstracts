@@ -29,6 +29,11 @@
   "[jsonc]": {
     "editor.defaultFormatter": "biomejs.biome"
   },
+  "[java]": {
+    "editor.defaultFormatter": "redhat.java"
+  },
+  "java.format.settings.url": "eclipse-formatter.xml",
+  "java.format.settings.profile": "abstracts",
   "java.compile.nullAnalysis.mode": "automatic",
   // Extensions - Code Spell Checker
   "cSpell.words": [
