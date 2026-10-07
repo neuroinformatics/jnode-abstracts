@@ -2,5 +2,5 @@
 // the build and deployment. Its "latest" dist-tag points at a newer major
 // line (26.x), so the default target would propose a major upgrade.
 export default {
-    target: (name) => (name === '@types/node' ? 'minor' : 'latest'),
+  target: (name) => (name === '@types/node' ? 'minor' : 'latest'),
 };
