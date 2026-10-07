@@ -1,5 +1,7 @@
 package jp.neuroinf.abstracts.service;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -38,7 +40,13 @@ public class AbstractService {
     if (abstract_ == null || !this.permissionService.isAbstractReadable(abstract_, account)) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, RESPONSE_MESSAGE_NO_ABSTRACT_DATA);
     }
-    return AbstractDto.of(abstract_);
+    AbstractDto dto = AbstractDto.of(abstract_);
+    if (!this.permissionService.isAbstractEditor(abstract_, account)) {
+      // owner mail addresses and review notes are private to the owners and managers
+      dto.setOwners(List.of());
+      dto.setStateLogs(List.of());
+    }
+    return dto;
   }
 
   /**

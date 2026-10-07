@@ -137,4 +137,25 @@ class AbstractAdminApiTest {
         .andExpect(status().isOk());
   }
 
+  @Test
+  void ownersAndStateLogsArePrivate() throws Exception {
+    Abstract abstract_ = this.testData.abstract_(this.conference, this.abstractOwner, AbstractState.SUBMITTED);
+    this.mockMvc.perform(put("/api/abstracts/{uuid}/state", abstract_.getUuid())
+        .param("state", "InReview").param("note", "internal")
+        .with(login(this.conferenceOwner)).with(csrf()))
+        .andExpect(status().isOk());
+    this.mockMvc.perform(put("/api/abstracts/{uuid}/state", abstract_.getUuid())
+        .param("state", "Accepted")
+        .with(login(this.conferenceOwner)).with(csrf()))
+        .andExpect(status().isOk());
+    this.mockMvc.perform(get("/api/abstracts/{uuid}", abstract_.getUuid()))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.owners.length()").value(0))
+        .andExpect(jsonPath("$.stateLogs.length()").value(0));
+    this.mockMvc.perform(get("/api/abstracts/{uuid}", abstract_.getUuid()).with(login(this.abstractOwner)))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.owners[0].mail").value("author@example.com"))
+        .andExpect(jsonPath("$.stateLogs.length()").value(2));
+  }
+
 }
