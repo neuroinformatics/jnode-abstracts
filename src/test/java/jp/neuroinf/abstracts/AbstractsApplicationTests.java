@@ -1,9 +1,10 @@
 package jp.neuroinf.abstracts;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
+import jp.neuroinf.abstracts.support.IntegrationTest;
+
+@IntegrationTest
 class AbstractsApplicationTests {
 
 	@Test

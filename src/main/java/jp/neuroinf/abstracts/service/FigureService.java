@@ -21,20 +21,20 @@ import jp.neuroinf.abstracts.repository.FigureRepository;
 public class FigureService {
 
   private final FigureRepository figureRepository;
-  private final AbstractService abstractService;
+  private final PermissionService permissionService;
   private final AppProperties appProperties;
 
-  public FigureService(FigureRepository figureRepository, AbstractService abstractService,
+  public FigureService(FigureRepository figureRepository, PermissionService permissionService,
       AppProperties appProperties) {
     this.figureRepository = figureRepository;
-    this.abstractService = abstractService;
+    this.permissionService = permissionService;
     this.appProperties = appProperties;
   }
 
   @Transactional
   public FigureDto getFigure(Account account, String uuid) {
     Figure figure = this.figureRepository.findFirstByUuid(uuid);
-    if (figure == null || !this.abstractService.isReadable(account, figure.getAbstract_())) {
+    if (figure == null || !this.permissionService.isAbstractReadable(figure.getAbstract_(), account)) {
       return null;
     }
     return FigureDto.of(figure);

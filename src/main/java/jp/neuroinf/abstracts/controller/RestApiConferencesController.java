@@ -3,8 +3,10 @@ package jp.neuroinf.abstracts.controller;
 import java.util.List;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,9 +15,11 @@ import org.springframework.web.server.ResponseStatusException;
 import jakarta.validation.Valid;
 import jp.neuroinf.abstracts.core.AccountDetails;
 import jp.neuroinf.abstracts.core.RestSuccessResponseBody;
+import jp.neuroinf.abstracts.dto.AbstractDto;
 import jp.neuroinf.abstracts.dto.AbstractSimpleDto;
 import jp.neuroinf.abstracts.dto.ConferenceDto;
 import jp.neuroinf.abstracts.dto.ConferenceSimpleDto;
+import jp.neuroinf.abstracts.form.ConferenceCreateForm;
 import jp.neuroinf.abstracts.form.ConferenceUpdateAbstractGroupsForm;
 import jp.neuroinf.abstracts.form.ConferenceUpdateForm;
 import jp.neuroinf.abstracts.form.ConferenceUpdateGeoForm;
@@ -40,6 +44,12 @@ public class RestApiConferencesController {
         return this.conferenceService.getConferenceList(user);
     }
 
+    @PostMapping("")
+    public ConferenceSimpleDto createConference(@AuthenticationPrincipal AccountDetails user,
+            @Valid ConferenceCreateForm form) throws ResponseStatusException {
+        return this.conferenceService.createConference(user, form);
+    }
+
     @GetMapping("/{uuid}")
     public ConferenceDto retrieveConference(@AuthenticationPrincipal AccountDetails user, @PathVariable String uuid)
             throws ResponseStatusException {
@@ -51,6 +61,13 @@ public class RestApiConferencesController {
             @PathVariable String uuid)
             throws ResponseStatusException {
         return this.conferenceService.getConferenceAbstracts(user, uuid);
+    }
+
+    @GetMapping("/{uuid}/allAbstracts")
+    public List<AbstractDto> listConferenceAllAbstracts(@AuthenticationPrincipal AccountDetails user,
+            @PathVariable String uuid)
+            throws ResponseStatusException {
+        return this.conferenceService.getConferenceAllAbstracts(user, uuid);
     }
 
     @PutMapping("/{uuid}")
@@ -89,6 +106,12 @@ public class RestApiConferencesController {
     public RestSuccessResponseBody updateConferenceOwners(@AuthenticationPrincipal AccountDetails user,
             @PathVariable("uuid") String uuid, @Valid ConferenceUpdateOwnersForm form) throws ResponseStatusException {
         return this.conferenceService.updateConferenceOwners(user, uuid, form);
+    }
+
+    @DeleteMapping("/{uuid}")
+    public RestSuccessResponseBody deleteConference(@AuthenticationPrincipal AccountDetails user,
+            @PathVariable("uuid") String uuid) throws ResponseStatusException {
+        return this.conferenceService.deleteConference(user, uuid);
     }
 
 }

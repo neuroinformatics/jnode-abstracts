@@ -1,5 +1,7 @@
 package jp.neuroinf.abstracts.controller;
 
+import java.util.List;
+
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,9 +17,11 @@ import jp.neuroinf.abstracts.core.RestSuccessResponseBody;
 import jp.neuroinf.abstracts.dto.AccountDto;
 import jp.neuroinf.abstracts.form.UsersChangeEmailForm;
 import jp.neuroinf.abstracts.form.UsersChangePasswordForm;
+import jp.neuroinf.abstracts.form.UsersCreateForm;
 import jp.neuroinf.abstracts.form.UsersExistsForm;
 import jp.neuroinf.abstracts.form.UsersRequestPasswordResetForm;
 import jp.neuroinf.abstracts.form.UsersResetPasswordForm;
+import jp.neuroinf.abstracts.form.UsersUpdateForm;
 import jp.neuroinf.abstracts.service.AccountService;
 
 @RestController
@@ -28,6 +32,17 @@ public class RestApiUsersController {
 
     public RestApiUsersController(AccountService accountService) {
         this.accountService = accountService;
+    }
+
+    @GetMapping("")
+    public List<AccountDto> listUsers(@AuthenticationPrincipal AccountDetails user) throws ResponseStatusException {
+        return this.accountService.listAccounts(user);
+    }
+
+    @PostMapping("")
+    public AccountDto createUser(@AuthenticationPrincipal AccountDetails user, @Valid UsersCreateForm form)
+            throws ResponseStatusException {
+        return this.accountService.createAccount(user, form);
     }
 
     @GetMapping("/current")
@@ -50,6 +65,12 @@ public class RestApiUsersController {
     @PostMapping("/password/reset")
     public RestSuccessResponseBody resetPassword(@Valid UsersResetPasswordForm form) throws ResponseStatusException {
         return this.accountService.resetPassword(form);
+    }
+
+    @PutMapping("/{uuid}")
+    public AccountDto updateUser(@AuthenticationPrincipal AccountDetails user, @PathVariable("uuid") String uuid,
+            @Valid UsersUpdateForm form) throws ResponseStatusException {
+        return this.accountService.updateAccount(user, uuid, form);
     }
 
     @PutMapping("/{uuid}/password")

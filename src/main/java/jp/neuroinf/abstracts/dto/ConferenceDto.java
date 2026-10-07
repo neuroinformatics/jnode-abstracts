@@ -41,7 +41,7 @@ public class ConferenceDto {
   private Boolean isOwner;
   private List<AccountSimpleDto> owners;
 
-  public static ConferenceDto of(Conference entity, Account account) {
+  public static ConferenceDto of(Conference entity, Account account, boolean isManager) {
     ConferenceDto dto = new ConferenceDto();
     dto.setUuid(entity.getUuid());
     dto.setIsOpen(entity.getIsOpen());
@@ -72,7 +72,8 @@ public class ConferenceDto {
     dto.setAbstractGroups(entity.getAbstractGroups().stream().map(AbstractGroupDto::of).toList());
     dto.setBanners(entity.getBanners().stream().map(BannerDto::of).toList());
     dto.setIsOwner(entity.isOwner(account));
-    if (dto.getIsOwner()) {
+    // managers include site admins who are not owners themselves
+    if (isManager) {
       dto.setOwners(entity.getConferenceOwners().stream().map(AccountSimpleDto::of).toList());
     }
     return dto;

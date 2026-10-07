@@ -1,9 +1,11 @@
 package jp.neuroinf.abstracts.service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -22,9 +24,11 @@ import jp.neuroinf.abstracts.dto.AccountDto;
 import jp.neuroinf.abstracts.entity.Account;
 import jp.neuroinf.abstracts.form.UsersChangeEmailForm;
 import jp.neuroinf.abstracts.form.UsersChangePasswordForm;
+import jp.neuroinf.abstracts.form.UsersCreateForm;
 import jp.neuroinf.abstracts.form.UsersExistsForm;
 import jp.neuroinf.abstracts.form.UsersRequestPasswordResetForm;
 import jp.neuroinf.abstracts.form.UsersResetPasswordForm;
+import jp.neuroinf.abstracts.form.UsersUpdateForm;
 import jp.neuroinf.abstracts.repository.AccountRepository;
 import jp.neuroinf.abstracts.utility.PasswordGenerator;
 import jp.neuroinf.abstracts.utility.PasswordGenerator.PasswordGeneratorBuilder;
@@ -36,6 +40,7 @@ public class AccountService implements UserDetailsService {
   private final PasswordEncoder passwordEncoder;
   private final TimestampSigner timestampSigner;
   private final EmailTemplateSender emailTemplateSender;
+  private final PermissionService permissionService;
   private final AppProperties appProperties;
 
   public AccountService(
@@ -43,11 +48,13 @@ public class AccountService implements UserDetailsService {
       PasswordEncoder passwordEncoder,
       TimestampSigner timestampSigner,
       EmailTemplateSender emailTemplateSender,
+      PermissionService permissionService,
       AppProperties appProperties) {
     this.accountRepository = accountRepository;
     this.passwordEncoder = passwordEncoder;
     this.timestampSigner = timestampSigner;
     this.emailTemplateSender = emailTemplateSender;
+    this.permissionService = permissionService;
     this.appProperties = appProperties;
   }
 
@@ -60,36 +67,13 @@ public class AccountService implements UserDetailsService {
     return new AccountDetails(account);
   }
 
-  /**
-   * Loads the latest account entity of the logged in user.
-   *
-   * @return the account, or null if not logged in or the account no longer exists
-   */
-  public Account findAccount(AccountDetails user) {
-    return user != null ? this.accountRepository.findFirstByUuid(user.getUuid()) : null;
-  }
-
-  private Account requireAccount(AccountDetails user) throws ResponseStatusException {
-    Account account = findAccount(user);
-    if (account == null) {
-      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Login required");
-    }
-    return account;
-  }
-
   public AccountDto getCurrentUser(AccountDetails user) throws ResponseStatusException {
-    if (user == null) {
-      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Login required");
-    }
-    Account account = requireAccount(user);
-    boolean isAdmin = this.appProperties.getAdmins().contains(account.getMail());
-    return AccountDto.of(account, isAdmin);
+    Account account = this.permissionService.requireAccount(user);
+    return AccountDto.of(account, this.permissionService.isAdmin(account));
   }
 
   public RestSuccessResponseBody exists(AccountDetails user, UsersExistsForm form) throws ResponseStatusException {
-    if (user == null) {
-      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Login required");
-    }
+    this.permissionService.requireAccount(user);
     Account account = this.accountRepository.findFirstByMail(form.getEmail());
     if (account == null) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Account with this email does not exist");
@@ -124,9 +108,7 @@ public class AccountService implements UserDetailsService {
     if (account == null) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Account with this email does not exist.");
     }
-    final PasswordGeneratorBuilder builder = new PasswordGenerator.PasswordGeneratorBuilder();
-    final PasswordGenerator generator = builder.useLower(true).useUpper(true).useDigit(true).usePunct(true).build();
-    final String password = generator.generate(16);
+    final String password = generatePassword();
     account.setPassword(this.passwordEncoder.encode(password));
     this.accountRepository.save(account);
     final Map<String, Object> variables = new HashMap<>();
@@ -141,11 +123,8 @@ public class AccountService implements UserDetailsService {
 
   public RestSuccessResponseBody changePassword(AccountDetails user, String uuid, UsersChangePasswordForm form)
       throws ResponseStatusException {
-    if (user == null) {
-      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Login required");
-    }
-    Account currentUser = requireAccount(user);
-    boolean isAdmin = this.appProperties.getAdmins().contains(currentUser.getMail());
+    Account currentUser = this.permissionService.requireAccount(user);
+    boolean isAdmin = this.permissionService.isAdmin(currentUser);
     Account account = this.accountRepository.findFirstByUuid(uuid);
     if (account == null) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid user id");
@@ -163,11 +142,8 @@ public class AccountService implements UserDetailsService {
 
   public RestSuccessResponseBody changeEmail(AccountDetails user, String uuid, UsersChangeEmailForm form)
       throws ResponseStatusException {
-    if (user == null) {
-      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Login required");
-    }
-    Account currentUser = requireAccount(user);
-    boolean isAdmin = this.appProperties.getAdmins().contains(currentUser.getMail());
+    Account currentUser = this.permissionService.requireAccount(user);
+    boolean isAdmin = this.permissionService.isAdmin(currentUser);
     Account account = this.accountRepository.findFirstByUuid(uuid);
     if (account == null) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid user id");
@@ -187,15 +163,63 @@ public class AccountService implements UserDetailsService {
     return new RestSuccessResponseBody("success");
   }
 
+  public List<AccountDto> listAccounts(AccountDetails user) throws ResponseStatusException {
+    this.permissionService.requireAdmin(user);
+    return this.accountRepository.findAll(Sort.by("lastName", "firstName", "mail")).stream()
+        .map(a -> AccountDto.of(a, this.permissionService.isAdmin(a))).toList();
+  }
+
+  /**
+   * Creates an active account with a generated password, and sends the password to the new user.
+   */
   @Transactional
-  public void create(AccountDto dto, String password) {
-    Account account = new Account();
-    account.setMail(dto.getMail());
+  public AccountDto createAccount(AccountDetails user, UsersCreateForm form) throws ResponseStatusException {
+    this.permissionService.requireAdmin(user);
+    final String email = form.getEmail().trim();
+    if (this.accountRepository.findFirstByMail(email) != null) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This email is already taken. Try another email.");
+    }
+    final String password = generatePassword();
+    final Account account = new Account();
+    account.setMail(email);
     account.setPassword(this.passwordEncoder.encode(password));
-    account.setFirstName(dto.getFirstName());
-    account.setLastName(dto.getLastName());
+    account.setFirstName(form.getFirstName().trim());
+    account.setLastName(form.getLastName().trim());
     account.setIsActive(true);
-    this.accountRepository.save(account);
+    final Account saved = this.accountRepository.saveAndFlush(account);
+    final Map<String, Object> variables = new HashMap<>();
+    variables.put("firstName", saved.getFirstName());
+    variables.put("mail", saved.getMail());
+    variables.put("password", password);
+    variables.put("loginUrl", String.format("%s/login", this.appProperties.getUrl()));
+    if (!this.emailTemplateSender.send(saved.getMail(), "Your account", "createAccount", variables)) {
+      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to send mail");
+    }
+    return AccountDto.of(saved, this.permissionService.isAdmin(saved));
+  }
+
+  @Transactional
+  public AccountDto updateAccount(AccountDetails user, String uuid, UsersUpdateForm form)
+      throws ResponseStatusException {
+    final Account currentUser = this.permissionService.requireAdmin(user);
+    final Account account = this.accountRepository.findFirstByUuid(uuid);
+    if (account == null) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid user id");
+    }
+    if (account.getUuid().equals(currentUser.getUuid()) && !form.getIsActive()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You cannot deactivate your own account");
+    }
+    account.setFirstName(form.getFirstName().trim());
+    account.setLastName(form.getLastName().trim());
+    account.setIsActive(form.getIsActive());
+    final Account saved = this.accountRepository.saveAndFlush(account);
+    return AccountDto.of(saved, this.permissionService.isAdmin(saved));
+  }
+
+  private String generatePassword() {
+    final PasswordGeneratorBuilder builder = new PasswordGenerator.PasswordGeneratorBuilder();
+    final PasswordGenerator generator = builder.useLower(true).useUpper(true).useDigit(true).usePunct(true).build();
+    return generator.generate(16);
   }
 
 }

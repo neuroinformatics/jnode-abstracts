@@ -116,6 +116,11 @@ public class Abstract {
   @OnDelete(action = OnDeleteAction.CASCADE)
   private List<AbstractOwners> abstractOwners = new ArrayList<>();
 
+  // mapped here too so that deleting an abstract also removes the favorites rows referring to it
+  @OneToMany(cascade = CascadeType.ALL, mappedBy = "abstract_", orphanRemoval = true)
+  @EqualsAndHashCode.Exclude
+  private List<AccountFavorites> favorites = new ArrayList<>();
+
   public List<Account> getOwners() {
     return getAbstractOwners().stream().map(o -> o.getOwner()).toList();
   }
