@@ -12,6 +12,8 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.mock.web.MockMultipartFile;
@@ -221,6 +223,32 @@ class ConferenceSettingsApiTest {
         .param("abstractGroups[0].shortName", "B")
         .with(login(this.owner)).with(csrf()))
         .andExpect(status().isBadRequest());
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = { "abstractGroups", "geo", "schedule", "info", "owners" })
+  void settingsAreChangedByManagersOnly(String setting) throws Exception {
+    Account other = this.testData.account("other-" + this.shortName + "@example.com");
+    String path = "/api/conferences/{uuid}/" + setting;
+    this.mockMvc.perform(put(path, this.conference.getUuid())
+        .param("geo", "").param("schedule", "").param("info", "").param("owners", other.getMail())
+        .with(login(other)).with(csrf()))
+        .andExpect(status().isForbidden());
+    this.mockMvc.perform(put(path, this.conference.getUuid())
+        .param("geo", "").param("schedule", "").param("info", "").param("owners", other.getMail())
+        .with(csrf()))
+        .andExpect(status().isUnauthorized());
+  }
+
+  @Test
+  void generalSettingsAreChangedByManagersOnly() throws Exception {
+    Account other = this.testData.account("other-" + this.shortName + "@example.com");
+    this.mockMvc.perform(general("Hijacked").with(login(other)).with(csrf()))
+        .andExpect(status().isForbidden());
+    this.mockMvc.perform(general("Hijacked").with(csrf()))
+        .andExpect(status().isUnauthorized());
+    this.mockMvc.perform(get("/api/conferences/{uuid}", this.conference.getUuid()))
+        .andExpect(jsonPath("$.name").value("Conference " + this.shortName));
   }
 
 }
