@@ -2,7 +2,12 @@ package jp.neuroinf.abstracts.controller;
 
 import java.util.List;
 
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jp.neuroinf.abstracts.core.AccountDetails;
 import jp.neuroinf.abstracts.core.RestSuccessResponseBody;
@@ -35,6 +42,7 @@ public class RestApiUsersController {
   private final AccountService accountService;
   private final AbstractService abstractService;
   private final FavoriteService favoriteService;
+  private final SecurityContextRepository securityContextRepository = new HttpSessionSecurityContextRepository();
 
   public RestApiUsersController(AccountService accountService, AbstractService abstractService,
       FavoriteService favoriteService) {
@@ -96,8 +104,19 @@ public class RestApiUsersController {
 
   @PutMapping("/{uuid}/password")
   public RestSuccessResponseBody changePassword(@AuthenticationPrincipal AccountDetails user,
-      @PathVariable("uuid") String uuid, @Valid UsersChangePasswordForm form) throws ResponseStatusException {
-    return this.accountService.changePassword(user, uuid, form);
+      @PathVariable("uuid") String uuid, @Valid UsersChangePasswordForm form, HttpServletRequest request,
+      HttpServletResponse response) throws ResponseStatusException {
+    final RestSuccessResponseBody body = this.accountService.changePassword(user, uuid, form);
+    if (user.getUuid().equals(uuid)) {
+      // sessions with the old password lose their access, so keep the current one with the new password
+      final AccountDetails details = this.accountService.findAccountDetails(uuid);
+      final SecurityContext context = SecurityContextHolder.createEmptyContext();
+      context.setAuthentication(UsernamePasswordAuthenticationToken.authenticated(details, null,
+          details.getAuthorities()));
+      SecurityContextHolder.setContext(context);
+      this.securityContextRepository.saveContext(context, request, response);
+    }
+    return body;
   }
 
   @PutMapping("/{uuid}/email")

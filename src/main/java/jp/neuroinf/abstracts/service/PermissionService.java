@@ -40,6 +40,10 @@ public class PermissionService {
     if (account == null || !Boolean.TRUE.equals(account.getIsActive())) {
       return null;
     }
+    // the password changed since the login, e.g. as it was stolen, so other sessions lose their access
+    if (!account.getPassword().equals(user.getPassword())) {
+      return null;
+    }
     return !this.appProperties.getReadOnly() || isAdmin(account) ? account : null;
   }
 

@@ -20,8 +20,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
 import jp.neuroinf.abstracts.component.TimestampSigner;
 import jp.neuroinf.abstracts.entity.Account;
@@ -112,6 +115,34 @@ class UsersApiTest {
     this.mockMvc.perform(post("/api/users/password/reset")
         .param("token", this.timestampSigner.sign("nobody@example.com")).with(csrf()))
         .andExpect(status().isNotFound());
+  }
+
+  @Test
+  void passwordChangesEndOtherSessions() throws Exception {
+    Account account = this.testData.account("user@example.com");
+    Account admin = this.testData.admin();
+    // a session that logged in with the current password
+    RequestPostProcessor oldSession = login(account);
+    MvcResult result = this.mockMvc.perform(put("/api/users/{uuid}/password", account.getUuid())
+        .param("oldPassword", "password").param("newPassword", "new-password-123")
+        .with(login(account)).with(csrf()))
+        .andExpect(status().isOk())
+        .andReturn();
+    this.mockMvc.perform(get("/api/users/current").with(oldSession))
+        .andExpect(status().isUnauthorized());
+    // the session that changed the password goes on
+    MockHttpSession session = (MockHttpSession) result.getRequest().getSession();
+    this.mockMvc.perform(get("/api/users/current").session(session))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.mail").value("user@example.com"));
+    // also when an admin sets the password
+    RequestPostProcessor userSession = login(this.accountRepository.findFirstByUuid(account.getUuid()));
+    this.mockMvc.perform(put("/api/users/{uuid}/password", account.getUuid())
+        .param("oldPassword", "").param("newPassword", "admin-set-123")
+        .with(login(admin)).with(csrf()))
+        .andExpect(status().isOk());
+    this.mockMvc.perform(get("/api/users/current").with(userSession))
+        .andExpect(status().isUnauthorized());
   }
 
   @Test

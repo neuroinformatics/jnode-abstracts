@@ -261,6 +261,14 @@ public class AccountService implements UserDetailsService {
     }
   }
 
+  /**
+   * Loads the authentication values of an account, e.g. to update the session after the password changed.
+   */
+  public AccountDetails findAccountDetails(String uuid) {
+    final Account account = this.accountRepository.findFirstByUuid(uuid);
+    return account != null ? new AccountDetails(account) : null;
+  }
+
   private boolean isAdminMail(String email) {
     return this.appProperties.getAdmins().stream().anyMatch(a -> a.equalsIgnoreCase(email.strip()));
   }
