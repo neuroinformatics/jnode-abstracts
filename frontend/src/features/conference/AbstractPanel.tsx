@@ -36,7 +36,8 @@ const AbstractPanel: React.FC<Props> = (props) => {
   return (
     <div className="abstract my-3">
       <h3 className="title mb-3">
-        <MathJax>{abstract.title}</MathJax>
+        {/* dynamic, as the panel stays mounted while paging through abstracts; MathJax typesets only once otherwise */}
+        <MathJax dynamic>{abstract.title}</MathJax>
       </h3>
       <ul className="authors mb-3">
         {abstract.authors.map((author) => {
@@ -61,7 +62,7 @@ const AbstractPanel: React.FC<Props> = (props) => {
         </div>
       )}
       <div className="text mb-3">
-        <MathJax>{abstract.text}</MathJax>
+        <MathJax dynamic>{abstract.text}</MathJax>
       </div>
       {abstract.figures.length > 0 && (
         <div className="figures row justify-content-center mb-3">
