@@ -2,7 +2,9 @@ import type React from 'react';
 
 import { Navigate, Route, Routes } from 'react-router-dom';
 import PageNotFound from '../common/PageNotFound';
+import AbstractEditorPanel from '../features/abstract/AbstractEditorPanel';
 import AbstractViewPanel from '../features/abstract/AbstractViewPanel';
+import MyAbstractsPanel from '../features/abstract/MyAbstractsPanel';
 import DashboardAccountsPanel from '../features/account/DashboardAccountsPanel';
 import MessageBar from '../features/common/MessageBar';
 import ConferenceListPanel from '../features/conference/ConferenceListPanel';
@@ -35,6 +37,8 @@ const MainPanel: React.FC = () => {
         <Route path="conferences" element={<ConferenceListPanel />} />
         <Route path="conference/:shortName/*" element={<ConferenceRouterPanel />} />
         <Route path="abstracts/:uuid" element={<AbstractViewPanel />} />
+        <Route path="myabstracts" element={<MyAbstractsPanel />} />
+        <Route path="myabstracts/:uuid/edit" element={<AbstractEditorPanel />} />
         <Route path="dashboard/conference" element={<DashboardConferenceCreatePanel />} />
         <Route path="dashboard/conference/:uuid/*" element={<DashboardConferenceRouterPanel />} />
         <Route path="dashboard/accounts" element={<DashboardAccountsPanel />} />

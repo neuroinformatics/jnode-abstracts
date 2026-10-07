@@ -88,7 +88,7 @@ export const formatAuthorAffiliations = (author: AuthorEntity, affiliations: Aff
   const positions = author.affiliationUuids
     .map((uuid) => (affiliations.find((a) => a.uuid === uuid)?.position ?? -1) + 1)
     .filter((p) => p > 0)
-    .sort();
+    .sort((a, b) => a - b);
   return positions.join(', ');
 };
 

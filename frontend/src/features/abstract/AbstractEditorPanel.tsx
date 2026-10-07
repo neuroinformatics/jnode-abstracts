@@ -1,24 +1,26 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
+import { Navigate, useParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import GeneralPanel from '../../common/GeneralPanel';
 import LoadingOverlay from '../../common/LoadingOverlay';
 import PageNotFound from '../../common/PageNotFound';
-import { isApiFailed, isApiPreparing } from '../../entities/api';
-import AbstractPanel from '../conference/AbstractPanel';
+import { isApiFailed } from '../../entities/api';
 import {
   getConferenceDetail,
   selectConferenceInfo,
   selectGetDetailState as selectGetConferenceDetailState,
   unsetConferenceDetail,
 } from '../conference/conferenceSlice';
-import AbstractStateLogPanel from './AbstractStateLogPanel';
+import { selectIsPreparingUserInfo, selectUserInfo } from '../user/userSlice';
+import AbstractEditor from './AbstractEditor';
 import { getAbstractDetail, selectAbstractInfo, selectGetDetailState, unsetAbstractDetail } from './abstractSlice';
 
-const AbstractViewPanel: React.FC = () => {
+const AbstractEditorPanel: React.FC = () => {
   const { uuid } = useParams();
 
   const dispatch = useAppDispatch();
+  const userInfo = useAppSelector(selectUserInfo);
+  const isPreparingUserInfo = useAppSelector(selectIsPreparingUserInfo);
   const abstractInfo = useAppSelector(selectAbstractInfo);
   const detailState = useAppSelector(selectGetDetailState);
   const conferenceInfo = useAppSelector(selectConferenceInfo);
@@ -26,13 +28,13 @@ const AbstractViewPanel: React.FC = () => {
   const conferenceUuid = abstractInfo != null && abstractInfo.uuid === uuid ? abstractInfo.conferenceUuid : null;
 
   React.useEffect(() => {
-    if (uuid != null) {
+    if (uuid != null && userInfo != null) {
       dispatch(getAbstractDetail(uuid));
     }
     return () => {
       dispatch(unsetAbstractDetail());
     };
-  }, [dispatch, uuid]);
+  }, [dispatch, uuid, userInfo]);
 
   React.useEffect(() => {
     if (conferenceUuid != null) {
@@ -43,23 +45,22 @@ const AbstractViewPanel: React.FC = () => {
     };
   }, [dispatch, conferenceUuid]);
 
+  if (!isPreparingUserInfo && userInfo == null) {
+    return <Navigate to="/login" />;
+  }
   if (isApiFailed(detailState) || isApiFailed(conferenceDetailState)) {
     return <PageNotFound />;
   }
   if (abstractInfo == null || conferenceInfo == null || conferenceInfo.uuid !== abstractInfo.conferenceUuid) {
-    return isApiPreparing(detailState) || isApiPreparing(conferenceDetailState) ? (
-      <LoadingOverlay message="Loading..." />
-    ) : null;
+    return <LoadingOverlay message="Loading..." />;
   }
 
   return (
-    <div className="abstract-view">
-      <GeneralPanel title={conferenceInfo.name} titleLinkTo={`/conference/${conferenceInfo.shortName}`}>
-        <AbstractStateLogPanel abstract={abstractInfo} />
-        <AbstractPanel conference={conferenceInfo} abstract={abstractInfo} />
-      </GeneralPanel>
-    </div>
+    <GeneralPanel title={conferenceInfo.name} titleLinkTo={`/conference/${conferenceInfo.shortName}`}>
+      <h3 className="mb-3">Edit abstract</h3>
+      <AbstractEditor key={abstractInfo.uuid} conference={conferenceInfo} abstract={abstractInfo} />
+    </GeneralPanel>
   );
 };
 
-export default AbstractViewPanel;
+export default AbstractEditorPanel;

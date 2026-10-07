@@ -1,27 +1,44 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { ApiAbstractPublicationUpdate, ApiAbstractRetrieve, ApiAbstractStateUpdate } from '../../api/abstractApi';
+import {
+  type AbstractEditParams,
+  ApiAbstractCreate,
+  ApiAbstractDelete,
+  ApiAbstractFigureUpload,
+  ApiAbstractOwnersUpdate,
+  ApiAbstractOwnList,
+  ApiAbstractPublicationUpdate,
+  ApiAbstractRetrieve,
+  ApiAbstractStateUpdate,
+  ApiAbstractUpdate,
+  ApiFigureDelete,
+  ApiFigureUpdate,
+} from '../../api/abstractApi';
 import { ApiConferenceAllAbstractList } from '../../api/conferenceApi ';
 import { getApiErrorMessage } from '../../api/utilities';
 import type { RootState } from '../../app/store';
 import type { NormalizedState } from '../../common/normalizedState';
 import type { AbstractEntity, StateLogState } from '../../entities/abstract';
-import { type ApiActionState, ApiAsyncStatus } from '../../entities/api';
+import { type ApiActionState, ApiAsyncStatus, type ApiSuccessResponse } from '../../entities/api';
 
 export type AbstractStateAbstracts = NormalizedState<AbstractEntity, string>;
 
 interface AbstractState {
   abstractInfo: AbstractEntity | null;
   managedAbstractsInfo: AbstractStateAbstracts;
+  ownAbstractsInfo: AbstractStateAbstracts;
   getDetailState: ApiActionState;
   getManagedAbstractsState: ApiActionState;
+  getOwnAbstractsState: ApiActionState;
   pageActionState: ApiActionState;
 }
 
 const initialState: Readonly<AbstractState> = {
   abstractInfo: null,
   managedAbstractsInfo: { byId: {}, allIds: [] },
+  ownAbstractsInfo: { byId: {}, allIds: [] },
   getDetailState: { type: null, error: null, status: ApiAsyncStatus.initializing },
   getManagedAbstractsState: { type: null, error: null, status: ApiAsyncStatus.initializing },
+  getOwnAbstractsState: { type: null, error: null, status: ApiAsyncStatus.initializing },
   pageActionState: { type: null, error: null, status: ApiAsyncStatus.initializing },
 };
 
@@ -46,6 +63,122 @@ export const getManagedAbstracts = createAsyncThunk<AbstractEntity[], string, { 
     try {
       const abstracts = await ApiConferenceAllAbstractList(conferenceUuid, thunkApi.signal);
       return abstracts;
+    } catch (e: unknown) {
+      const message = await getApiErrorMessage(e);
+      return thunkApi.rejectWithValue(message);
+    }
+  },
+);
+
+export const getOwnAbstracts = createAsyncThunk<AbstractEntity[], void, { rejectValue: string }>(
+  'abstract/own/list',
+  async (_, thunkApi) => {
+    try {
+      const abstracts = await ApiAbstractOwnList(thunkApi.signal);
+      return abstracts;
+    } catch (e: unknown) {
+      const message = await getApiErrorMessage(e);
+      return thunkApi.rejectWithValue(message);
+    }
+  },
+);
+
+export const createAbstract = createAsyncThunk<
+  AbstractEntity,
+  { conferenceUuid: string; content: AbstractEditParams },
+  { rejectValue: string }
+>('abstract/create', async (params, thunkApi) => {
+  const { conferenceUuid, content } = params;
+  try {
+    const abstract = await ApiAbstractCreate(conferenceUuid, content, thunkApi.signal);
+    return abstract;
+  } catch (e: unknown) {
+    const message = await getApiErrorMessage(e);
+    return thunkApi.rejectWithValue(message);
+  }
+});
+
+export const updateAbstract = createAsyncThunk<
+  AbstractEntity,
+  { uuid: string; content: AbstractEditParams },
+  { rejectValue: string }
+>('abstract/update', async (params, thunkApi) => {
+  const { uuid, content } = params;
+  try {
+    const abstract = await ApiAbstractUpdate(uuid, content, thunkApi.signal);
+    return abstract;
+  } catch (e: unknown) {
+    const message = await getApiErrorMessage(e);
+    return thunkApi.rejectWithValue(message);
+  }
+});
+
+export const deleteAbstract = createAsyncThunk<ApiSuccessResponse, string, { rejectValue: string }>(
+  'abstract/delete',
+  async (params, thunkApi) => {
+    const uuid = params;
+    try {
+      const result = await ApiAbstractDelete(uuid, thunkApi.signal);
+      return result;
+    } catch (e: unknown) {
+      const message = await getApiErrorMessage(e);
+      return thunkApi.rejectWithValue(message);
+    }
+  },
+);
+
+export const updateAbstractOwners = createAsyncThunk<
+  AbstractEntity,
+  { uuid: string; owners: string[] },
+  { rejectValue: string }
+>('abstract/owners/update', async (params, thunkApi) => {
+  const { uuid, owners } = params;
+  try {
+    const abstract = await ApiAbstractOwnersUpdate(uuid, owners, thunkApi.signal);
+    return abstract;
+  } catch (e: unknown) {
+    const message = await getApiErrorMessage(e);
+    return thunkApi.rejectWithValue(message);
+  }
+});
+
+export const uploadFigure = createAsyncThunk<
+  AbstractEntity,
+  { uuid: string; file: File; caption: string },
+  { rejectValue: string }
+>('abstract/figure/upload', async (params, thunkApi) => {
+  const { uuid, file, caption } = params;
+  try {
+    const abstract = await ApiAbstractFigureUpload(uuid, file, caption, thunkApi.signal);
+    return abstract;
+  } catch (e: unknown) {
+    const message = await getApiErrorMessage(e);
+    return thunkApi.rejectWithValue(message);
+  }
+});
+
+export const updateFigure = createAsyncThunk<
+  AbstractEntity,
+  { uuid: string; caption: string },
+  { rejectValue: string }
+>('abstract/figure/update', async (params, thunkApi) => {
+  const { uuid, caption } = params;
+  try {
+    const abstract = await ApiFigureUpdate(uuid, caption, thunkApi.signal);
+    return abstract;
+  } catch (e: unknown) {
+    const message = await getApiErrorMessage(e);
+    return thunkApi.rejectWithValue(message);
+  }
+});
+
+export const deleteFigure = createAsyncThunk<AbstractEntity, string, { rejectValue: string }>(
+  'abstract/figure/delete',
+  async (params, thunkApi) => {
+    const uuid = params;
+    try {
+      const abstract = await ApiFigureDelete(uuid, thunkApi.signal);
+      return abstract;
     } catch (e: unknown) {
       const message = await getApiErrorMessage(e);
       return thunkApi.rejectWithValue(message);
@@ -110,6 +243,9 @@ const StateFuncAbstractUpdated = (state: AbstractState, abstract: AbstractEntity
   if (abstract.uuid in state.managedAbstractsInfo.byId) {
     state.managedAbstractsInfo.byId[abstract.uuid] = abstract;
   }
+  if (abstract.uuid in state.ownAbstractsInfo.byId) {
+    state.ownAbstractsInfo.byId[abstract.uuid] = abstract;
+  }
 };
 
 export const abstractSlice = createSlice({
@@ -163,6 +299,96 @@ export const abstractSlice = createSlice({
         state.getManagedAbstractsState.error = error;
         state.getManagedAbstractsState.status = ApiAsyncStatus.failed;
       })
+      .addCase(getOwnAbstracts.pending, (state) => {
+        state.getOwnAbstractsState.status = ApiAsyncStatus.loading;
+      })
+      .addCase(getOwnAbstracts.fulfilled, (state, action) => {
+        const abstracts = action.payload;
+        state.getOwnAbstractsState.error = null;
+        state.getOwnAbstractsState.status = ApiAsyncStatus.idle;
+        state.ownAbstractsInfo = { allIds: [], byId: {} };
+        abstracts.forEach((abstract) => {
+          state.ownAbstractsInfo.allIds.push(abstract.uuid);
+          state.ownAbstractsInfo.byId[abstract.uuid] = abstract;
+        });
+      })
+      .addCase(getOwnAbstracts.rejected, (state, action) => {
+        const error = action.payload ?? '';
+        state.getOwnAbstractsState.error = error;
+        state.getOwnAbstractsState.status = ApiAsyncStatus.failed;
+      })
+      .addCase(createAbstract.pending, (state) => {
+        StateFuncPageActionPending(state, 'create');
+      })
+      .addCase(createAbstract.fulfilled, (state, action) => {
+        StateFuncPageActionFulfilled(state);
+        StateFuncAbstractUpdated(state, action.payload);
+      })
+      .addCase(createAbstract.rejected, (state, action) => {
+        StateFuncPageActionRejected(state, action.payload);
+      })
+      .addCase(updateAbstract.pending, (state) => {
+        StateFuncPageActionPending(state, 'update');
+      })
+      .addCase(updateAbstract.fulfilled, (state, action) => {
+        StateFuncPageActionFulfilled(state);
+        StateFuncAbstractUpdated(state, action.payload);
+      })
+      .addCase(updateAbstract.rejected, (state, action) => {
+        StateFuncPageActionRejected(state, action.payload);
+      })
+      .addCase(deleteAbstract.pending, (state) => {
+        StateFuncPageActionPending(state, 'delete');
+      })
+      .addCase(deleteAbstract.fulfilled, (state, action) => {
+        StateFuncPageActionFulfilled(state);
+        const uuid = action.meta.arg;
+        state.ownAbstractsInfo.allIds = state.ownAbstractsInfo.allIds.filter((id) => id !== uuid);
+        delete state.ownAbstractsInfo.byId[uuid];
+      })
+      .addCase(deleteAbstract.rejected, (state, action) => {
+        StateFuncPageActionRejected(state, action.payload);
+      })
+      .addCase(updateAbstractOwners.pending, (state) => {
+        StateFuncPageActionPending(state, 'owners');
+      })
+      .addCase(updateAbstractOwners.fulfilled, (state, action) => {
+        StateFuncPageActionFulfilled(state);
+        StateFuncAbstractUpdated(state, action.payload);
+      })
+      .addCase(updateAbstractOwners.rejected, (state, action) => {
+        StateFuncPageActionRejected(state, action.payload);
+      })
+      .addCase(uploadFigure.pending, (state) => {
+        StateFuncPageActionPending(state, 'figure');
+      })
+      .addCase(uploadFigure.fulfilled, (state, action) => {
+        StateFuncPageActionFulfilled(state);
+        StateFuncAbstractUpdated(state, action.payload);
+      })
+      .addCase(uploadFigure.rejected, (state, action) => {
+        StateFuncPageActionRejected(state, action.payload);
+      })
+      .addCase(updateFigure.pending, (state) => {
+        StateFuncPageActionPending(state, 'figure');
+      })
+      .addCase(updateFigure.fulfilled, (state, action) => {
+        StateFuncPageActionFulfilled(state);
+        StateFuncAbstractUpdated(state, action.payload);
+      })
+      .addCase(updateFigure.rejected, (state, action) => {
+        StateFuncPageActionRejected(state, action.payload);
+      })
+      .addCase(deleteFigure.pending, (state) => {
+        StateFuncPageActionPending(state, 'figure');
+      })
+      .addCase(deleteFigure.fulfilled, (state, action) => {
+        StateFuncPageActionFulfilled(state);
+        StateFuncAbstractUpdated(state, action.payload);
+      })
+      .addCase(deleteFigure.rejected, (state, action) => {
+        StateFuncPageActionRejected(state, action.payload);
+      })
       .addCase(updateAbstractState.pending, (state) => {
         StateFuncPageActionPending(state, 'state');
       })
@@ -192,6 +418,8 @@ export const selectAbstractInfo = (state: RootState) => state.abstract.abstractI
 export const selectManagedAbstractsInfo = (state: RootState) => state.abstract.managedAbstractsInfo;
 export const selectGetDetailState = (state: RootState) => state.abstract.getDetailState;
 export const selectGetManagedAbstractsState = (state: RootState) => state.abstract.getManagedAbstractsState;
+export const selectOwnAbstractsInfo = (state: RootState) => state.abstract.ownAbstractsInfo;
+export const selectGetOwnAbstractsState = (state: RootState) => state.abstract.getOwnAbstractsState;
 export const selectPageActionState = (state: RootState) => state.abstract.pageActionState;
 
 export default abstractSlice.reducer;

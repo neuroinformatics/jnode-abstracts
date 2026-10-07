@@ -5,6 +5,7 @@ import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import LoadingOverlay from '../../common/LoadingOverlay';
 import PageNotFound from '../../common/PageNotFound';
 import { isApiFailed, isApiPreparing } from '../../entities/api';
+import AbstractSubmissionPanel from '../abstract/AbstractSubmissionPanel';
 import AbstractListPanel from './AbstractListPanel';
 import ConferenceFloorplansPanel from './ConferenceFloorplansPanel';
 import ConferenceLocationsPanel from './ConferenceLocationsPanel';
@@ -49,6 +50,7 @@ const ConferenceRouterPanel: React.FC = () => {
           <Route path="/" element={<ConferencePanel conference={conferenceInfo} />} />
           <Route path="/schedule" element={<ConferenceSchedulePanel conference={conferenceInfo} />} />
           <Route path="/abstracts" element={<AbstractListPanel conference={conferenceInfo} />} />
+          <Route path="/submission" element={<AbstractSubmissionPanel conference={conferenceInfo} />} />
           <Route path="/locations" element={<ConferenceLocationsPanel conference={conferenceInfo} />} />
           <Route path="/floorplans" element={<ConferenceFloorplansPanel conference={conferenceInfo} />} />
           <Route path="*" element={<PageNotFound />} />

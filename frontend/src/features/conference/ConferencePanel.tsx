@@ -43,15 +43,15 @@ const ConferencePanel: React.FC<Props> = (props) => {
             <p className="fs-5">
               Submission is <strong className="text-success">open</strong>!
             </p>
-            <p>In order to submit an abstract please press the appropriate button below. or manage</p>
+            <p>In order to submit an abstract please press the appropriate button below.</p>
             <p>
-              <button type="button" className="btn btn-success" disabled>
+              <Link to={`/conference/${conference.shortName}/submission`} className="btn btn-success">
                 Submit new Abstract
-              </button>{' '}
+              </Link>{' '}
               or manage{' '}
-              <button type="button" className="btn btn-primary" disabled>
+              <Link to="/myabstracts" className="btn btn-primary">
                 Your Abstracts
-              </button>
+              </Link>
             </p>
           </div>
         ) : conference.isPublished ? (
