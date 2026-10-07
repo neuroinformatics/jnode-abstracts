@@ -7,8 +7,9 @@ export const getApiErrorMessage = async (e: unknown): Promise<string> => {
     return 'Request cancelled by the user';
   }
   if (error instanceof HTTPError) {
-    const json = (await error.response.json()) as ApiExceptionResponse;
-    return json.message ?? error.message;
+    // ky reads the error body into `data`, so the response body is already consumed
+    const data = error.data as ApiExceptionResponse | undefined;
+    return data?.message ?? error.message;
   }
   return error.message;
 };
