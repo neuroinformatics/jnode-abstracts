@@ -118,15 +118,14 @@ const AbstractListPanel: React.FC<Props> = (props) => {
     dispatch(getConferenceAbstracts(conference.uuid));
   }, [dispatch, conference.uuid]);
 
-  React.useEffect(() => {
-    if (!badAbstractGroups) {
-      if (abstractGroups != null && tab !== abstractGroups.uuid) {
-        setTab(abstractGroups.uuid ?? '');
-      } else if (abstractGroups == null && tab !== '' && !badAbstract && !hasAbstract) {
-        setTab('');
-      }
+  // sync tab with location hash, keeping the current tab while an abstract is shown
+  if (!badAbstractGroups) {
+    if (abstractGroups != null && tab !== (abstractGroups.uuid ?? '')) {
+      setTab(abstractGroups.uuid ?? '');
+    } else if (abstractGroups == null && tab !== '' && !badAbstract && !hasAbstract) {
+      setTab('');
     }
-  }, [abstractGroups, badAbstract, badAbstractGroups, hasAbstract, tab]);
+  }
 
   const filterTab = (uuid: string): boolean => {
     return tab === '' ? true : abstractsInfo.byId[uuid].abstractGroupUuid === tab;

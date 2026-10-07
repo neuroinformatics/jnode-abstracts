@@ -7,23 +7,20 @@ import { hideMessage, selectMessageState } from './commonSlice';
 const MessageBar: React.FC = () => {
   const dispatch = useAppDispatch();
   const messageState = useAppSelector(selectMessageState);
-  const [isShow, setIsShow] = React.useState<boolean>(false);
+  const isShow = messageState.variant != null;
 
   const onCloseAlert = React.useCallback(() => {
-    setIsShow(false);
     dispatch(hideMessage());
   }, [dispatch]);
 
   React.useEffect(() => {
     if (messageState.variant != null) {
-      setIsShow(true);
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         onCloseAlert();
       }, 10000);
-    } else {
-      setIsShow(false);
+      return () => clearTimeout(timer);
     }
-  }, [dispatch, messageState.variant, onCloseAlert]);
+  }, [messageState.variant, onCloseAlert]);
 
   return (
     <>

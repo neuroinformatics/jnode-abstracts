@@ -6,11 +6,7 @@ import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import LoadingOverlay from '../../common/LoadingOverlay';
 import { ApiAsyncStatus } from '../../entities/api';
 import { showMessage } from '../common/commonSlice';
-import {
-  exists,
-  selectPageActionState as selectUserPageActionState,
-  unsetPageActionState as unsetUserPageActionState,
-} from '../user/userSlice';
+import { exists, unsetPageActionState as unsetUserPageActionState } from '../user/userSlice';
 import type { DashboardConferenceTabProps } from './DashboardConferenceTab';
 import { selectPageActionState, unsetPageActionState, updateConferenceOwners } from './conferenceSlice';
 
@@ -23,22 +19,7 @@ const DashboardConferenceTabOwner: React.FC<DashboardConferenceTabProps> = (prop
   );
   const [isChanged, setIsChanged] = React.useState<boolean>(false);
   const [email, setEmail] = React.useState<string>('');
-  const userPageActionState = useAppSelector(selectUserPageActionState);
   const pageActionState = useAppSelector(selectPageActionState);
-
-  React.useEffect(() => {
-    if (userPageActionState.status === ApiAsyncStatus.idle) {
-      const data = email.trim();
-      setOwners((prev) => [...prev, data].sort((a, b) => a.localeCompare(b)));
-      dispatch(unsetUserPageActionState());
-      setEmail('');
-      setIsChanged(true);
-    } else if (userPageActionState.status === ApiAsyncStatus.failed) {
-      dispatch(showMessage({ variant: 'danger', message: userPageActionState.error ?? '' }));
-      dispatch(unsetUserPageActionState());
-      setEmail('');
-    }
-  }, [dispatch, email, userPageActionState.error, userPageActionState.status]);
 
   React.useEffect(() => {
     if (pageActionState.type === 'owners') {
@@ -46,12 +27,9 @@ const DashboardConferenceTabOwner: React.FC<DashboardConferenceTabProps> = (prop
         const message = 'Owners successfully updated.';
         dispatch(showMessage({ variant: 'success', message }));
         dispatch(unsetPageActionState());
-        setEmail('');
-        setIsChanged(false);
       } else if (pageActionState.status === ApiAsyncStatus.failed) {
         dispatch(showMessage({ variant: 'danger', message: pageActionState.error ?? '' }));
         dispatch(unsetPageActionState());
-        setEmail('');
       }
     }
   }, [dispatch, pageActionState.error, pageActionState.status, pageActionState.type]);
@@ -69,7 +47,16 @@ const DashboardConferenceTabOwner: React.FC<DashboardConferenceTabProps> = (prop
     (e) => {
       e.preventDefault();
       const data = email.trim();
-      dispatch(exists({ email: data }));
+      dispatch(exists({ email: data })).then((action) => {
+        if (exists.fulfilled.match(action)) {
+          setOwners((prev) => [...prev, data].sort((a, b) => a.localeCompare(b)));
+          setIsChanged(true);
+        } else {
+          dispatch(showMessage({ variant: 'danger', message: action.payload ?? '' }));
+        }
+        dispatch(unsetUserPageActionState());
+        setEmail('');
+      });
     },
     [dispatch, email],
   );
@@ -77,7 +64,12 @@ const DashboardConferenceTabOwner: React.FC<DashboardConferenceTabProps> = (prop
   const onSubmitOwner = React.useCallback<React.FormEventHandler<HTMLFormElement>>(
     (e) => {
       e.preventDefault();
-      dispatch(updateConferenceOwners({ uuid: conference.uuid, owners }));
+      dispatch(updateConferenceOwners({ uuid: conference.uuid, owners })).then((action) => {
+        if (updateConferenceOwners.fulfilled.match(action)) {
+          setIsChanged(false);
+        }
+        setEmail('');
+      });
     },
     [conference.uuid, dispatch, owners],
   );

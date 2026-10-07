@@ -25,7 +25,6 @@ const DashboardConferenceTabSchedule: React.FC<DashboardConferenceTabProps> = (p
         const message = 'Schedule successfully updated.';
         dispatch(showMessage({ variant: 'success', message }));
         dispatch(unsetPageActionState());
-        setIsChanged(false);
       } else if (pageActionState.status === ApiAsyncStatus.failed) {
         dispatch(showMessage({ variant: 'danger', message: pageActionState.error ?? '' }));
         dispatch(unsetPageActionState());

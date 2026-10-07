@@ -38,7 +38,6 @@ const ForgotPasswordPanel: React.FC = () => {
 
   React.useEffect(() => {
     if (pageActionState.status === ApiAsyncStatus.idle) {
-      setEmail('');
       const message =
         "A URL to reset your password has been sent to you by email. If you don't get it in a few moments, please check your spam folder.";
       dispatch(showMessage({ variant: 'success', message }));
@@ -60,7 +59,11 @@ const ForgotPasswordPanel: React.FC = () => {
     (e) => {
       e.preventDefault();
       if (!invalidEmail && userInfo == null) {
-        dispatch(requestPasswordReset({ email }));
+        dispatch(requestPasswordReset({ email })).then((action) => {
+          if (requestPasswordReset.fulfilled.match(action)) {
+            setEmail('');
+          }
+        });
       }
     },
     [dispatch, email, invalidEmail, userInfo],

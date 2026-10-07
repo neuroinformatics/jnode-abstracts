@@ -40,9 +40,6 @@ const ChangePasswordPanel: React.FC = () => {
 
   React.useEffect(() => {
     if (pageActionState.status === ApiAsyncStatus.idle) {
-      setOldPassword('');
-      setNewPassword('');
-      setConfirmPassword('');
       const message = 'Password successfully changed.';
       dispatch(showMessage({ variant: 'success', message }));
     } else if (pageActionState.status === ApiAsyncStatus.failed) {
@@ -80,7 +77,15 @@ const ChangePasswordPanel: React.FC = () => {
     (e) => {
       e.preventDefault();
       if (!canUpdatePassword && userInfo != null) {
-        dispatch(changePassword({ uuid: userInfo.uuid, oldPassword: oldPassword, newPassword: newPassword }));
+        dispatch(changePassword({ uuid: userInfo.uuid, oldPassword: oldPassword, newPassword: newPassword })).then(
+          (action) => {
+            if (changePassword.fulfilled.match(action)) {
+              setOldPassword('');
+              setNewPassword('');
+              setConfirmPassword('');
+            }
+          },
+        );
       }
     },
     [canUpdatePassword, oldPassword, dispatch, newPassword, userInfo],

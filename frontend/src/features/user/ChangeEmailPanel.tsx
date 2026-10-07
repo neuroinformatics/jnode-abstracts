@@ -40,9 +40,6 @@ const ChangeEmailPanel: React.FC = () => {
 
   React.useEffect(() => {
     if (pageActionState.status === ApiAsyncStatus.idle) {
-      setNewEmail('');
-      setConfirmEmail('');
-      setPassword('');
       const message = 'E-Mail address successfully changed.';
       dispatch(showMessage({ variant: 'success', message }));
     } else if (pageActionState.status === ApiAsyncStatus.failed) {
@@ -75,7 +72,13 @@ const ChangeEmailPanel: React.FC = () => {
     (e) => {
       e.preventDefault();
       if (!canUpdateEmail && userInfo != null) {
-        dispatch(changeEmail({ uuid: userInfo.uuid, email: newEmail, password: password }));
+        dispatch(changeEmail({ uuid: userInfo.uuid, email: newEmail, password: password })).then((action) => {
+          if (changeEmail.fulfilled.match(action)) {
+            setNewEmail('');
+            setConfirmEmail('');
+            setPassword('');
+          }
+        });
       }
     },
     [canUpdateEmail, dispatch, newEmail, password, userInfo],

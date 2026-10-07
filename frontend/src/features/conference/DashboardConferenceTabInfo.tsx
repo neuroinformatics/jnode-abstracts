@@ -20,7 +20,6 @@ const DashboardConferenceTabInfo: React.FC<DashboardConferenceTabProps> = (props
         const message = 'Info successfully updated.';
         dispatch(showMessage({ variant: 'success', message }));
         dispatch(unsetPageActionState());
-        setIsChanged(false);
       } else if (pageActionState.status === ApiAsyncStatus.failed) {
         dispatch(showMessage({ variant: 'danger', message: pageActionState.error ?? '' }));
         dispatch(unsetPageActionState());
