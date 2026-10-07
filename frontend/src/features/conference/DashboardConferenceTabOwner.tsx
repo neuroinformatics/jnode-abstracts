@@ -1,14 +1,13 @@
-import React from 'react';
-
 import { faPlus, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React from 'react';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import LoadingOverlay from '../../common/LoadingOverlay';
 import { ApiAsyncStatus } from '../../entities/api';
 import { showMessage } from '../common/commonSlice';
 import { exists, unsetPageActionState as unsetUserPageActionState } from '../user/userSlice';
-import type { DashboardConferenceTabProps } from './DashboardConferenceTab';
 import { selectPageActionState, unsetPageActionState, updateConferenceOwners } from './conferenceSlice';
+import type { DashboardConferenceTabProps } from './DashboardConferenceTab';
 
 const DashboardConferenceTabOwner: React.FC<DashboardConferenceTabProps> = (props) => {
   const { conference } = props;
@@ -82,7 +81,7 @@ const DashboardConferenceTabOwner: React.FC<DashboardConferenceTabProps> = (prop
       <p>Here is the list of current owners:</p>
       <ul>
         {owners.map((owner, idx) => (
-          <li className="my-1" key={idx}>
+          <li className="my-1" key={owner}>
             <strong>{owner}</strong>{' '}
             <button className="btn btn-sm btn-danger" onClick={() => onClickRemove(idx)}>
               <FontAwesomeIcon icon={faXmark} />

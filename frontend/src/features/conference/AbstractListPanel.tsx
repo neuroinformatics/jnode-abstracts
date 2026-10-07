@@ -1,6 +1,5 @@
-import React from 'react';
-
 import classNames from 'classnames';
+import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import GeneralPanel from '../../common/GeneralPanel';

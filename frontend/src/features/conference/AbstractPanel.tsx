@@ -1,6 +1,5 @@
-import React from 'react';
-
 import { MathJax } from 'better-react-mathjax';
+import React from 'react';
 import { Button, Modal } from 'react-bootstrap';
 import type { AbstractSimpleEntity } from '../../entities/abstract';
 import type { ConferenceEntity } from '../../entities/conference';
@@ -113,7 +112,7 @@ const AbstractPanel: React.FC<Props> = (props) => {
             {abstract.references.map((reference) => {
               const text = reference.text || reference.link;
               const html = reference.link ? (
-                <a href={reference.link} target="_blank">
+                <a href={reference.link} target="_blank" rel="noopener">
                   {text}
                 </a>
               ) : (
@@ -121,7 +120,7 @@ const AbstractPanel: React.FC<Props> = (props) => {
               );
               const doi = reference.doi?.match(/10\..*/)?.[0] ?? null;
               const doiLink = doi ? (
-                <a href={`https://doi.org/${doi}`} target="_blank">
+                <a href={`https://doi.org/${doi}`} target="_blank" rel="noopener">
                   https://doi.org/{doi}
                 </a>
               ) : null;

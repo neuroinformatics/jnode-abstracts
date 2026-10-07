@@ -1,8 +1,6 @@
-import React from 'react';
-
-import GeneralPage from '../common/GeneralPanel';
-
+import type React from 'react';
 import JNodeLogo from '../assets/J-Node-logo.png';
+import GeneralPage from '../common/GeneralPanel';
 
 const AboutPanel: React.FC = () => {
   const title = 'About';
@@ -12,7 +10,7 @@ const AboutPanel: React.FC = () => {
         <div className="col-md-8 d-flex align-items-center">
           <p>
             This Abstract System is hosted by the{' '}
-            <a href="https://www.neuroinf.jp/" target="_blank">
+            <a href="https://www.neuroinf.jp/" target="_blank" rel="noopener">
               INCF Japan Node (J-Node)
             </a>
             .

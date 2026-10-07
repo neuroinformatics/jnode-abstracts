@@ -72,7 +72,7 @@ export class SchedulerModel {
         .map((resourceId) => this.resources.byId[resourceId].endDate)
         .reduce((d1, d2) => (d1.getTime() > d2.getTime() ? d1 : d2), new Date(0));
     const flattenEventDates = (resourceIds: string[]): string[] => [
-      ...new Set(resourceIds.map((resourceId) => this.resources.byId[resourceId].eventDates).flat()),
+      ...new Set(resourceIds.flatMap((resourceId) => this.resources.byId[resourceId].eventDates)),
     ];
     const registerEvent = (entity: ScheduleJSON_EventEntity, parentId: string): ScheduleJSON_EntityResource => {
       const id = `${parentId !== '' ? `${parentId}:` : ''}e${idx++}`;

@@ -1,6 +1,5 @@
-import React from 'react';
-
 import classNames from 'classnames';
+import React from 'react';
 
 export type AlertPanelVariant = 'primary' | 'secondary' | 'success' | 'info' | 'warning' | 'danger' | 'light' | 'dark';
 

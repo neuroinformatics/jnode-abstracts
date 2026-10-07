@@ -33,7 +33,7 @@ const LogoutPanel: React.FC = () => {
     if (pageActionState.status === ApiAsyncStatus.failed) {
       dispatch(showMessage({ variant: 'danger', message: pageActionState.error ?? '' }));
     }
-  }, [dispatch, navigate, pageActionState]);
+  }, [dispatch, pageActionState]);
 
   const title = 'Sign out';
 

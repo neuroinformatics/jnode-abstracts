@@ -1,8 +1,7 @@
-import React from 'react';
-
 import { faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import classNames from 'classnames';
+import React from 'react';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import AlertPanel from '../../common/AlertPanel';
 import { ApiAsyncStatus } from '../../entities/api';
@@ -16,14 +15,19 @@ import {
 } from './conferenceSlice';
 import type { DashboardConferenceTabProps } from './DashboardConferenceTab';
 
+// abstract group with a client-side key to identify table rows, since new groups have no uuid yet
+type EditableAbstractGroup = AbstractGroupEntity & { key: string };
+
+let newGroupKeySeq = 0;
+
 const DashboardConferenceTabGroups: React.FC<DashboardConferenceTabProps> = (props) => {
   const { conference } = props;
 
   const dispatch = useAppDispatch();
   const pageActionState = useAppSelector(selectPageActionState);
 
-  const [abstractGroups, setAbstractGroups] = React.useState<AbstractGroupEntity[]>(
-    structuredClone(conference.abstractGroups),
+  const [abstractGroups, setAbstractGroups] = React.useState<EditableAbstractGroup[]>(() =>
+    structuredClone(conference.abstractGroups).map((g) => ({ ...g, key: g.uuid ?? `new-${newGroupKeySeq++}` })),
   );
   const [isChanged, setIsChanged] = React.useState<boolean>(false);
   const [wasValidated, setWasValidated] = React.useState<boolean>(false);
@@ -120,7 +124,13 @@ const DashboardConferenceTabGroups: React.FC<DashboardConferenceTabProps> = (pro
     setWasValidated(false);
     setAbstractGroups((prev) => [
       ...prev,
-      { uuid: null, prefix: parseInt(prefix), shortName: shortName.trim(), name: name.trim() },
+      {
+        key: `new-${newGroupKeySeq++}`,
+        uuid: null,
+        prefix: parseInt(prefix),
+        shortName: shortName.trim(),
+        name: name.trim(),
+      },
     ]);
     setPrefix('');
     setShortName('');
@@ -134,7 +144,12 @@ const DashboardConferenceTabGroups: React.FC<DashboardConferenceTabProps> = (pro
     setName('');
     setWasValidated(true);
     if (cleanup() && validationResult.isValid) {
-      dispatch(updateConferenceAbstractGroups({ uuid: conference.uuid, abstractGroups }));
+      dispatch(
+        updateConferenceAbstractGroups({
+          uuid: conference.uuid,
+          abstractGroups: abstractGroups.map(({ key: _key, ...g }) => g),
+        }),
+      );
       setIsChanged(false);
     }
   };
@@ -152,7 +167,7 @@ const DashboardConferenceTabGroups: React.FC<DashboardConferenceTabProps> = (pro
         </thead>
         <tbody>
           {abstractGroups.map((g, idx) => (
-            <tr key={`${idx}:${g.uuid}`} className="align-middle">
+            <tr key={g.key} className="align-middle">
               <td>
                 <input
                   form="groups"

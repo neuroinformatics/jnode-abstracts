@@ -1,8 +1,7 @@
-import React from 'react';
-
 import { faHouse, faUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import type { Feature, FeatureCollection, GeoJsonObject } from 'geojson';
+import type React from 'react';
 import { Container, Nav, Navbar, NavDropdown } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import { useLocation } from 'react-router-dom';
@@ -179,7 +178,7 @@ const HeaderPanel: React.FC = () => {
               )}
               {conferenceInfo.link != null && (
                 <div className="nav-item">
-                  <a className="nav-link" href={conferenceInfo.link} target="_blank">
+                  <a className="nav-link" href={conferenceInfo.link} target="_blank" rel="noopener">
                     <FontAwesomeIcon icon={faUpRightFromSquare} className="pe-2" />
                     Conference home
                   </a>

@@ -1,13 +1,21 @@
-import React from 'react';
-
 import Ajv from 'ajv';
 import classNames from 'classnames';
+import React from 'react';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import GeoJsonSchema from '../../assets/schema/GeoJSON.json';
 import { ApiAsyncStatus } from '../../entities/api';
 import { showMessage } from '../common/commonSlice';
 import { selectPageActionState, unsetPageActionState, updateConferenceGeo } from './conferenceSlice';
 import type { DashboardConferenceTabProps } from './DashboardConferenceTab';
+
+const validateJson = (text: string): boolean => {
+  try {
+    const ajv = new Ajv();
+    return !!ajv.validate(GeoJsonSchema, JSON.parse(text));
+  } catch {
+    return false;
+  }
+};
 
 const DashboardConferenceTabMaps: React.FC<DashboardConferenceTabProps> = (props) => {
   const { conference } = props;
@@ -31,15 +39,6 @@ const DashboardConferenceTabMaps: React.FC<DashboardConferenceTabProps> = (props
       }
     }
   }, [dispatch, pageActionState.error, pageActionState.status, pageActionState.type]);
-
-  const validateJson = (text: string): boolean => {
-    try {
-      const ajv = new Ajv();
-      return !!ajv.validate(GeoJsonSchema, JSON.parse(text));
-    } catch {
-      return false;
-    }
-  };
 
   const onChangeMaps: React.ChangeEventHandler<HTMLTextAreaElement> = (e) => {
     setMaps(e.target.value);

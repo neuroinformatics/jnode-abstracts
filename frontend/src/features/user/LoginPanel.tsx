@@ -1,7 +1,6 @@
-import React from 'react';
-
 import { faEnvelope, faKey } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import GeneralPanel from '../../common/GeneralPanel';
@@ -36,7 +35,7 @@ const LoginPanel: React.FC = () => {
     if (pageActionState.status === ApiAsyncStatus.failed) {
       dispatch(showMessage({ variant: 'danger', message: pageActionState.error ?? '' }));
     }
-  }, [dispatch, navigate, pageActionState]);
+  }, [dispatch, pageActionState]);
 
   const onSubmitLogin = React.useCallback<React.FormEventHandler<HTMLFormElement>>(
     (e) => {

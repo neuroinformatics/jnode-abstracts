@@ -1,10 +1,9 @@
-import React from 'react';
-
 import { MathJaxContext } from 'better-react-mathjax';
+import React from 'react';
 import { ScrollRestoration } from 'react-router-dom';
-import { useAppDispatch, useAppSelector } from './app/hooks';
+import { useAppDispatch } from './app/hooks';
 import { getConferenceList } from './features/conference/conferenceSlice';
-import { restore, selectUserInfo } from './features/user/userSlice';
+import { restore } from './features/user/userSlice';
 import FooterPanel from './main/FooterPanel';
 import HeaderPanel from './main/HeaderPanel';
 import MainPanel from './main/MainPanel';
@@ -33,15 +32,14 @@ const MATHJAX_CONFIG = {
 
 const App: React.FC = () => {
   const dispatch = useAppDispatch();
-  const userInfo = useAppSelector(selectUserInfo);
 
   React.useEffect(() => {
     if (isFirst) {
       isFirst = false;
       dispatch(restore());
+      dispatch(getConferenceList());
     }
-    dispatch(getConferenceList());
-  }, [dispatch, userInfo]);
+  }, [dispatch]);
 
   return (
     <div className="app container">

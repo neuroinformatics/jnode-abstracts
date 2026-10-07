@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 
 import { Navigate, Route, Routes } from 'react-router-dom';
 import PageNotFound from '../common/PageNotFound';

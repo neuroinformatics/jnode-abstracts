@@ -1,6 +1,5 @@
-import React from 'react';
-
 import classNames from 'classnames';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import GeneralPanel from '../../common/GeneralPanel';
@@ -44,7 +43,7 @@ const ForgotPasswordPanel: React.FC = () => {
     } else if (pageActionState.status === ApiAsyncStatus.failed) {
       dispatch(showMessage({ variant: 'danger', message: pageActionState.error ?? '' }));
     }
-  }, [dispatch, navigate, pageActionState]);
+  }, [dispatch, pageActionState]);
 
   const invalidEmail = email.length > 0 && !/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i.test(email);
 

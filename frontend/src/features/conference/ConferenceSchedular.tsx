@@ -1,5 +1,3 @@
-import React from 'react';
-
 import {
   faBackwardStep,
   faChevronLeft,
@@ -12,6 +10,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import classNames from 'classnames';
 import dayjs from 'dayjs';
 import { scheduler } from 'dhtmlx-scheduler';
+import React from 'react';
 import { Button, Modal } from 'react-bootstrap';
 import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
@@ -56,69 +55,75 @@ const ConferenceScheduler: React.FC<Props> = (props) => {
   const events = model.getEvents();
   const typeLabels: Record<ScheduleEventType, string> = { s: 'Session', t: 'Track', e: 'Event' };
 
+  const onViewChange = React.useEffectEvent((mode: string, date: Date) => {
+    if (mode === 'day') {
+      const hoursByDate = model.getHoursByDate(date);
+      if (hoursByDate != null) {
+        scheduler.config.first_hour = hoursByDate.firstHour;
+        scheduler.config.last_hour = hoursByDate.lastHour;
+      } else {
+        scheduler.config.first_hour = 0;
+        scheduler.config.last_hour = 24;
+      }
+      setHeight(`${1 + (scheduler.config.last_hour - scheduler.config.first_hour) * scheduler.config.hour_size_px}px`);
+    } else {
+      scheduler.config.first_hour = 0;
+      scheduler.config.last_hour = 24;
+      setHeight('900px');
+    }
+    setCurrentDate(date);
+    scheduler.updateView();
+  });
+
+  const initScheduler = React.useEffectEvent((el: HTMLDivElement) => {
+    // disable editing events
+    scheduler.config.readonly = true;
+    // prevent short events from overlapping
+    scheduler.config.separate_short_events = true;
+    scheduler.config.multi_day = false;
+    // set zero for padding to a view column
+    scheduler.config.day_column_padding = 0;
+    /*
+     * Disable dragging events by touching.
+     * This can also be set to "false" to completely disable dragging,
+     * but some touch functionality will break that way.
+     */
+    scheduler.config.touch_drag = 99999999;
+    /*
+     * Size of the x-axis hour steps.
+     * Must be a multiple of 44 for proper alignment (default skin).
+     * This number may vary between different skins.
+     */
+    scheduler.config.hour_size_px = 264;
+
+    // scheduler.skin = 'terrace';
+    // display custom event box
+    scheduler.renderEvent = (container: HTMLElement, ev: DhtmlxSchedulerEvent) => {
+      const matches = ev.id.match(/(\d{4}-\d{2}-\d{2})(?:#(.+))?/);
+      if (matches == null) {
+        return false;
+      }
+      setEventContainers((prev) => {
+        const arr = prev.filter((entry) => entry.id !== ev.id);
+        return [...arr, { id: ev.id, el: container }];
+      });
+      return true;
+    };
+
+    scheduler.config.header = ['day', 'date', 'prev', 'today', 'next'];
+    scheduler.init(el, currentDate, 'day');
+    scheduler.clearAll();
+    scheduler.parse(events);
+  });
+
   React.useEffect(() => {
     if (!isMounted) {
       isMounted = true;
       if (container.current != null) {
         onViewChangeEventId = scheduler.attachEvent('onViewChange', (mode: string, date: Date) => {
-          if (mode === 'day') {
-            const hoursByDate = model.getHoursByDate(date);
-            if (hoursByDate != null) {
-              scheduler.config.first_hour = hoursByDate.firstHour;
-              scheduler.config.last_hour = hoursByDate.lastHour;
-            } else {
-              scheduler.config.first_hour = 0;
-              scheduler.config.last_hour = 24;
-            }
-            setHeight(
-              `${1 + (scheduler.config.last_hour - scheduler.config.first_hour) * scheduler.config.hour_size_px}px`,
-            );
-          } else {
-            scheduler.config.first_hour = 0;
-            scheduler.config.last_hour = 24;
-            setHeight('900px');
-          }
-          setCurrentDate(date);
-          scheduler.updateView();
+          onViewChange(mode, date);
         });
-        // disable editing events
-        scheduler.config.readonly = true;
-        // prevent short events from overlapping
-        scheduler.config.separate_short_events = true;
-        scheduler.config.multi_day = false;
-        // set zero for padding to a view column
-        scheduler.config.day_column_padding = 0;
-        /*
-         * Disable dragging events by touching.
-         * This can also be set to "false" to completely disable dragging,
-         * but some touch functionality will break that way.
-         */
-        scheduler.config.touch_drag = 99999999;
-        /*
-         * Size of the x-axis hour steps.
-         * Must be a multiple of 44 for proper alignment (default skin).
-         * This number may vary between different skins.
-         */
-        scheduler.config.hour_size_px = 264;
-
-        // scheduler.skin = 'terrace';
-        // display custom event box
-        scheduler.renderEvent = (container: HTMLElement, ev: DhtmlxSchedulerEvent) => {
-          const matches = ev.id.match(/(\d{4}-\d{2}-\d{2})(?:#(.+))?/);
-          if (matches == null) {
-            return false;
-          }
-          setEventContainers((prev) => {
-            const arr = prev.filter((entry) => entry.id !== ev.id);
-            return [...arr, { id: ev.id, el: container }];
-          });
-          return true;
-        };
-
-        scheduler.config.header = ['day', 'date', 'prev', 'today', 'next'];
-        scheduler.init(container.current, currentDate, 'day');
-        scheduler.clearAll();
-        scheduler.parse(events);
+        initScheduler(container.current);
       }
     }
     return () => {
@@ -129,15 +134,14 @@ const ConferenceScheduler: React.FC<Props> = (props) => {
       }
       scheduler.clearAll();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onShowEventModal = (id: string, parentId: string | null) => {
     setEventModalState({ show: true, id, parentId });
   };
-  const onHideEventModal = () => {
+  const onHideEventModal = React.useCallback(() => {
     setEventModalState({ show: false, id: '', parentId: null });
-  };
+  }, []);
 
   const onClickCollapseEvent = React.useCallback<React.MouseEventHandler<HTMLSpanElement>>(
     (ev) => {
@@ -153,7 +157,7 @@ const ConferenceScheduler: React.FC<Props> = (props) => {
       });
       onHideEventModal();
     },
-    [model],
+    [model, onHideEventModal],
   );
 
   const onClickExpandEvent = React.useCallback<React.MouseEventHandler<HTMLSpanElement>>(
@@ -170,7 +174,7 @@ const ConferenceScheduler: React.FC<Props> = (props) => {
       });
       onHideEventModal();
     },
-    [model],
+    [model, onHideEventModal],
   );
 
   const renderEvent = (id: string) => {

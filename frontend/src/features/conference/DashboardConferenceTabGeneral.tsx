@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { closestCenter, DndContext } from '@dnd-kit/core';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import { arrayMove, SortableContext, useSortable } from '@dnd-kit/sortable';
@@ -8,13 +6,14 @@ import { faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import classNames from 'classnames';
 import moment, { type Moment } from 'moment';
+import React from 'react';
 import Datetime from 'react-datetime';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { ApiAsyncStatus } from '../../entities/api';
 import type { TopicEntity } from '../../entities/conference';
-import type { DashboardConferenceTabProps } from './DashboardConferenceTab';
 import { getConferenceDetail, selectPageActionState, unsetPageActionState, updateConference } from './conferenceSlice';
 import { getBannerUrl, getLogoUuid, getThumbnailUuid } from './conferenceUtilities';
+import type { DashboardConferenceTabProps } from './DashboardConferenceTab';
 
 import 'react-datetime/css/react-datetime.css';
 import { showMessage } from '../common/commonSlice';

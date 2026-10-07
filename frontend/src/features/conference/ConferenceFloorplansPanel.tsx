@@ -1,6 +1,5 @@
-import React from 'react';
-
 import type { Feature, FeatureCollection, GeoJsonObject } from 'geojson';
+import type React from 'react';
 import GeneralPanel from '../../common/GeneralPanel';
 import type { ConferenceEntity } from '../../entities/conference';
 
@@ -11,6 +10,8 @@ interface Props {
 }
 
 interface FloorPlan {
+  // feature id if exists, otherwise the position in the GeoJSON data
+  key: string;
   name: string;
   description: string | null;
   floorplans: string[];
@@ -25,20 +26,24 @@ const ConferenceFloorplansPanel: React.FC<Props> = (props) => {
   const data = JSON.parse(conference.geo) as GeoJsonObject;
 
   const getFloorPlans = (data: GeoJsonObject): FloorPlan[] => {
-    const getFloorPlan = (feature: Feature): FloorPlan | null => {
+    const getFloorPlan = (feature: Feature, position: number): FloorPlan | null => {
       if (feature.geometry.type === 'Point' && feature.properties != null) {
         const { name, description = null, floorplans } = feature.properties;
         if (name != null && floorplans != null && Array.isArray(floorplans)) {
-          return { name, description, floorplans };
+          const key = feature.id != null ? `id:${feature.id}` : `pos:${position}`;
+          // drop duplicate urls so that each image can be keyed by its url
+          return { key, name, description, floorplans: Array.from(new Set<string>(floorplans)) };
         }
       }
       return null;
     };
     if (data.type === 'FeatureCollection') {
       const featureCollection = data as FeatureCollection;
-      return featureCollection.features.map((feature) => getFloorPlan(feature)).filter((data) => data != null);
+      return featureCollection.features
+        .map((feature, position) => getFloorPlan(feature, position))
+        .filter((data) => data != null);
     } else if (data.type === 'Feature') {
-      const ret = getFloorPlan(data as Feature);
+      const ret = getFloorPlan(data as Feature, 0);
       if (ret != null) {
         return [ret];
       }
@@ -53,14 +58,14 @@ const ConferenceFloorplansPanel: React.FC<Props> = (props) => {
 
   return (
     <GeneralPanel title="Floorplans">
-      {plans.map((plan, idx) => {
+      {plans.map((plan) => {
         return (
-          <div key={`${idx}-${plan.name}`} className="text-center mb-3">
+          <div key={plan.key} className="text-center mb-3">
             <h2>{plan.name}</h2>
             {plan.description != null && <p>{plan.description}</p>}
-            {plan.floorplans.map((url, idx2) => {
+            {plan.floorplans.map((url) => {
               return (
-                <div key={`${idx}-${plan.name}-${idx2}`} className="border mb-5">
+                <div key={url} className="border mb-5">
                   <img src={url} alt={plan.name} />
                 </div>
               );

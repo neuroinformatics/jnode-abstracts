@@ -1,13 +1,21 @@
-import React from 'react';
-
 import Ajv from 'ajv';
 import classNames from 'classnames';
+import React from 'react';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import ScheduleJsonSchema from '../../assets/schema/ScheduleJSON.json';
 import { ApiAsyncStatus } from '../../entities/api';
 import { showMessage } from '../common/commonSlice';
 import { selectPageActionState, unsetPageActionState, updateConferenceSchedule } from './conferenceSlice';
 import type { DashboardConferenceTabProps } from './DashboardConferenceTab';
+
+const validateJson = (text: string): boolean => {
+  try {
+    const ajv = new Ajv();
+    return !!ajv.validate(ScheduleJsonSchema, JSON.parse(text));
+  } catch {
+    return false;
+  }
+};
 
 const DashboardConferenceTabSchedule: React.FC<DashboardConferenceTabProps> = (props) => {
   const { conference } = props;
@@ -31,15 +39,6 @@ const DashboardConferenceTabSchedule: React.FC<DashboardConferenceTabProps> = (p
       }
     }
   }, [dispatch, pageActionState.error, pageActionState.status, pageActionState.type]);
-
-  const validateJson = (text: string): boolean => {
-    try {
-      const ajv = new Ajv();
-      return !!ajv.validate(ScheduleJsonSchema, JSON.parse(text));
-    } catch {
-      return false;
-    }
-  };
 
   const onChangeSchedule: React.ChangeEventHandler<HTMLTextAreaElement> = (e) => {
     setSchedule(e.target.value);

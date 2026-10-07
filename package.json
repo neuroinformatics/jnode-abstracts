@@ -6,8 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
+    "lint": "biome check",
+    "preview": "vite preview",
+    "format": "biome check --write"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -18,6 +19,7 @@
     "@fortawesome/free-solid-svg-icons": "^7.3.1",
     "@fortawesome/react-fontawesome": "^3.5.0",
     "@reduxjs/toolkit": "^2.13.0",
+    "ajv": "^6.15.0",
     "avg": "^0.5.0",
     "better-react-mathjax": "^3.0.2",
     "bootstrap": "^5.3.8",
@@ -37,7 +39,7 @@
     "react-router-dom": "^7.18.4"
   },
   "devDependencies": {
-    "@eslint/js": "^10.0.1",
+    "@biomejs/biome": "2.5.15",
     "@types/geojson": "^7946.0.16",
     "@types/leaflet": "^1.9.22",
     "@types/lodash": "^4.17.25",
@@ -45,13 +47,8 @@
     "@types/react-dom": "^19.3.0",
     "@types/react-router-bootstrap": "^0.26.8",
     "@vitejs/plugin-react-swc": "^4.3.3",
-    "eslint": "^10.12.0",
-    "eslint-plugin-react-hooks": "^7.1.1",
-    "eslint-plugin-react-refresh": "^0.5.7",
-    "globals": "^17.13.0",
     "sass-embedded": "^1.105.1",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.71.1",
     "vite": "^8.3.3"
   },
   "overrides": {

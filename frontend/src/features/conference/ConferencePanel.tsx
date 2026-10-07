@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 
 import Markdown from 'react-markdown';
 import { Link } from 'react-router-dom';
@@ -65,7 +65,7 @@ const ConferencePanel: React.FC<Props> = (props) => {
                     <>
                       <br />
                       Please check the{' '}
-                      <a href={conference.link} target="_blank">
+                      <a href={conference.link} target="_blank" rel="noopener">
                         conference homepage
                       </a>{' '}
                       for details.

@@ -1,6 +1,5 @@
-import React from 'react';
-
 import classNames from 'classnames';
+import type React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import GeneralPanel from '../../common/GeneralPanel';
 import HeaderTitle from '../../common/HeaderTitle';
