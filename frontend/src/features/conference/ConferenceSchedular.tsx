@@ -301,15 +301,11 @@ const ConferenceScheduler: React.FC<Props> = (props) => {
                 {dayjs(ev.start_date).format('HH:mm')} - {dayjs(ev.end_date).format('HH:mm')}
               </span>
             </p>
-            {model.isTrack(entity) && (
-              <React.Fragment>
-                {entity.chair != null && entity.chair.length > 0 && (
-                  <p>
-                    <strong>Chair: </strong>
-                    <span>{entity.chair.join(', ')}</span>
-                  </p>
-                )}
-              </React.Fragment>
+            {model.isTrack(entity) && entity.chair != null && entity.chair.length > 0 && (
+              <p>
+                <strong>Chair: </strong>
+                <span>{entity.chair.join(', ')}</span>
+              </p>
             )}
             {model.isEvent(entity) && (
               <React.Fragment>

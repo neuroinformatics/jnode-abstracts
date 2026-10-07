@@ -73,27 +73,25 @@ const ResetPasswordPanel: React.FC = () => {
           Invalid reset <b>token</b> parameter found.
         </AlertPanel>
       ) : (
-        <>
-          <fieldset>
-            <form onSubmit={onSubmitReset} autoComplete="off">
-              <div className="mb-3">
-                <p className="mb-0">
-                  Hello <b>{email}</b>, do you really want to reset your password?
-                </p>
+        <fieldset>
+          <form onSubmit={onSubmitReset} autoComplete="off">
+            <div className="mb-3">
+              <p className="mb-0">
+                Hello <b>{email}</b>, do you really want to reset your password?
+              </p>
+            </div>
+            <div className="mb-3">
+              <div className="d-grid">
+                <button className="btn btn-primary btn-lg" type="submit">
+                  Reset and send new password
+                </button>
               </div>
-              <div className="mb-3">
-                <div className="d-grid">
-                  <button className="btn btn-primary btn-lg" type="submit">
-                    Reset and send new password
-                  </button>
-                </div>
-              </div>
-              <div className="mb-3">
-                <p className="mb-0">If you did not request this, please ignore this message.</p>
-              </div>
-            </form>
-          </fieldset>
-        </>
+            </div>
+            <div className="mb-3">
+              <p className="mb-0">If you did not request this, please ignore this message.</p>
+            </div>
+          </form>
+        </fieldset>
       )}
     </GeneralPanel>
   );

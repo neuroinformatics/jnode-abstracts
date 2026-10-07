@@ -630,7 +630,7 @@ const DashboardConferenceTabGeneral: React.FC<DashboardConferenceTabProps> = (pr
             className="form-control"
             placeholder="Maximum Abstract Length (chars)"
             value={abstractMaxLength}
-            onChange={(e) => setAbstractMaxLength(parseInt(e.target.value))}
+            onChange={(e) => setAbstractMaxLength(parseInt(e.target.value, 10))}
           />
         </div>
       </div>
@@ -646,7 +646,7 @@ const DashboardConferenceTabGeneral: React.FC<DashboardConferenceTabProps> = (pr
             className="form-control"
             placeholder="Maximum Number Of Figures"
             value={abstractMaxFigures}
-            onChange={(e) => setAbstractMaxFigures(parseInt(e.target.value))}
+            onChange={(e) => setAbstractMaxFigures(parseInt(e.target.value, 10))}
           />
         </div>
       </div>

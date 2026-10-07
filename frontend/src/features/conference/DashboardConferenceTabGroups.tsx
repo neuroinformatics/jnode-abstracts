@@ -86,7 +86,7 @@ const DashboardConferenceTabGroups: React.FC<DashboardConferenceTabProps> = (pro
     setIsChanged(true);
     setWasValidated(false);
     if (/^\d+$/.test(e.target.value)) {
-      const prefix = parseInt(e.target.value);
+      const prefix = parseInt(e.target.value, 10);
       e.target.blur();
       setAbstractGroups((prev) => prev.map((obj, pIdx) => (pIdx === idx ? { ...obj, prefix } : obj)));
     }
@@ -127,7 +127,7 @@ const DashboardConferenceTabGroups: React.FC<DashboardConferenceTabProps> = (pro
       {
         key: `new-${newGroupKeySeq++}`,
         uuid: null,
-        prefix: parseInt(prefix),
+        prefix: parseInt(prefix, 10),
         shortName: shortName.trim(),
         name: name.trim(),
       },

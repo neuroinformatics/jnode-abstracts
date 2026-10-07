@@ -54,7 +54,7 @@ const PageNavigationBar: React.FC<PageNavigationBarProps> = (props) => {
   const { conference, abstract, abstractUuids } = props;
   const abstractsInfo = useAppSelector(selectAbstractsInfo);
   const abstractId = getAbstractId(conference, abstract);
-  const idx = abstractUuids.findIndex((f) => f === abstract.uuid);
+  const idx = abstractUuids.indexOf(abstract.uuid);
   const prevUuid = idx > 0 ? abstractUuids[idx - 1] : null;
   const nextUuid = idx !== -1 && idx < abstractUuids.length - 1 ? abstractUuids[idx + 1] : null;
   return (

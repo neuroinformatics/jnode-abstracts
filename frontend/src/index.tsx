@@ -11,7 +11,12 @@ import './index.scss';
 
 const router = createBrowserRouter([{ path: '*', element: <App /> }]);
 
-createRoot(document.getElementById('root')!).render(
+const rootElement = document.getElementById('root');
+if (rootElement == null) {
+  throw new Error('root element not found');
+}
+
+createRoot(rootElement).render(
   <React.StrictMode>
     <Provider store={store}>
       <RouterProvider router={router} />

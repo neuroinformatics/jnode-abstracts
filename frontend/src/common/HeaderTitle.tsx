@@ -8,7 +8,7 @@ interface Props {
 
 const HeaderTitle: React.FC<Props> = (props) => {
   const { title } = props;
-  const label = (title !== '' ? title + ' - ' : '') + SITE_TITLE;
+  const label = (title !== '' ? `${title} - ` : '') + SITE_TITLE;
   return <title>{label}</title>;
 };
 

@@ -45,16 +45,14 @@ const ConferenceRouterPanel: React.FC = () => {
       )}
       {(isApiFailed(listState) || uuid == null || isApiFailed(detailState)) && <PageNotFound />}
       {conferenceInfo != null && (
-        <>
-          <Routes>
-            <Route path="/" element={<ConferencePanel conference={conferenceInfo} />} />
-            <Route path="/schedule" element={<ConferenceSchedulePanel conference={conferenceInfo} />} />
-            <Route path="/abstracts" element={<AbstractListPanel conference={conferenceInfo} />} />
-            <Route path="/locations" element={<ConferenceLocationsPanel conference={conferenceInfo} />} />
-            <Route path="/floorplans" element={<ConferenceFloorplansPanel conference={conferenceInfo} />} />
-            <Route path="*" element={<PageNotFound />} />
-          </Routes>
-        </>
+        <Routes>
+          <Route path="/" element={<ConferencePanel conference={conferenceInfo} />} />
+          <Route path="/schedule" element={<ConferenceSchedulePanel conference={conferenceInfo} />} />
+          <Route path="/abstracts" element={<AbstractListPanel conference={conferenceInfo} />} />
+          <Route path="/locations" element={<ConferenceLocationsPanel conference={conferenceInfo} />} />
+          <Route path="/floorplans" element={<ConferenceFloorplansPanel conference={conferenceInfo} />} />
+          <Route path="*" element={<PageNotFound />} />
+        </Routes>
       )}
     </>
   );

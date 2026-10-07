@@ -298,7 +298,7 @@ export class SchedulerModel {
     const removedIds: string[] = [];
     const removeChildren = (cIds: string[]) => {
       cIds.forEach((cId) => {
-        const pos = this.visibleIds.findIndex((vId) => vId === cId);
+        const pos = this.visibleIds.indexOf(cId);
         if (pos >= 0) {
           this.visibleIds.splice(pos, 1);
           removedIds.push(cId);
@@ -319,7 +319,7 @@ export class SchedulerModel {
       return { append: [], remove: [] };
     }
     const ev = this.events.byId[id];
-    const pos = this.visibleIds.findIndex((visibleId) => visibleId === id);
+    const pos = this.visibleIds.indexOf(id);
     if (pos >= 0) {
       this.visibleIds.splice(pos, 1);
     }
@@ -346,7 +346,13 @@ export class SchedulerModel {
     const ymd = entity.date.split('-');
     // format hour:minute
     const time = entity.start != null && entity.start.length > 0 ? entity.start.split(':') : ['0', '0'];
-    return new Date(parseInt(ymd[0]), parseInt(ymd[1]) - 1, parseInt(ymd[2]), parseInt(time[0]), parseInt(time[1]));
+    return new Date(
+      parseInt(ymd[0], 10),
+      parseInt(ymd[1], 10) - 1,
+      parseInt(ymd[2], 10),
+      parseInt(time[0], 10),
+      parseInt(time[1], 10),
+    );
   }
 
   private static parseEndDate(entity: ScheduleJSON_EventEntity): Date {
@@ -354,7 +360,13 @@ export class SchedulerModel {
     const ymd = entity.date.split('-');
     // format hour:minute
     const time = entity.end != null && entity.end.length > 0 ? entity.end.split(':') : ['23', '59'];
-    return new Date(parseInt(ymd[0]), parseInt(ymd[1]) - 1, parseInt(ymd[2]), parseInt(time[0]), parseInt(time[1]));
+    return new Date(
+      parseInt(ymd[0], 10),
+      parseInt(ymd[1], 10) - 1,
+      parseInt(ymd[2], 10),
+      parseInt(time[0], 10),
+      parseInt(time[1], 10),
+    );
   }
 
   private static getEventDays(startDate: Date, endDate: Date): Date[] {
@@ -370,20 +382,22 @@ export class SchedulerModel {
   }
 }
 
-export class ScheduleUtility {
-  static getDate(date: Date): Date {
+export const ScheduleUtility = {
+  getDate(date: Date): Date {
     return new Date(date.getFullYear(), date.getMonth(), date.getDate());
-  }
+  },
 
-  static makeDateKey(date: Date): string {
+  makeDateKey(date: Date): string {
     return dayjs(date).format('YYYY-MM-DD');
-  }
+  },
 
-  static isSameDate(date1: Date | null, date2: Date | null): boolean {
-    return date1 != null && date2 != null ? this.getDate(date1).getTime() === this.getDate(date2).getTime() : false;
-  }
+  isSameDate(date1: Date | null, date2: Date | null): boolean {
+    return date1 != null && date2 != null
+      ? ScheduleUtility.getDate(date1).getTime() === ScheduleUtility.getDate(date2).getTime()
+      : false;
+  },
 
-  static isIntermediateDate(startDate: Date | null, endDate: Date | null, date: Date | null): boolean {
+  isIntermediateDate(startDate: Date | null, endDate: Date | null, date: Date | null): boolean {
     if (startDate != null && endDate != null && date != null) {
       const startTime = dayjs(startDate).startOf('day').toDate().getTime();
       const endTime = dayjs(endDate).endOf('day').toDate().getTime();
@@ -391,5 +405,5 @@ export class ScheduleUtility {
       return startTime <= time && endTime >= time;
     }
     return false;
-  }
-}
+  },
+};

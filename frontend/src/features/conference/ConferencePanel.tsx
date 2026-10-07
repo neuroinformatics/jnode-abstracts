@@ -54,32 +54,28 @@ const ConferencePanel: React.FC<Props> = (props) => {
               </button>
             </p>
           </div>
+        ) : conference.isPublished ? (
+          <div className="mb-3">
+            <Link to={`/conference/${conference.shortName}/abstracts`} className="btn btn-primary">
+              Abstracts
+            </Link>
+          </div>
         ) : (
-          <>
-            {conference.isPublished ? (
-              <div className="mb-3">
-                <Link to={`/conference/${conference.shortName}/abstracts`} className="btn btn-primary">
-                  Abstracts
-                </Link>
-              </div>
-            ) : (
-              <div className="mb-3">
-                <p className="fs-5">
-                  Submission is <strong className="text-danger">closed</strong>.
-                  {conference.link && (
-                    <>
-                      <br />
-                      Please check the{' '}
-                      <a href={conference.link} target="_blank" rel="noopener">
-                        conference homepage
-                      </a>{' '}
-                      for details.
-                    </>
-                  )}
-                </p>
-              </div>
-            )}
-          </>
+          <div className="mb-3">
+            <p className="fs-5">
+              Submission is <strong className="text-danger">closed</strong>.
+              {conference.link && (
+                <>
+                  <br />
+                  Please check the{' '}
+                  <a href={conference.link} target="_blank" rel="noopener">
+                    conference homepage
+                  </a>{' '}
+                  for details.
+                </>
+              )}
+            </p>
+          </div>
         )}
         {(isAdmin || conference.isOwner) && (
           <>
