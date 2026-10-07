@@ -10,10 +10,10 @@ class StringUtilityTest {
 
   @Test
   void rSplitSplitsAtTheLastSeparator() {
-    assertArrayEquals(new String[] { "a:b", "c" }, StringUtility.rSplit(":", "a:b:c"));
-    assertArrayEquals(new String[] { "a", "" }, StringUtility.rSplit(":", "a:"));
-    assertArrayEquals(new String[] { "abc" }, StringUtility.rSplit(":", "abc"));
-    assertArrayEquals(new String[] { "a", "b" }, StringUtility.rSplit("::", "a::b"));
+    assertArrayEquals(new String[]{"a:b", "c"}, StringUtility.rSplit(":", "a:b:c"));
+    assertArrayEquals(new String[]{"a", ""}, StringUtility.rSplit(":", "a:"));
+    assertArrayEquals(new String[]{"abc"}, StringUtility.rSplit(":", "abc"));
+    assertArrayEquals(new String[]{"a", "b"}, StringUtility.rSplit("::", "a::b"));
   }
 
   @Test

@@ -35,94 +35,94 @@ import jp.neuroinf.abstracts.service.ConferenceService;
 @RequestMapping("/api/conferences")
 public class RestApiConferencesController {
 
-    private final ConferenceService conferenceService;
-    private final AbstractService abstractService;
+  private final ConferenceService conferenceService;
+  private final AbstractService abstractService;
 
-    public RestApiConferencesController(ConferenceService conferenceService, AbstractService abstractService) {
-        this.conferenceService = conferenceService;
-        this.abstractService = abstractService;
-    }
+  public RestApiConferencesController(ConferenceService conferenceService, AbstractService abstractService) {
+    this.conferenceService = conferenceService;
+    this.abstractService = abstractService;
+  }
 
-    @GetMapping("")
-    public List<ConferenceSimpleDto> listConference(
-            @AuthenticationPrincipal AccountDetails user) {
-        return this.conferenceService.getConferenceList(user);
-    }
+  @GetMapping("")
+  public List<ConferenceSimpleDto> listConference(
+      @AuthenticationPrincipal AccountDetails user) {
+    return this.conferenceService.getConferenceList(user);
+  }
 
-    @PostMapping("")
-    public ConferenceSimpleDto createConference(@AuthenticationPrincipal AccountDetails user,
-            @Valid ConferenceCreateForm form) throws ResponseStatusException {
-        return this.conferenceService.createConference(user, form);
-    }
+  @PostMapping("")
+  public ConferenceSimpleDto createConference(@AuthenticationPrincipal AccountDetails user,
+      @Valid ConferenceCreateForm form) throws ResponseStatusException {
+    return this.conferenceService.createConference(user, form);
+  }
 
-    @GetMapping("/{uuid}")
-    public ConferenceDto retrieveConference(@AuthenticationPrincipal AccountDetails user, @PathVariable String uuid)
-            throws ResponseStatusException {
-        return this.conferenceService.getConference(user, uuid);
-    }
+  @GetMapping("/{uuid}")
+  public ConferenceDto retrieveConference(@AuthenticationPrincipal AccountDetails user, @PathVariable String uuid)
+      throws ResponseStatusException {
+    return this.conferenceService.getConference(user, uuid);
+  }
 
-    @GetMapping("/{uuid}/abstracts")
-    public List<AbstractSimpleDto> listConferenceAbstracts(@AuthenticationPrincipal AccountDetails user,
-            @PathVariable String uuid)
-            throws ResponseStatusException {
-        return this.conferenceService.getConferenceAbstracts(user, uuid);
-    }
+  @GetMapping("/{uuid}/abstracts")
+  public List<AbstractSimpleDto> listConferenceAbstracts(@AuthenticationPrincipal AccountDetails user,
+      @PathVariable String uuid)
+      throws ResponseStatusException {
+    return this.conferenceService.getConferenceAbstracts(user, uuid);
+  }
 
-    @PostMapping("/{uuid}/abstracts")
-    public AbstractDto createConferenceAbstract(@AuthenticationPrincipal AccountDetails user,
-            @PathVariable String uuid, @Valid @RequestBody AbstractEditForm form) throws ResponseStatusException {
-        return this.abstractService.createAbstract(user, uuid, form);
-    }
+  @PostMapping("/{uuid}/abstracts")
+  public AbstractDto createConferenceAbstract(@AuthenticationPrincipal AccountDetails user,
+      @PathVariable String uuid, @Valid @RequestBody AbstractEditForm form) throws ResponseStatusException {
+    return this.abstractService.createAbstract(user, uuid, form);
+  }
 
-    @GetMapping("/{uuid}/allAbstracts")
-    public List<AbstractDto> listConferenceAllAbstracts(@AuthenticationPrincipal AccountDetails user,
-            @PathVariable String uuid)
-            throws ResponseStatusException {
-        return this.conferenceService.getConferenceAllAbstracts(user, uuid);
-    }
+  @GetMapping("/{uuid}/allAbstracts")
+  public List<AbstractDto> listConferenceAllAbstracts(@AuthenticationPrincipal AccountDetails user,
+      @PathVariable String uuid)
+      throws ResponseStatusException {
+    return this.conferenceService.getConferenceAllAbstracts(user, uuid);
+  }
 
-    @PutMapping("/{uuid}")
-    public RestSuccessResponseBody updateConference(@AuthenticationPrincipal AccountDetails user,
-            @PathVariable("uuid") String uuid, @Valid ConferenceUpdateForm form) throws ResponseStatusException {
-        return this.conferenceService.updateConference(user, uuid, form);
-    }
+  @PutMapping("/{uuid}")
+  public RestSuccessResponseBody updateConference(@AuthenticationPrincipal AccountDetails user,
+      @PathVariable("uuid") String uuid, @Valid ConferenceUpdateForm form) throws ResponseStatusException {
+    return this.conferenceService.updateConference(user, uuid, form);
+  }
 
-    @PutMapping("/{uuid}/abstractGroups")
-    public RestSuccessResponseBody updateConferenceAbstractGroups(@AuthenticationPrincipal AccountDetails user,
-            @PathVariable("uuid") String uuid, @Valid ConferenceUpdateAbstractGroupsForm form)
-            throws ResponseStatusException {
-        return this.conferenceService.updateConferenceAbstractGroups(user, uuid, form);
-    }
+  @PutMapping("/{uuid}/abstractGroups")
+  public RestSuccessResponseBody updateConferenceAbstractGroups(@AuthenticationPrincipal AccountDetails user,
+      @PathVariable("uuid") String uuid, @Valid ConferenceUpdateAbstractGroupsForm form)
+      throws ResponseStatusException {
+    return this.conferenceService.updateConferenceAbstractGroups(user, uuid, form);
+  }
 
-    @PutMapping("/{uuid}/geo")
-    public RestSuccessResponseBody updateConferenceGeo(@AuthenticationPrincipal AccountDetails user,
-            @PathVariable("uuid") String uuid, @Valid ConferenceUpdateGeoForm form) throws ResponseStatusException {
-        return this.conferenceService.updateConferenceGeo(user, uuid, form);
-    }
+  @PutMapping("/{uuid}/geo")
+  public RestSuccessResponseBody updateConferenceGeo(@AuthenticationPrincipal AccountDetails user,
+      @PathVariable("uuid") String uuid, @Valid ConferenceUpdateGeoForm form) throws ResponseStatusException {
+    return this.conferenceService.updateConferenceGeo(user, uuid, form);
+  }
 
-    @PutMapping("/{uuid}/schedule")
-    public RestSuccessResponseBody updateConferenceSchedule(@AuthenticationPrincipal AccountDetails user,
-            @PathVariable("uuid") String uuid, @Valid ConferenceUpdateScheduleForm form)
-            throws ResponseStatusException {
-        return this.conferenceService.updateConferenceSchedule(user, uuid, form);
-    }
+  @PutMapping("/{uuid}/schedule")
+  public RestSuccessResponseBody updateConferenceSchedule(@AuthenticationPrincipal AccountDetails user,
+      @PathVariable("uuid") String uuid, @Valid ConferenceUpdateScheduleForm form)
+      throws ResponseStatusException {
+    return this.conferenceService.updateConferenceSchedule(user, uuid, form);
+  }
 
-    @PutMapping("/{uuid}/info")
-    public RestSuccessResponseBody updateConferenceInfo(@AuthenticationPrincipal AccountDetails user,
-            @PathVariable("uuid") String uuid, @Valid ConferenceUpdateInfoForm form) throws ResponseStatusException {
-        return this.conferenceService.updateConferenceInfo(user, uuid, form);
-    }
+  @PutMapping("/{uuid}/info")
+  public RestSuccessResponseBody updateConferenceInfo(@AuthenticationPrincipal AccountDetails user,
+      @PathVariable("uuid") String uuid, @Valid ConferenceUpdateInfoForm form) throws ResponseStatusException {
+    return this.conferenceService.updateConferenceInfo(user, uuid, form);
+  }
 
-    @PutMapping("/{uuid}/owners")
-    public RestSuccessResponseBody updateConferenceOwners(@AuthenticationPrincipal AccountDetails user,
-            @PathVariable("uuid") String uuid, @Valid ConferenceUpdateOwnersForm form) throws ResponseStatusException {
-        return this.conferenceService.updateConferenceOwners(user, uuid, form);
-    }
+  @PutMapping("/{uuid}/owners")
+  public RestSuccessResponseBody updateConferenceOwners(@AuthenticationPrincipal AccountDetails user,
+      @PathVariable("uuid") String uuid, @Valid ConferenceUpdateOwnersForm form) throws ResponseStatusException {
+    return this.conferenceService.updateConferenceOwners(user, uuid, form);
+  }
 
-    @DeleteMapping("/{uuid}")
-    public RestSuccessResponseBody deleteConference(@AuthenticationPrincipal AccountDetails user,
-            @PathVariable("uuid") String uuid) throws ResponseStatusException {
-        return this.conferenceService.deleteConference(user, uuid);
-    }
+  @DeleteMapping("/{uuid}")
+  public RestSuccessResponseBody deleteConference(@AuthenticationPrincipal AccountDetails user,
+      @PathVariable("uuid") String uuid) throws ResponseStatusException {
+    return this.conferenceService.deleteConference(user, uuid);
+  }
 
 }

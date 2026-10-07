@@ -11,15 +11,15 @@ import jp.neuroinf.abstracts.dto.ConfigDto;
 @RequestMapping("/api/config")
 public class RestApiConfigController {
 
-    private final AppProperties appProperties;
+  private final AppProperties appProperties;
 
-    public RestApiConfigController(AppProperties appProperties) {
-        this.appProperties = appProperties;
-    }
+  public RestApiConfigController(AppProperties appProperties) {
+    this.appProperties = appProperties;
+  }
 
-    @GetMapping("")
-    public ConfigDto retrieveConfig() {
-        return new ConfigDto(this.appProperties.getReadOnly());
-    }
+  @GetMapping("")
+  public ConfigDto retrieveConfig() {
+    return new ConfigDto(this.appProperties.getReadOnly());
+  }
 
 }

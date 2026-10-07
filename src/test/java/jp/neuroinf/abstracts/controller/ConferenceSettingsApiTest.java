@@ -107,7 +107,7 @@ class ConferenceSettingsApiTest {
 
   @Test
   void generalSettingsUploadAndRemoveLogo() throws Exception {
-    MockMultipartFile logo = new MockMultipartFile("logoFile", "logo.png", "image/png", new byte[] { 1, 2, 3 });
+    MockMultipartFile logo = new MockMultipartFile("logoFile", "logo.png", "image/png", new byte[]{1, 2, 3});
     this.mockMvc.perform(general("With logo").file(logo).with(login(this.owner)).with(csrf()))
         .andExpect(status().isOk());
     JsonNode saved = retrieve();
@@ -226,7 +226,7 @@ class ConferenceSettingsApiTest {
   }
 
   @ParameterizedTest
-  @ValueSource(strings = { "abstractGroups", "geo", "schedule", "info", "owners" })
+  @ValueSource(strings = {"abstractGroups", "geo", "schedule", "info", "owners"})
   void settingsAreChangedByManagersOnly(String setting) throws Exception {
     Account other = this.testData.account("other-" + this.shortName + "@example.com");
     String path = "/api/conferences/{uuid}/" + setting;

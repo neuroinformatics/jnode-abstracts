@@ -25,9 +25,9 @@ class RoutingTest {
   private MockMvc mockMvc;
 
   @ParameterizedTest
-  @ValueSource(strings = { "/conferences", "/login", "/conference/TEST2026", "/conference/TEST2026/abstracts",
+  @ValueSource(strings = {"/conferences", "/login", "/conference/TEST2026", "/conference/TEST2026/abstracts",
       "/dashboard/conference", "/dashboard/conference/uuid/abstracts", "/myabstracts", "/myabstracts/uuid/edit",
-      "/abstracts/uuid", "/favouriteabstracts" })
+      "/abstracts/uuid", "/favouriteabstracts"})
   void applicationPathsServeTheIndexPage(String path) throws Exception {
     this.mockMvc.perform(get(path).accept(MediaType.TEXT_HTML))
         .andExpect(status().isOk())
@@ -35,7 +35,7 @@ class RoutingTest {
   }
 
   @ParameterizedTest
-  @ValueSource(strings = { "/favicon.ico", "/api/unknown" })
+  @ValueSource(strings = {"/favicon.ico", "/api/unknown"})
   void filesAndApiPathsAreNotForwarded(String path) throws Exception {
     this.mockMvc.perform(get(path).accept(MediaType.TEXT_HTML))
         .andExpect(forwardedUrl(null));

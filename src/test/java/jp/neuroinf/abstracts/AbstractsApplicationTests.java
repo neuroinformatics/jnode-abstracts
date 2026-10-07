@@ -7,8 +7,8 @@ import jp.neuroinf.abstracts.support.IntegrationTest;
 @IntegrationTest
 class AbstractsApplicationTests {
 
-	@Test
-	void contextLoads() {
-	}
+  @Test
+  void contextLoads() {
+  }
 
 }

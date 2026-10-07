@@ -32,78 +32,78 @@ import jp.neuroinf.abstracts.service.FavoriteService;
 @RequestMapping("/api/users")
 public class RestApiUsersController {
 
-    private final AccountService accountService;
-    private final AbstractService abstractService;
-    private final FavoriteService favoriteService;
+  private final AccountService accountService;
+  private final AbstractService abstractService;
+  private final FavoriteService favoriteService;
 
-    public RestApiUsersController(AccountService accountService, AbstractService abstractService,
-            FavoriteService favoriteService) {
-        this.accountService = accountService;
-        this.abstractService = abstractService;
-        this.favoriteService = favoriteService;
-    }
+  public RestApiUsersController(AccountService accountService, AbstractService abstractService,
+      FavoriteService favoriteService) {
+    this.accountService = accountService;
+    this.abstractService = abstractService;
+    this.favoriteService = favoriteService;
+  }
 
-    @GetMapping("")
-    public List<AccountDto> listUsers(@AuthenticationPrincipal AccountDetails user) throws ResponseStatusException {
-        return this.accountService.listAccounts(user);
-    }
+  @GetMapping("")
+  public List<AccountDto> listUsers(@AuthenticationPrincipal AccountDetails user) throws ResponseStatusException {
+    return this.accountService.listAccounts(user);
+  }
 
-    @PostMapping("")
-    public AccountDto createUser(@AuthenticationPrincipal AccountDetails user, @Valid UsersCreateForm form)
-            throws ResponseStatusException {
-        return this.accountService.createAccount(user, form);
-    }
+  @PostMapping("")
+  public AccountDto createUser(@AuthenticationPrincipal AccountDetails user, @Valid UsersCreateForm form)
+      throws ResponseStatusException {
+    return this.accountService.createAccount(user, form);
+  }
 
-    @GetMapping("/current")
-    public AccountDto getCurrentUser(@AuthenticationPrincipal AccountDetails user) throws ResponseStatusException {
-        return this.accountService.getCurrentUser(user);
-    }
+  @GetMapping("/current")
+  public AccountDto getCurrentUser(@AuthenticationPrincipal AccountDetails user) throws ResponseStatusException {
+    return this.accountService.getCurrentUser(user);
+  }
 
-    @GetMapping("/current/abstracts")
-    public List<AbstractDto> listCurrentUserAbstracts(@AuthenticationPrincipal AccountDetails user)
-            throws ResponseStatusException {
-        return this.abstractService.getOwnAbstracts(user);
-    }
+  @GetMapping("/current/abstracts")
+  public List<AbstractDto> listCurrentUserAbstracts(@AuthenticationPrincipal AccountDetails user)
+      throws ResponseStatusException {
+    return this.abstractService.getOwnAbstracts(user);
+  }
 
-    @GetMapping("/current/favorites")
-    public List<AbstractSimpleDto> listCurrentUserFavorites(@AuthenticationPrincipal AccountDetails user)
-            throws ResponseStatusException {
-        return this.favoriteService.getFavorites(user);
-    }
+  @GetMapping("/current/favorites")
+  public List<AbstractSimpleDto> listCurrentUserFavorites(@AuthenticationPrincipal AccountDetails user)
+      throws ResponseStatusException {
+    return this.favoriteService.getFavorites(user);
+  }
 
-    @GetMapping("/exists")
-    public RestSuccessResponseBody userExists(@AuthenticationPrincipal AccountDetails user,
-            @Valid UsersExistsForm form) throws ResponseStatusException {
-        return this.accountService.exists(user, form);
-    }
+  @GetMapping("/exists")
+  public RestSuccessResponseBody userExists(@AuthenticationPrincipal AccountDetails user,
+      @Valid UsersExistsForm form) throws ResponseStatusException {
+    return this.accountService.exists(user, form);
+  }
 
-    @PostMapping("/password/reset/request")
-    public RestSuccessResponseBody requestPasswordReset(@Valid UsersRequestPasswordResetForm form)
-            throws ResponseStatusException {
-        return this.accountService.requestPasswordReset(form);
-    }
+  @PostMapping("/password/reset/request")
+  public RestSuccessResponseBody requestPasswordReset(@Valid UsersRequestPasswordResetForm form)
+      throws ResponseStatusException {
+    return this.accountService.requestPasswordReset(form);
+  }
 
-    @PostMapping("/password/reset")
-    public RestSuccessResponseBody resetPassword(@Valid UsersResetPasswordForm form) throws ResponseStatusException {
-        return this.accountService.resetPassword(form);
-    }
+  @PostMapping("/password/reset")
+  public RestSuccessResponseBody resetPassword(@Valid UsersResetPasswordForm form) throws ResponseStatusException {
+    return this.accountService.resetPassword(form);
+  }
 
-    @PutMapping("/{uuid}")
-    public AccountDto updateUser(@AuthenticationPrincipal AccountDetails user, @PathVariable("uuid") String uuid,
-            @Valid UsersUpdateForm form) throws ResponseStatusException {
-        return this.accountService.updateAccount(user, uuid, form);
-    }
+  @PutMapping("/{uuid}")
+  public AccountDto updateUser(@AuthenticationPrincipal AccountDetails user, @PathVariable("uuid") String uuid,
+      @Valid UsersUpdateForm form) throws ResponseStatusException {
+    return this.accountService.updateAccount(user, uuid, form);
+  }
 
-    @PutMapping("/{uuid}/password")
-    public RestSuccessResponseBody changePassword(@AuthenticationPrincipal AccountDetails user,
-            @PathVariable("uuid") String uuid, @Valid UsersChangePasswordForm form) throws ResponseStatusException {
-        return this.accountService.changePassword(user, uuid, form);
-    }
+  @PutMapping("/{uuid}/password")
+  public RestSuccessResponseBody changePassword(@AuthenticationPrincipal AccountDetails user,
+      @PathVariable("uuid") String uuid, @Valid UsersChangePasswordForm form) throws ResponseStatusException {
+    return this.accountService.changePassword(user, uuid, form);
+  }
 
-    @PutMapping("/{uuid}/email")
-    public RestSuccessResponseBody changeEmail(@AuthenticationPrincipal AccountDetails user,
-            @PathVariable("uuid") String uuid, @Valid UsersChangeEmailForm form) throws ResponseStatusException {
-        return this.accountService.changeEmail(user, uuid, form);
-    }
+  @PutMapping("/{uuid}/email")
+  public RestSuccessResponseBody changeEmail(@AuthenticationPrincipal AccountDetails user,
+      @PathVariable("uuid") String uuid, @Valid UsersChangeEmailForm form) throws ResponseStatusException {
+    return this.accountService.changeEmail(user, uuid, form);
+  }
 
 }

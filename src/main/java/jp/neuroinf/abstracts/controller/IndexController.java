@@ -14,7 +14,7 @@ public class IndexController {
     return FORWARD_INDEX;
   }
 
-  @GetMapping({ "/conference/**", "/dashboard/**", "/myabstracts/**", "/abstracts/**" })
+  @GetMapping({"/conference/**", "/dashboard/**", "/myabstracts/**", "/abstracts/**"})
   public String applicationIndex() {
     return FORWARD_INDEX;
   }

@@ -226,7 +226,7 @@ class SubmissionApiTest {
   @Test
   void figuresAreUploadedUpToTheLimit() throws Exception {
     String uuid = create(content("Title", "Text"));
-    MockMultipartFile png = new MockMultipartFile("file", "fig.png", "image/png", new byte[] { 1, 2, 3 });
+    MockMultipartFile png = new MockMultipartFile("file", "fig.png", "image/png", new byte[]{1, 2, 3});
     String body = this.mockMvc.perform(multipart("/api/abstracts/{uuid}/figures", uuid).file(png)
         .param("caption", "First figure")
         .with(login(this.author)).with(csrf()))
@@ -255,7 +255,7 @@ class SubmissionApiTest {
   @Test
   void figuresMustBeImages() throws Exception {
     String uuid = create(content("Title", "Text"));
-    MockMultipartFile pdf = new MockMultipartFile("file", "fig.pdf", "application/pdf", new byte[] { 1 });
+    MockMultipartFile pdf = new MockMultipartFile("file", "fig.pdf", "application/pdf", new byte[]{1});
     this.mockMvc.perform(multipart("/api/abstracts/{uuid}/figures", uuid).file(pdf).param("caption", "PDF")
         .with(login(this.author)).with(csrf()))
         .andExpect(status().isBadRequest());

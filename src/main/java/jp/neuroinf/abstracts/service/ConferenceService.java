@@ -26,6 +26,7 @@ import jp.neuroinf.abstracts.entity.Figure;
 import jp.neuroinf.abstracts.entity.Topic;
 import jp.neuroinf.abstracts.form.ConferenceCreateForm;
 import jp.neuroinf.abstracts.form.ConferenceUpdateAbstractGroupsForm;
+import jp.neuroinf.abstracts.form.ConferenceUpdateAbstractGroupsForm.AbstractGroupForm;
 import jp.neuroinf.abstracts.form.ConferenceUpdateForm;
 import jp.neuroinf.abstracts.form.ConferenceUpdateGeoForm;
 import jp.neuroinf.abstracts.form.ConferenceUpdateInfoForm;
@@ -234,7 +235,7 @@ public class ConferenceService {
       ConferenceUpdateAbstractGroupsForm form) throws ResponseStatusException {
     final Conference conference = requireManagedConference(user, uuid);
     // an empty list is sent as no parameters at all
-    final List<ConferenceUpdateAbstractGroupsForm.AbstractGroupForm> abstractGroupForms = form.getAbstractGroups() != null
+    final List<AbstractGroupForm> abstractGroupForms = form.getAbstractGroups() != null
         ? form.getAbstractGroups()
         : List.of();
     conference.getAbstractGroups().stream()

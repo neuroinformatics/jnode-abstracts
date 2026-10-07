@@ -24,47 +24,47 @@ import jp.neuroinf.abstracts.service.FigureService;
 @RequestMapping("/api/figures")
 public class RestApiFiguresController {
 
-    private final PermissionService permissionService;
-    private final FigureService figureService;
+  private final PermissionService permissionService;
+  private final FigureService figureService;
 
-    public RestApiFiguresController(PermissionService permissionService, FigureService abstractService) {
-        this.permissionService = permissionService;
-        this.figureService = abstractService;
-    }
+  public RestApiFiguresController(PermissionService permissionService, FigureService abstractService) {
+    this.permissionService = permissionService;
+    this.figureService = abstractService;
+  }
 
-    @GetMapping("/{uuid}")
-    public FigureDto retrieveFigure(@AuthenticationPrincipal AccountDetails user, @PathVariable String uuid)
-            throws ResponseStatusException {
-        Account account = this.permissionService.findAccount(user);
-        FigureDto figure = this.figureService.getFigure(account, uuid);
-        if (figure == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "no figure data found");
-        }
-        return figure;
+  @GetMapping("/{uuid}")
+  public FigureDto retrieveFigure(@AuthenticationPrincipal AccountDetails user, @PathVariable String uuid)
+      throws ResponseStatusException {
+    Account account = this.permissionService.findAccount(user);
+    FigureDto figure = this.figureService.getFigure(account, uuid);
+    if (figure == null) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "no figure data found");
     }
+    return figure;
+  }
 
-    @GetMapping("/{uuid}/image")
-    public void imageFigure(@AuthenticationPrincipal AccountDetails user, @PathVariable String uuid,
-            HttpServletResponse response)
-            throws ResponseStatusException {
-        Account account = this.permissionService.findAccount(user);
-        try {
-            this.figureService.downloadFigureImage(account, uuid, response);
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "no figure data found");
-        }
+  @GetMapping("/{uuid}/image")
+  public void imageFigure(@AuthenticationPrincipal AccountDetails user, @PathVariable String uuid,
+      HttpServletResponse response)
+      throws ResponseStatusException {
+    Account account = this.permissionService.findAccount(user);
+    try {
+      this.figureService.downloadFigureImage(account, uuid, response);
+    } catch (Exception e) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "no figure data found");
     }
+  }
 
-    @PutMapping("/{uuid}")
-    public AbstractDto updateFigure(@AuthenticationPrincipal AccountDetails user, @PathVariable String uuid,
-            @Valid FigureUpdateForm form) throws ResponseStatusException {
-        return this.figureService.updateFigure(user, uuid, form);
-    }
+  @PutMapping("/{uuid}")
+  public AbstractDto updateFigure(@AuthenticationPrincipal AccountDetails user, @PathVariable String uuid,
+      @Valid FigureUpdateForm form) throws ResponseStatusException {
+    return this.figureService.updateFigure(user, uuid, form);
+  }
 
-    @DeleteMapping("/{uuid}")
-    public AbstractDto deleteFigure(@AuthenticationPrincipal AccountDetails user, @PathVariable String uuid)
-            throws ResponseStatusException {
-        return this.figureService.deleteFigure(user, uuid);
-    }
+  @DeleteMapping("/{uuid}")
+  public AbstractDto deleteFigure(@AuthenticationPrincipal AccountDetails user, @PathVariable String uuid)
+      throws ResponseStatusException {
+    return this.figureService.deleteFigure(user, uuid);
+  }
 
 }

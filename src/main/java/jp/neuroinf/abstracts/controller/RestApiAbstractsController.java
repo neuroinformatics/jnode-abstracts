@@ -28,71 +28,71 @@ import jp.neuroinf.abstracts.service.FigureService;
 @RequestMapping("/api/abstracts")
 public class RestApiAbstractsController {
 
-    private final AbstractService abstractService;
-    private final FigureService figureService;
-    private final FavoriteService favoriteService;
+  private final AbstractService abstractService;
+  private final FigureService figureService;
+  private final FavoriteService favoriteService;
 
-    public RestApiAbstractsController(AbstractService abstractService, FigureService figureService,
-            FavoriteService favoriteService) {
-        this.abstractService = abstractService;
-        this.figureService = figureService;
-        this.favoriteService = favoriteService;
-    }
+  public RestApiAbstractsController(AbstractService abstractService, FigureService figureService,
+      FavoriteService favoriteService) {
+    this.abstractService = abstractService;
+    this.figureService = figureService;
+    this.favoriteService = favoriteService;
+  }
 
-    @GetMapping("/{uuid}")
-    public AbstractDto retrieveAbstract(@AuthenticationPrincipal AccountDetails user, @PathVariable String uuid)
-            throws ResponseStatusException {
-        return this.abstractService.getAbstract(user, uuid);
-    }
+  @GetMapping("/{uuid}")
+  public AbstractDto retrieveAbstract(@AuthenticationPrincipal AccountDetails user, @PathVariable String uuid)
+      throws ResponseStatusException {
+    return this.abstractService.getAbstract(user, uuid);
+  }
 
-    @PutMapping("/{uuid}")
-    public AbstractDto updateAbstract(@AuthenticationPrincipal AccountDetails user,
-            @PathVariable("uuid") String uuid, @Valid @RequestBody AbstractEditForm form)
-            throws ResponseStatusException {
-        return this.abstractService.updateAbstract(user, uuid, form);
-    }
+  @PutMapping("/{uuid}")
+  public AbstractDto updateAbstract(@AuthenticationPrincipal AccountDetails user,
+      @PathVariable("uuid") String uuid, @Valid @RequestBody AbstractEditForm form)
+      throws ResponseStatusException {
+    return this.abstractService.updateAbstract(user, uuid, form);
+  }
 
-    @DeleteMapping("/{uuid}")
-    public RestSuccessResponseBody deleteAbstract(@AuthenticationPrincipal AccountDetails user,
-            @PathVariable("uuid") String uuid) throws ResponseStatusException {
-        return this.abstractService.deleteAbstract(user, uuid);
-    }
+  @DeleteMapping("/{uuid}")
+  public RestSuccessResponseBody deleteAbstract(@AuthenticationPrincipal AccountDetails user,
+      @PathVariable("uuid") String uuid) throws ResponseStatusException {
+    return this.abstractService.deleteAbstract(user, uuid);
+  }
 
-    @PutMapping("/{uuid}/owners")
-    public AbstractDto updateAbstractOwners(@AuthenticationPrincipal AccountDetails user,
-            @PathVariable("uuid") String uuid, @Valid AbstractUpdateOwnersForm form) throws ResponseStatusException {
-        return this.abstractService.updateOwners(user, uuid, form);
-    }
+  @PutMapping("/{uuid}/owners")
+  public AbstractDto updateAbstractOwners(@AuthenticationPrincipal AccountDetails user,
+      @PathVariable("uuid") String uuid, @Valid AbstractUpdateOwnersForm form) throws ResponseStatusException {
+    return this.abstractService.updateOwners(user, uuid, form);
+  }
 
-    @PostMapping("/{uuid}/figures")
-    public AbstractDto uploadAbstractFigure(@AuthenticationPrincipal AccountDetails user,
-            @PathVariable("uuid") String uuid, @Valid FigureUploadForm form) throws ResponseStatusException {
-        return this.figureService.uploadFigure(user, uuid, form);
-    }
+  @PostMapping("/{uuid}/figures")
+  public AbstractDto uploadAbstractFigure(@AuthenticationPrincipal AccountDetails user,
+      @PathVariable("uuid") String uuid, @Valid FigureUploadForm form) throws ResponseStatusException {
+    return this.figureService.uploadFigure(user, uuid, form);
+  }
 
-    @PutMapping("/{uuid}/favorite")
-    public RestSuccessResponseBody addAbstractFavorite(@AuthenticationPrincipal AccountDetails user,
-            @PathVariable("uuid") String uuid) throws ResponseStatusException {
-        return this.favoriteService.addFavorite(user, uuid);
-    }
+  @PutMapping("/{uuid}/favorite")
+  public RestSuccessResponseBody addAbstractFavorite(@AuthenticationPrincipal AccountDetails user,
+      @PathVariable("uuid") String uuid) throws ResponseStatusException {
+    return this.favoriteService.addFavorite(user, uuid);
+  }
 
-    @DeleteMapping("/{uuid}/favorite")
-    public RestSuccessResponseBody removeAbstractFavorite(@AuthenticationPrincipal AccountDetails user,
-            @PathVariable("uuid") String uuid) throws ResponseStatusException {
-        return this.favoriteService.removeFavorite(user, uuid);
-    }
+  @DeleteMapping("/{uuid}/favorite")
+  public RestSuccessResponseBody removeAbstractFavorite(@AuthenticationPrincipal AccountDetails user,
+      @PathVariable("uuid") String uuid) throws ResponseStatusException {
+    return this.favoriteService.removeFavorite(user, uuid);
+  }
 
-    @PutMapping("/{uuid}/state")
-    public AbstractDto updateAbstractState(@AuthenticationPrincipal AccountDetails user,
-            @PathVariable("uuid") String uuid, @Valid AbstractUpdateStateForm form) throws ResponseStatusException {
-        return this.abstractService.updateState(user, uuid, form);
-    }
+  @PutMapping("/{uuid}/state")
+  public AbstractDto updateAbstractState(@AuthenticationPrincipal AccountDetails user,
+      @PathVariable("uuid") String uuid, @Valid AbstractUpdateStateForm form) throws ResponseStatusException {
+    return this.abstractService.updateState(user, uuid, form);
+  }
 
-    @PutMapping("/{uuid}/publication")
-    public AbstractDto updateAbstractPublication(@AuthenticationPrincipal AccountDetails user,
-            @PathVariable("uuid") String uuid, @Valid AbstractUpdatePublicationForm form)
-            throws ResponseStatusException {
-        return this.abstractService.updatePublication(user, uuid, form);
-    }
+  @PutMapping("/{uuid}/publication")
+  public AbstractDto updateAbstractPublication(@AuthenticationPrincipal AccountDetails user,
+      @PathVariable("uuid") String uuid, @Valid AbstractUpdatePublicationForm form)
+      throws ResponseStatusException {
+    return this.abstractService.updatePublication(user, uuid, form);
+  }
 
 }

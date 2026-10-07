@@ -61,7 +61,8 @@ public enum AbstractState {
   }
 
   public boolean canOwnerTransitionTo(AbstractState to, boolean isConferenceOpen) {
-    Map<AbstractState, List<AbstractState>> transitions = isConferenceOpen ? OWNER_OPEN_TRANSITIONS
+    Map<AbstractState, List<AbstractState>> transitions = isConferenceOpen
+        ? OWNER_OPEN_TRANSITIONS
         : OWNER_CLOSED_TRANSITIONS;
     return transitions.getOrDefault(this, List.of()).contains(to);
   }

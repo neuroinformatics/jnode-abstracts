@@ -10,8 +10,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 @EnableJpaAuditing
 public class AbstractsApplication {
 
-	public static void main(String[] args) {
-		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
-		SpringApplication.run(AbstractsApplication.class, args);
-	}
+  public static void main(String[] args) {
+    TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+    SpringApplication.run(AbstractsApplication.class, args);
+  }
 }

@@ -30,7 +30,7 @@ class FileStorageTest {
 
   private final String directory = System.getProperty("java.io.tmpdir") + "/abstracts-test/storage";
 
-  private final MockMultipartFile file = new MockMultipartFile("file", "f.png", "image/png", new byte[] { 1 });
+  private final MockMultipartFile file = new MockMultipartFile("file", "f.png", "image/png", new byte[]{1});
 
   @Test
   void writtenFileIsRemovedOnRollback() {
@@ -48,8 +48,8 @@ class FileStorageTest {
     String kept = UUID.randomUUID().toString();
     String deleted = UUID.randomUUID().toString();
     Files.createDirectories(Path.of(this.directory));
-    Files.write(Path.of(this.directory, kept), new byte[] { 1 });
-    Files.write(Path.of(this.directory, deleted), new byte[] { 1 });
+    Files.write(Path.of(this.directory, kept), new byte[]{1});
+    Files.write(Path.of(this.directory, deleted), new byte[]{1});
     new TransactionTemplate(this.transactionManager).executeWithoutResult(status -> {
       this.fileStorage.delete(this.directory, kept);
       status.setRollbackOnly();

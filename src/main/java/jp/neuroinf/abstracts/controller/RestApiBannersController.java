@@ -15,28 +15,28 @@ import jp.neuroinf.abstracts.service.BannerService;
 @RequestMapping("/api/banners")
 public class RestApiBannersController {
 
-    private final BannerService bannerService;
+  private final BannerService bannerService;
 
-    public RestApiBannersController(BannerService abstractService) {
-        this.bannerService = abstractService;
-    }
+  public RestApiBannersController(BannerService abstractService) {
+    this.bannerService = abstractService;
+  }
 
-    @GetMapping("/{uuid}")
-    public BannerDto retrieveBanner(@PathVariable String uuid) throws ResponseStatusException {
-        BannerDto figure = this.bannerService.getBanner(uuid);
-        if (figure == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "no figure data found");
-        }
-        return figure;
+  @GetMapping("/{uuid}")
+  public BannerDto retrieveBanner(@PathVariable String uuid) throws ResponseStatusException {
+    BannerDto figure = this.bannerService.getBanner(uuid);
+    if (figure == null) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "no figure data found");
     }
+    return figure;
+  }
 
-    @GetMapping("/{uuid}/image")
-    public void imageFigure(@PathVariable String uuid, HttpServletResponse response) throws ResponseStatusException {
-        try {
-            this.bannerService.downloadBannerImage(uuid, response);
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "no figure data found");
-        }
+  @GetMapping("/{uuid}/image")
+  public void imageFigure(@PathVariable String uuid, HttpServletResponse response) throws ResponseStatusException {
+    try {
+      this.bannerService.downloadBannerImage(uuid, response);
+    } catch (Exception e) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "no figure data found");
     }
+  }
 
 }

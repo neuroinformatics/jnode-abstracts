@@ -135,13 +135,13 @@ class PublicApiTest {
     conference.getBanners().add(banner);
     this.conferenceRepository.flush();
     Files.createDirectories(Path.of(this.pathBanners));
-    Files.write(Path.of(this.pathBanners, banner.getUuid()), new byte[] { 1, 2, 3 });
+    Files.write(Path.of(this.pathBanners, banner.getUuid()), new byte[]{1, 2, 3});
     this.mockMvc.perform(get("/api/banners/{uuid}", banner.getUuid()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.type").value("logo"));
     this.mockMvc.perform(get("/api/banners/{uuid}/image", banner.getUuid()))
         .andExpect(status().isOk())
-        .andExpect(content().bytes(new byte[] { 1, 2, 3 }));
+        .andExpect(content().bytes(new byte[]{1, 2, 3}));
     this.mockMvc.perform(get("/api/banners/{uuid}", "unknown"))
         .andExpect(status().isNotFound());
     this.mockMvc.perform(get("/api/banners/{uuid}/image", "unknown"))
@@ -177,7 +177,7 @@ class PublicApiTest {
     abstract_.getFigures().add(figure);
     this.abstractRepository.flush();
     Files.createDirectories(Path.of(this.pathFigures));
-    Files.write(Path.of(this.pathFigures, figure.getUuid()), new byte[] { 1 });
+    Files.write(Path.of(this.pathFigures, figure.getUuid()), new byte[]{1});
     return figure;
   }
 
