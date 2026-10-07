@@ -17,9 +17,11 @@ import org.springframework.web.server.ResponseStatusException;
 
 import jakarta.transaction.Transactional;
 import jp.neuroinf.abstracts.component.EmailTemplateSender;
+import jp.neuroinf.abstracts.component.LoginAttemptLimiter;
 import jp.neuroinf.abstracts.component.TimestampSigner;
 import jp.neuroinf.abstracts.core.AccountDetails;
 import jp.neuroinf.abstracts.core.AppProperties;
+import jp.neuroinf.abstracts.core.LoginBlockedException;
 import jp.neuroinf.abstracts.core.LoginRestrictedException;
 import jp.neuroinf.abstracts.core.RestSuccessResponseBody;
 import jp.neuroinf.abstracts.dto.AccountDto;
@@ -45,6 +47,7 @@ public class AccountService implements UserDetailsService {
   private final TimestampSigner timestampSigner;
   private final EmailTemplateSender emailTemplateSender;
   private final PermissionService permissionService;
+  private final LoginAttemptLimiter loginAttemptLimiter;
   private final AppProperties appProperties;
 
   public AccountService(
@@ -53,12 +56,14 @@ public class AccountService implements UserDetailsService {
       TimestampSigner timestampSigner,
       EmailTemplateSender emailTemplateSender,
       PermissionService permissionService,
+      LoginAttemptLimiter loginAttemptLimiter,
       AppProperties appProperties) {
     this.accountRepository = accountRepository;
     this.passwordEncoder = passwordEncoder;
     this.timestampSigner = timestampSigner;
     this.emailTemplateSender = emailTemplateSender;
     this.permissionService = permissionService;
+    this.loginAttemptLimiter = loginAttemptLimiter;
     this.appProperties = appProperties;
   }
 
@@ -67,6 +72,9 @@ public class AccountService implements UserDetailsService {
     // checked before looking up the account, so that the answer does not tell whether the account exists
     if (this.appProperties.getReadOnly() && !this.appProperties.getAdmins().contains(email)) {
       throw new LoginRestrictedException();
+    }
+    if (this.loginAttemptLimiter.isBlocked(email)) {
+      throw new LoginBlockedException();
     }
     Account account = this.accountRepository.findFirstByMail(email);
     if (account == null) {

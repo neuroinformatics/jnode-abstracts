@@ -24,6 +24,7 @@ import org.springframework.security.web.authentication.logout.LogoutSuccessHandl
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jp.neuroinf.abstracts.component.LoginAttemptLimiter;
 import tools.jackson.databind.json.JsonMapper;
 
 @Configuration
@@ -36,9 +37,11 @@ public class SecurityConfig
   private static final String LOGIN_PAGE_URL = "/login";
 
   private final JacksonJsonHttpMessageConverter httpMessageConverter;
+  private final LoginAttemptLimiter loginAttemptLimiter;
 
-  public SecurityConfig(JsonMapper jsonMapper) {
+  public SecurityConfig(JsonMapper jsonMapper, LoginAttemptLimiter loginAttemptLimiter) {
     this.httpMessageConverter = new JacksonJsonHttpMessageConverter(jsonMapper);
+    this.loginAttemptLimiter = loginAttemptLimiter;
   }
 
   @Bean
@@ -67,6 +70,7 @@ public class SecurityConfig
   @Override
   public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
       Authentication authentication) throws IOException, ServletException {
+    this.loginAttemptLimiter.loginSucceeded(authentication.getName());
     RestSuccessResponseBody body = new RestSuccessResponseBody("success");
     HttpOutputMessage outputMessage = new ServletServerHttpResponse(response);
     response.setStatus(HttpStatus.OK.value());
@@ -77,14 +81,22 @@ public class SecurityConfig
   public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
       AuthenticationException exception) throws IOException, ServletException {
     HttpOutputMessage outputMessage = new ServletServerHttpResponse(response);
+    // the provider wraps exceptions thrown by the user details service other than UsernameNotFoundException
+    final Throwable cause = exception.getCause() != null ? exception.getCause() : exception;
     HttpStatus status = HttpStatus.UNAUTHORIZED;
+    String message = status.getReasonPhrase();
+    if (cause instanceof LoginRestrictedException) {
+      message = LoginRestrictedException.MESSAGE;
+    } else if (cause instanceof LoginBlockedException) {
+      status = HttpStatus.TOO_MANY_REQUESTS;
+      message = LoginBlockedException.MESSAGE;
+    } else {
+      this.loginAttemptLimiter.loginFailed(request.getParameter("username"));
+    }
     RestErrorResponseBody body = new RestErrorResponseBody();
     body.setTimestamp(ZonedDateTime.now());
     body.setCode(status.value());
-    // the provider wraps exceptions thrown by the user details service other than UsernameNotFoundException
-    final boolean isRestricted = exception instanceof LoginRestrictedException
-        || exception.getCause() instanceof LoginRestrictedException;
-    body.setMessage(isRestricted ? LoginRestrictedException.MESSAGE : status.getReasonPhrase());
+    body.setMessage(message);
     body.setPath(LOGIN_API_URL);
     response.setStatus(status.value());
     httpMessageConverter.write(body, MediaType.APPLICATION_JSON, outputMessage);

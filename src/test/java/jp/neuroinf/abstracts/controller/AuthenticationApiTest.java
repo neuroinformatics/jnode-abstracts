@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 
+import jp.neuroinf.abstracts.component.LoginAttemptLimiter;
 import jp.neuroinf.abstracts.entity.Account;
 import jp.neuroinf.abstracts.repository.AccountRepository;
 import jp.neuroinf.abstracts.support.IntegrationTest;
@@ -81,6 +82,26 @@ class AuthenticationApiTest {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.message").value("success"))
         .andExpect(unauthenticated());
+  }
+
+  @Test
+  void repeatedFailuresBlockTheAccountForAWhile() throws Exception {
+    this.testData.account("guessed@example.com");
+    this.testData.account("other@example.com");
+    for (int i = 0; i < LoginAttemptLimiter.MAX_FAILURES; i++) {
+      this.mockMvc.perform(post("/api/login").param("username", "guessed@example.com").param("password", "wrong")
+          .with(csrf()))
+          .andExpect(status().isUnauthorized());
+    }
+    // even the correct password is refused now
+    this.mockMvc.perform(post("/api/login").param("username", "Guessed@example.com").param("password", "password")
+        .with(csrf()))
+        .andExpect(status().isTooManyRequests())
+        .andExpect(jsonPath("$.message").value("Too many failed logins. Please try again later."))
+        .andExpect(unauthenticated());
+    this.mockMvc.perform(post("/api/login").param("username", "other@example.com").param("password", "password")
+        .with(csrf()))
+        .andExpect(status().isOk());
   }
 
 }
