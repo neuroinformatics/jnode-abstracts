@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>4.1.1</version>
+		<version>4.1.2</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>jp.neuroinf</groupId>
@@ -166,7 +166,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-enforcer-plugin</artifactId>
-				<version>3.6.3</version>
+				<version>3.7.0</version>
 				<executions>
 					<execution>
 						<id>enforce-maven</id>
@@ -186,7 +186,7 @@
 			<plugin>
 				<groupId>com.diffplug.spotless</groupId>
 				<artifactId>spotless-maven-plugin</artifactId>
-				<version>3.10.3</version>
+				<version>3.11.0</version>
 				<configuration>
 					<!-- the index does not notice changes of eclipse-formatter.xml -->
 					<upToDateChecking>
@@ -215,7 +215,7 @@
 							<goal>install-node-and-npm</goal>
 						</goals>
 						<configuration>
-							<nodeVersion>v24.21.0</nodeVersion>
+							<nodeVersion>v24.22.2</nodeVersion>
 						</configuration>
 					</execution>
 					<execution>
