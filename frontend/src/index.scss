@@ -1,10 +1,13 @@
-@use 'sass:color';
+@use "sass:color";
 
 @function to-rgb($value) {
-  @return color.channel($value, "red", $space: rgb), color.channel($value, "green", $space: rgb), color.channel($value, "blue", $space: rgb);
+  @return
+    color.channel($value, "red", $space: rgb),
+    color.channel($value, "green", $space: rgb),
+    color.channel($value, "blue", $space: rgb);
 }
 
-@mixin enum-with-comma($selector: '') {
+@mixin enum-with-comma($selector: "") {
   ul#{$selector} {
     margin: 0;
     padding: 0;
@@ -15,7 +18,7 @@
       display: inline-block;
 
       &:not(:last-child) {
-        margin-right: .3rem;
+        margin-right: 0.3rem;
 
         &:after {
           content: ", ";
@@ -48,21 +51,13 @@ $custom-secondary-color-rgb: to-rgb($custom-secondary-color);
 $custom-tertiary-bg: #f5f7fa;
 $custom-tertiary-bg-rgb: to-rgb($custom-tertiary-bg);
 
-// conference scheduler
-:root {
-  --dhx-scheduler-xy-scale_height: 0 !important;
-  --dhx-scheduler-xy-scroll_width: 0 !important;
-  --dhx-scheduler-event-color: var(--bs-body-color) !important;
-  --dhx-scheduler-event-background: var(--bs-body-bg) !important;
-}
-
 $conference-schedule-event-badge-color: blue;
 $conference-schedule-track-badge-color: green;
 $conference-schedule-session-badge-color: red;
 
 %conference-schedule-badge {
-  padding: .4rem .7rem;
-  font-size: .9rem;
+  padding: 0.4rem 0.7rem;
+  font-size: 0.9rem;
   font-weight: 400;
   border-radius: 3px;
   line-height: 1.5;
@@ -173,6 +168,25 @@ a {
   background-color: rgba(var(--bs-warning-rgb), 50%);
 }
 
+#conference-scheduler-info {
+  .modal-header {
+    .modal-title {
+      width: 100%;
+
+      .badge {
+        @extend %conference-schedule-badge;
+        margin-right: 20px;
+      }
+    }
+  }
+
+  .modal-body {
+    > p {
+      margin: 0 0 0.5rem;
+    }
+  }
+}
+
 // App
 #root .app {
   max-width: 960px;
@@ -191,16 +205,14 @@ a {
       }
 
       .navbar-collapse {
-
         @media (max-width: 768px) {
           border-top: 1px solid var(--bs-link-hover-color);
           box-shadow: inset 0 1px 0 rgba(var(--bs-body-bg-rgb), 0.1);
-          padding: .3rem 0;
+          padding: 0.3rem 0;
         }
 
         .navbar-nav {
           .nav-item {
-
             .nav-link {
               padding: 1rem;
               line-height: 2rem;
@@ -266,7 +278,6 @@ a {
           margin-top: 1rem;
           font-size: 2rem;
         }
-
       }
     }
 
@@ -279,7 +290,7 @@ a {
     // conference/ConferenceListPanel,
     // conference/ConferencePanel
     .conference {
-      padding: .5rem;
+      padding: 0.5rem;
 
       img.logo {
         max-height: 128px;
@@ -302,39 +313,9 @@ a {
         }
       }
 
-      .abstract-list {
-
-        .list-group-item {
-          color: var(--bs-list-group-color);
-          text-decoration: none;
-
-          &:hover {
-            text-decoration: none;
-            cursor: pointer;
-            background-color: var(--bs-primary) !important;
-            color: White;
-          }
-
-          .abstract {
-            padding: 0 .5rem;
-
-            .sortId {
-              float: right;
-              margin: .5rem 0 .5rem 1rem;
-            }
-
-            h5 {
-              font-size: 1.2rem;
-            }
-
-            @include enum-with-comma('.authors');
-          }
-        }
-      }
-
       // conference/AbstractPanel
       .abstract {
-        @include enum-with-comma('.authors');
+        @include enum-with-comma(".authors");
 
         .affiliations {
           margin: 0;
@@ -360,7 +341,36 @@ a {
         }
 
         .figures .figure img:hover {
-          cursor: pointer
+          cursor: pointer;
+        }
+      }
+
+      .abstract-list {
+        .list-group-item {
+          color: var(--bs-list-group-color);
+          text-decoration: none;
+
+          &:hover {
+            text-decoration: none;
+            cursor: pointer;
+            background-color: var(--bs-primary);
+            color: White;
+          }
+
+          .abstract {
+            padding: 0 0.5rem;
+
+            .sortId {
+              float: right;
+              margin: 0.5rem 0 0.5rem 1rem;
+            }
+
+            h5 {
+              font-size: 1.2rem;
+            }
+
+            @include enum-with-comma(".authors");
+          }
         }
       }
     }
@@ -376,6 +386,12 @@ a {
       }
 
       .dhx_cal_container {
+        // set on the container, which the scheduler reads them from, to take precedence over the values on :root
+        --dhx-scheduler-xy-scale_height: 0;
+        --dhx-scheduler-xy-scroll_width: 0;
+        --dhx-scheduler-event-color: var(--bs-body-color);
+        --dhx-scheduler-event-background: var(--bs-body-bg);
+
         width: 100%;
 
         .dhx_cal_navline {
@@ -399,7 +415,7 @@ a {
               height: 100%;
               min-height: 100%;
               width: 100%;
-              padding: .3rem .5rem;
+              padding: 0.3rem 0.5rem;
               border: 1px solid var(--bs-border-color);
               border-radius: 4px;
               overflow: hidden;
@@ -424,7 +440,7 @@ a {
               .conference-scheduler-header {
                 display: block;
                 width: 100%;
-                padding: .5rem 0;
+                padding: 0.5rem 0;
                 border-bottom: 1px solid var(--bs-border-color);
 
                 &:hover {
@@ -440,7 +456,7 @@ a {
                   font-size: 1.29rem;
                   font-weight: 500;
                   line-height: 1.2;
-                  margin: .5rem;
+                  margin: 0.5rem;
                   display: inline-block;
                   vertical-align: middle;
                 }
@@ -453,14 +469,14 @@ a {
               }
 
               .conference-scheduler-body {
-                padding: .5rem 0;
+                padding: 0.5rem 0;
 
                 .conference-scheduler-modification {
                   text-align: right;
 
                   button {
-                    padding: .3rem;
-                    margin: 0 .1rem;
+                    padding: 0.3rem;
+                    margin: 0 0.1rem;
 
                     &:hover {
                       cursor: pointer;
@@ -480,10 +496,10 @@ a {
                       background-color: var(--bs-border-color);
                     }
 
-                    >span {
+                    > span {
                       display: block;
-                      font-size: .9rem;
-                      padding: .5rem;
+                      font-size: 0.9rem;
+                      padding: 0.5rem;
 
                       &:last-child {
                         text-align: right;
@@ -502,25 +518,5 @@ a {
   // main/FooterPanel
   div.footer a {
     color: var(--bs-secondary-color);
-  }
-}
-
-#conference-scheduler-info {
-  .modal-header {
-    .modal-title {
-      width: 100%;
-
-      .badge {
-        @extend %conference-schedule-badge;
-        margin-right: 20px;
-      }
-
-    }
-  }
-
-  .modal-body {
-    >p {
-      margin: 0 0 .5rem;
-    }
   }
 }

@@ -1,7 +1,7 @@
 .general {
   :global {
     .row {
-      padding: .5rem 0;
+      padding: 0.5rem 0;
 
       &:not(:last-child) {
         border-bottom: 1px solid #eeeeee;
@@ -22,11 +22,11 @@
       }
 
       .form-control {
-        margin: .3rem 0;
+        margin: 0.3rem 0;
       }
 
       .btn-banner-remove {
-        margin: .5rem 0;
+        margin: 0.5rem 0;
       }
     }
   }
