@@ -101,7 +101,7 @@ This builds the frontend into `src/main/resources/static` and packages everythin
 `target/abstracts-<version>.jar`. Run it with an `application.properties` in the working directory:
 
 ```sh
-java -jar abstracts-1.0.0.jar
+java -jar abstracts-<version>.jar
 ```
 
 ## Configuration
