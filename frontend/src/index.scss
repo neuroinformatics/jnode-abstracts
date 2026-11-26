@@ -191,6 +191,11 @@ a {
 #root .app {
   max-width: 960px;
 
+  // main/FooterPanel
+  div.footer a {
+    color: var(--bs-secondary-color);
+  }
+
   // main/HeaderPanel
   nav.header {
     a:hover {
@@ -513,10 +518,5 @@ a {
         }
       }
     }
-  }
-
-  // main/FooterPanel
-  div.footer a {
-    color: var(--bs-secondary-color);
   }
 }
