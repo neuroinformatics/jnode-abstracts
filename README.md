@@ -78,6 +78,19 @@ backend log instead of being sent.
 
 VS Code formats Java files on save with the same Eclipse profile and the frontend with Biome (see `.vscode`).
 
+### Updating dependencies
+
+```sh
+npx npm-check-updates -u  # raise the versions in package.json, with the targets in .ncurc.js
+npm update                # also update the indirect dependencies locked in package-lock.json
+npm audit
+./mvnw versions:display-parent-updates versions:display-plugin-updates
+```
+
+`npm install` keeps the indirect dependencies at their locked versions, so run `npm update` before working around
+findings of `npm audit` with `overrides`. The Spring Boot parent manages the versions of the Java dependencies, and
+`nodeVersion` in `pom.xml` sets the Node.js used by the build.
+
 ## Building
 
 ```sh
